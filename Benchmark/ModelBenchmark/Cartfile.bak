@@ -1,0 +1,7 @@
+github "Hearst-DD/ObjectMapper"
+
+github "thoughtbot/Argo"
+github "thoughtbot/Curry"
+
+github "isair/JSONHelper"
+github "ovenbits/ModelRocket"
