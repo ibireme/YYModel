@@ -13,7 +13,7 @@ High performance model framework for iOS.
 Performance
 ==============
 
-Process GithubUser 10000 times on iPhone 6:
+Time cost (process GithubUser 10000 times on iPhone 6):
 
 ![DemoImage](https://raw.github.com/ibireme/YYModel/master/Benchmark/Result.png
 )
@@ -87,7 +87,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 
 
 
-###Match model's property to different JSON value
+###Match model property to different JSON key
 
 	// JSON:
 	{
