@@ -278,3 +278,8 @@ This library supports iOS 6.0 and later.
 License
 ==============
 YYModel is provided under the MIT license. See LICENSE file for details.
+
+中文链接
+==============
+[中文介绍](http://blog.ibireme.com/2015/10/23/yymodel/)
+[性能评测](http://blog.ibireme.com/2015/10/23/ios_model_framework_benchmark/)
