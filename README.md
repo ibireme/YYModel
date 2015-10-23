@@ -74,13 +74,34 @@ EEE MMM dd HH:mm:ss Z yyyy
       </td>
     </tr>
     <tr>
+      <td>NSDate</td>
+      <td>NSString (formatted with ISO8601)<br/>
+      "YYYY-MM-dd'T'HH:mm:ssZ"</td>
+    </tr>
+    <tr>
       <td>NSString/NSNumber</td>
       <td>C number (BOOL,int,float,NSUInteger,UInt64,...)<br/>
       NaN and Inf will be ignored</td>
     </tr>
     <tr>
+      <td>NSNumber</td>
+      <td>NSString (NSNumber.stringValue)</td>
+    </tr>
+    <tr>
       <td>NSValue</td>
       <td>struct (CGRect,CGSize,...)</td>
+    </tr>
+    <tr>
+      <td>NSNull</td>
+      <td>nil,0</td>
+    </tr>
+    <tr>
+      <td>"null","nil","no","false",...</td>
+      <td>nil,0</td>
+    </tr>
+    <tr>
+      <td>"YES","yes","true",...</td>
+      <td>@(YES)</td>
     </tr>
   </tbody>
 </table>
@@ -149,12 +170,13 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@interface Attributes
 	@property NSString *name;
 	@property NSArray *shadows; //Array<Shadow>
-	@property NSSet *borders; //Array<Border>
-	@property NSMutableDictionary *attachments; //Array<Attachment>
+	@property NSSet *borders; //Set<Border>
+	@property NSMutableDictionary *attachments; //Dict<NSString,Attachment>
 	@end
 
 	@implementation Attributes
 	+ (NSDictionary *)modelContainerPropertyGenericClass {
+		// value should be Class or Class name.
 	    return @{@"shadows" : [Shadow class],
 	             @"borders" : Border.class,
 	             @"attachments" : @"Attachment" };
