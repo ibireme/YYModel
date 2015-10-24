@@ -15,7 +15,7 @@ Performance
 
 Time cost (process GithubUser 10000 times on iPhone 6):
 
-![DemoImage](https://raw.github.com/ibireme/YYModel/master/Benchmark/Result.png
+![Benchmark result](https://raw.github.com/ibireme/YYModel/master/Benchmark/Result.png
 )
 
 See `Benchmark/ModelBenchmark.xcodeproj` for more benchmark case.
