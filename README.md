@@ -259,7 +259,7 @@ Installation
 ### Carthage
 
 1. Add `github "ibireme/YYModel"` to your Cartfile.
-2. Run `carthage update` and add the framework to your project.
+2. Run `carthage update --platform ios` and add the framework to your project.
 3. Import \<YYModel/YYModel.h\>
 
 
