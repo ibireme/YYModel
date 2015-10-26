@@ -15,7 +15,7 @@
 FOUNDATION_EXPORT double YYModelVersionNumber;
 FOUNDATION_EXPORT const unsigned char YYModelVersionString[];
 #import <YYModel/NSObject+YYModel.h>
-#import <YYCache/YYClassInfo.h>
+#import <YYModel/YYClassInfo.h>
 #else
 #import "NSObject+YYModel.h"
 #import "YYClassInfo.h"
