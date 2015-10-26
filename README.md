@@ -84,7 +84,7 @@ EEE MMM dd HH:mm:ss Z yyyy
     </tr>
     <tr>
       <td>NSDate</td>
-      <td>NSString (formatted with ISO8601)<br/>
+      <td>NSString formatted with ISO8601:<br/>
       "YYYY-MM-dd'T'HH:mm:ssZ"</td>
     </tr>
     <tr>
