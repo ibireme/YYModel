@@ -50,7 +50,7 @@ Usage
 	NSDictionary *json = [user yy_modelToJSONObject];
 
 
-If the type of an object in JSON/Dictionary cannot be matched to the property of the model, the following automatic conversion is performed:
+If the type of an object in JSON/Dictionary cannot be matched to the property of the model, the following automatic conversion is performed. If the automatic conversion failed, the value will be ignored.
 <table>
   <thead>
     <tr>
@@ -61,7 +61,16 @@ If the type of an object in JSON/Dictionary cannot be matched to the property of
   <tbody>
     <tr>
       <td>NSString</td>
-      <td>NSURL,SEL,Class</td>
+      <td>NSNumber,NSURL,SEL,Class</td>
+    </tr>
+    <tr>
+      <td>NSNumber</td>
+      <td>NSString</td>
+    </tr>
+    <tr>
+      <td>NSString/NSNumber</td>
+      <td>C number (BOOL,int,float,NSUInteger,UInt64,...)<br/>
+      NaN and Inf will be ignored</td>
     </tr>
     <tr>
       <td>NSString</td>
@@ -79,15 +88,6 @@ EEE MMM dd HH:mm:ss Z yyyy
       "YYYY-MM-dd'T'HH:mm:ssZ"</td>
     </tr>
     <tr>
-      <td>NSString/NSNumber</td>
-      <td>C number (BOOL,int,float,NSUInteger,UInt64,...)<br/>
-      NaN and Inf will be ignored</td>
-    </tr>
-    <tr>
-      <td>NSNumber</td>
-      <td>NSString (NSNumber.stringValue)</td>
-    </tr>
-    <tr>
       <td>NSValue</td>
       <td>struct (CGRect,CGSize,...)</td>
     </tr>
@@ -96,12 +96,12 @@ EEE MMM dd HH:mm:ss Z yyyy
       <td>nil,0</td>
     </tr>
     <tr>
-      <td>"null","nil","no","false",...</td>
-      <td>nil,0</td>
+      <td>"no","false",...</td>
+      <td>@(NO),0</td>
     </tr>
     <tr>
-      <td>"YES","yes","true",...</td>
-      <td>@(YES)</td>
+      <td>"yes","true",...</td>
+      <td>@(YES),1</td>
     </tr>
   </tbody>
 </table>
