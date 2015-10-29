@@ -7,7 +7,8 @@ YYModel <a href="#中文介绍">中文介绍</a>
 [![Cocoapods](http://img.shields.io/cocoapods/p/YYModel.svg?style=flat)](http://cocoapods.org/?q= YYModel)&nbsp;
 [![Support](https://img.shields.io/badge/support-iOS%206%2B%20-blue.svg?style=flat)](https://www.apple.com/nl/ios/)
 
-High performance model framework for iOS.
+High performance model framework for iOS.<br/>
+(It's a component of [YYKit](https://github.com/ibireme/YYKit))
 
 
 Performance
@@ -293,7 +294,8 @@ YYModel is provided under the MIT license. See LICENSE file for details.
 ---
 中文介绍
 ==============
-YYModel：目前性能最高的 iOS 模型转换框架。
+目前性能最高的 iOS 模型转换框架。<br/>
+(该项目是 [YYKit](https://github.com/ibireme/YYKit) 组件之一)
 
 
 性能
