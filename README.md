@@ -21,6 +21,15 @@ Time cost (process GithubUser 10000 times on iPhone 6):
 See `Benchmark/ModelBenchmark.xcodeproj` for more benchmark case.
 
 
+Features
+==============
+- **High performance**: The conversion performance is close to handwriting code.
+- **Automatic type conversion**: The object types can be automatically converted.
+- **Type Safe**: All data types will be verified to ensure type-safe during the conversion process.
+- **Non-intrusive**: There is no need to make the model class inherit from other base class.
+- **Lightwight**: This frame contains only 5 files.
+
+
 Usage
 ==============
 
@@ -296,6 +305,15 @@ YYModel：目前性能最高的 iOS 模型转换框架。
 
 YYModel 性能高出其他类库一个数量级，接近手写代码转换的效率。<br/>
 更多测试代码和用例见 `Benchmark/ModelBenchmark.xcodeproj`。
+
+
+特性
+==============
+- **高性能**: 模型转换性能接近手写解析代码。
+- **自动类型转换**: 对象类型可以自动转换，详情见下方表格。
+- **类型安全**: 转换过程中，所有的数据类型都会被检测一遍，以保证类型安全，避免崩溃问题。
+- **无侵入性**: 模型无需继承自其他基类。
+- **轻量**: 该框架只有 5 个文件 (包括.h文件)。
 
 
 使用方法
