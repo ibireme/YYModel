@@ -282,7 +282,6 @@ YYModel is provided under the MIT license. See LICENSE file for details.
 
 <br/><br/>
 ---
-<br/><br/>
 中文介绍
 ==============
 YYModel：目前性能最高的 iOS 模型转换框架。
