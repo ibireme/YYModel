@@ -28,7 +28,7 @@ Features
 - **Automatic type conversion**: The object types can be automatically converted.
 - **Type Safe**: All data types will be verified to ensure type-safe during the conversion process.
 - **Non-intrusive**: There is no need to make the model class inherit from other base class.
-- **Lightwight**: This frame contains only 5 files.
+- **Lightwight**: This library contains only 5 files.
 
 
 Usage
