@@ -122,7 +122,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @interface YYClassInfo : NSObject
 
 @property (nonatomic, assign, readonly) Class cls;
-@property (nonatomic, strong, readonly) Class superCls;
+@property (nonatomic, assign, readonly) Class superCls;
 @property (nonatomic, assign, readonly) Class metaCls;
 @property (nonatomic, assign, readonly) BOOL isMeta;
 @property (nonatomic, strong, readonly) NSString *name;
