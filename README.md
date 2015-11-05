@@ -578,7 +578,13 @@ EEE MMM dd HH:mm:ss Z yyyy
 3. 导入 `YYModel.h`。
 
 
-关于
+文档
+==============
+你可以在 [CocoaDocs](http://cocoadocs.org/docsets/YYModel/) 查看在线 API 文档，也可以用 [appledoc](https://github.com/tomaz/appledoc) 本地生成文档。
+
+
+
+系统要求
 ==============
 该项目最低支持 iOS 6.0。
 
