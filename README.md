@@ -282,9 +282,15 @@ Installation
 3. Import `YYModel.h`.
 
 
-About
+Documentation
 ==============
-This library supports iOS 6.0 and later.
+Full API documentation is available on [CocoaDocs](http://cocoadocs.org/docsets/YYModel/).<br/>
+You can also install documentation locally using [appledoc](https://github.com/tomaz/appledoc).
+
+
+Requirements
+==============
+This library requires a deployment target of iOS 6.0 or greater.
 
 
 License
