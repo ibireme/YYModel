@@ -302,7 +302,7 @@ YYModel is provided under the MIT license. See LICENSE file for details.
 ---
 中文介绍
 ==============
-目前性能最高的 iOS 模型转换框架。<br/>
+高性能 iOS 模型转换框架。<br/>
 (该项目是 [YYKit](https://github.com/ibireme/YYKit) 组件之一)
 
 
@@ -313,7 +313,6 @@ YYModel is provided under the MIT license. See LICENSE file for details.
 ![Benchmark result](https://raw.github.com/ibireme/YYModel/master/Benchmark/Result.png
 )
 
-YYModel 性能高出其他类库一个数量级，接近手写代码转换的效率。<br/>
 更多测试代码和用例见 `Benchmark/ModelBenchmark.xcodeproj`。
 
 
@@ -602,5 +601,5 @@ YYModel 使用 MIT 许可证，详情见 LICENSE 文件。
 相关链接
 ==============
 
-[iOS JSON 模型转换库横向评测](http://blog.ibireme.com/2015/10/23/ios_model_framework_benchmark/)
+[iOS JSON 模型转换库评测](http://blog.ibireme.com/2015/10/23/ios_model_framework_benchmark/)
 
