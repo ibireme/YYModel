@@ -1071,8 +1071,8 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         }
     }];
     
-    if (modelMeta->_hasCustomTransformFromDictonary) {
-        BOOL suc = [((id<YYModel>)model) modelCustomTransformFromDictionary:dic];
+    if (modelMeta->_hasCustomTransformToDictionary) {
+        BOOL suc = [((id<YYModel>)model) modelCustomTransformToDictionary:dic];
         if (!suc) return nil;
     }
     return result;
