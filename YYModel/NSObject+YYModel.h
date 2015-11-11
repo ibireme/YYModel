@@ -348,7 +348,7 @@
 
  @param dictionary The json/kv dictionary.
  
- @return Class to create from this dictionary
+ @return Class to create from this dictionary, `nil` to use current class.
 
  */
 + (Class)modelCustomClassForDictionary:(NSDictionary*)dictionary;
