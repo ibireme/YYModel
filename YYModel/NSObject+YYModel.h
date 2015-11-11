@@ -320,6 +320,11 @@
 + (NSDictionary *)modelContainerPropertyGenericClass;
 
 /**
+ TODO: description and example
+ */
++ (Class)modelCustomClassForDictionary:(NSDictionary*)dictionary;
+
+/**
  All the properties in blacklist will be ignored in model transform process.
  Returns nil to ignore this feature.
  
