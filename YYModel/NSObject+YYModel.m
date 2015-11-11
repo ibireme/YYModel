@@ -733,8 +733,8 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 if ([one isKindOfClass:meta->_genericCls]) {
                                     [objectArr addObject:one];
                                 } else if ([one isKindOfClass:[NSDictionary class]]) {
-                                    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:meta->_genericCls];
                                     Class clazz = meta->_genericCls;
+                                    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
                                     if (modelMeta->_hasCustomClassFromDictionary) {
                                         clazz = [clazz modelCustomClassForDictionary:one] ?: clazz;
                                     }
@@ -778,8 +778,8 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             NSMutableDictionary *dic = [NSMutableDictionary new];
                             [((NSDictionary *)value) enumerateKeysAndObjectsUsingBlock:^(NSString *oneKey, NSObject *oneValue, BOOL *stop) {
                                 if ([oneValue isKindOfClass:[NSDictionary class]]) {
-                                    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:meta->_genericCls];
                                     Class clazz = meta->_genericCls;
+                                    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
                                     if (modelMeta->_hasCustomClassFromDictionary) {
                                         clazz = [clazz modelCustomClassForDictionary:oneValue] ?: clazz;
                                     }
@@ -816,8 +816,8 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             if ([one isKindOfClass:meta->_genericCls]) {
                                 [set addObject:one];
                             } else if ([one isKindOfClass:[NSDictionary class]]) {
-                                _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:meta->_genericCls];
                                 Class clazz = meta->_genericCls;
+                                _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
                                 if (modelMeta->_hasCustomClassFromDictionary) {
                                     clazz = [clazz modelCustomClassForDictionary:one] ?: clazz;
                                 }
@@ -859,8 +859,8 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                     if (one) {
                         [one yy_modelSetWithDictionary:value];
                     } else {
-                        _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:meta->_cls];
                         Class clazz = meta->_cls;
+                        _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
                         if (modelMeta->_hasCustomClassFromDictionary) {
                             clazz = [clazz modelCustomClassForDictionary:value] ?: clazz;
                         }
@@ -1116,8 +1116,8 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
 + (instancetype)yy_modelWithDictionary:(NSDictionary *)dictionary {
     if (!dictionary || dictionary == (id)kCFNull) return nil;
     if (![dictionary isKindOfClass:[NSDictionary class]]) return nil;
-    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:[self class]];
     Class clazz = [self class];
+    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
     if (modelMeta->_hasCustomClassFromDictionary) {
         clazz = [clazz modelCustomClassForDictionary:dictionary] ?: clazz;
     }
