@@ -320,7 +320,36 @@
 + (NSDictionary *)modelContainerPropertyGenericClass;
 
 /**
- TODO: description and example
+ If you need to create instances of different classes during json->object transform,
+ use the method to choose custom class based on dictionary data.
+ 
+ @discussion If the model implements this method, it will be called to determine resulting class
+ during `+modelWithJSON:`, `+modelWithDictionary:`, conveting object of properties of parent objects 
+ (both singular and containers via `+modelContainerPropertyGenericClass`).
+ 
+ Example:
+        @class YYCircle, YYRectangle, YYLine;
+ 
+        @implementation YYShape
+
+        + (Class)modelCustomClassForDictionary:(NSDictionary*)dictionary {
+            if (dictionary[@"radius"] != nil) {
+                return [YYCircle class];
+            } else if (dictionary[@"width"] != nil) {
+                return [YYRectangle class];
+            } else if (dictionary[@"y2"] != nil) {
+                return [YYLine class];
+            } else {
+                return [self class];
+            }
+        }
+
+        @end
+
+ @param dictionary The json/kv dictionary.
+ 
+ @return Class to create from this dictionary
+
  */
 + (Class)modelCustomClassForDictionary:(NSDictionary*)dictionary;
 
