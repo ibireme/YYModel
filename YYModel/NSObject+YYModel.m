@@ -342,7 +342,7 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     /// Model class type.
     YYEncodingNSType _nsType;
     
-    BOOL _hasCustomTransformFromDictonary;
+    BOOL _hasCustomTransformFromDictionary;
     BOOL _hasCustomTransformToDictionary;
 }
 @end
@@ -450,7 +450,7 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     if(keyPathPropertyMetas) _keyPathPropertyMetas = keyPathPropertyMetas;
     _keyMappedCount = _allPropertyMetas.count;
     _nsType = YYClassGetNSType(cls);
-    _hasCustomTransformFromDictonary = ([cls instancesRespondToSelector:@selector(modelCustomTransformFromDictionary:)]);
+    _hasCustomTransformFromDictionary = ([cls instancesRespondToSelector:@selector(modelCustomTransformFromDictionary:)]);
     _hasCustomTransformToDictionary = ([cls instancesRespondToSelector:@selector(modelCustomTransformToDictionary:)]);
     
     return self;
@@ -1141,7 +1141,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
                              &context);
     }
     
-    if (modelMeta->_hasCustomTransformFromDictonary) {
+    if (modelMeta->_hasCustomTransformFromDictionary) {
         return [((id<YYModel>)self) modelCustomTransformFromDictionary:dic];
     }
     return YES;
