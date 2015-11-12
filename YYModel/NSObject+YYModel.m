@@ -314,7 +314,7 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
 
     if (generic) {
         meta->_hasCustomClassFromDictionary = [generic respondsToSelector:@selector(modelCustomClassForDictionary:)];
-    } else {
+    } else if (meta->_cls && meta->_type == YYEncodingTypeNSUnknown) {
         meta->_hasCustomClassFromDictionary = [meta->_cls respondsToSelector:@selector(modelCustomClassForDictionary:)];
     }
 
