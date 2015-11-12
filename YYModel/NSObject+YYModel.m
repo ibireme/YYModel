@@ -292,7 +292,7 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     Class _genericCls;           ///< container's generic class, or nil if threr's no generic class
     SEL _getter;                 ///< getter, or nil if the instances cannot respond
     SEL _setter;                 ///< setter, or nil if the instances cannot respond
-    
+    BOOL _hasCustomClassFromDictionary; ///< class/generic class implements +modelCustomClassForDictionary:
     NSString *_mappedToKey;      ///< the key mapped to
     NSArray *_mappedToKeyPath;   ///< the key path mapped to (nil if the name is not key path)
     _YYModelPropertyMeta *_next; ///< next meta if there are multiple properties mapped to the same key.
@@ -311,6 +311,14 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
         meta->_isCNumber = YYEncodingTypeIsCNumber(meta->_type);
     }
     meta->_cls = propertyInfo.cls;
+
+    if (generic) {
+        meta->_hasCustomClassFromDictionary = [generic respondsToSelector:@selector(modelCustomClassForDictionary:)];
+    } else {
+        meta->_hasCustomClassFromDictionary = [meta->_cls respondsToSelector:@selector(modelCustomClassForDictionary:)];
+    }
+
+    
     if (propertyInfo.getter) {
         SEL sel = NSSelectorFromString(propertyInfo.getter);
         if ([classInfo.cls instancesRespondToSelector:sel]) {
@@ -323,6 +331,7 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
             meta->_setter = sel;
         }
     }
+    
     return meta;
 }
 @end
@@ -734,8 +743,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                     [objectArr addObject:one];
                                 } else if ([one isKindOfClass:[NSDictionary class]]) {
                                     Class clazz = meta->_genericCls;
-                                    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
-                                    if (modelMeta->_hasCustomClassFromDictionary) {
+                                    if (meta->_hasCustomClassFromDictionary) {
                                         clazz = [clazz modelCustomClassForDictionary:one] ?: clazz;
                                     }
                                     
@@ -779,8 +787,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             [((NSDictionary *)value) enumerateKeysAndObjectsUsingBlock:^(NSString *oneKey, NSObject *oneValue, BOOL *stop) {
                                 if ([oneValue isKindOfClass:[NSDictionary class]]) {
                                     Class clazz = meta->_genericCls;
-                                    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
-                                    if (modelMeta->_hasCustomClassFromDictionary) {
+                                    if (meta->_hasCustomClassFromDictionary) {
                                         clazz = [clazz modelCustomClassForDictionary:oneValue] ?: clazz;
                                     }
 
@@ -817,8 +824,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 [set addObject:one];
                             } else if ([one isKindOfClass:[NSDictionary class]]) {
                                 Class clazz = meta->_genericCls;
-                                _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
-                                if (modelMeta->_hasCustomClassFromDictionary) {
+                                if (meta->_hasCustomClassFromDictionary) {
                                     clazz = [clazz modelCustomClassForDictionary:one] ?: clazz;
                                 }
                                 NSObject *newOne = [clazz new];
@@ -860,8 +866,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         [one yy_modelSetWithDictionary:value];
                     } else {
                         Class clazz = meta->_cls;
-                        _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
-                        if (modelMeta->_hasCustomClassFromDictionary) {
+                        if (meta->_hasCustomClassFromDictionary) {
                             clazz = [clazz modelCustomClassForDictionary:value] ?: clazz;
                         }
                         one = [clazz new];
