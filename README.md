@@ -3,8 +3,8 @@ YYModel <a href="#中文介绍">中文介绍</a>
 
 [![License MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/ibireme/YYModel/master/LICENSE)&nbsp;
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)&nbsp;
-[![Cocoapods](http://img.shields.io/cocoapods/v/YYModel.svg?style=flat)](http://cocoapods.org/?q= YYModel)&nbsp;
-[![Cocoapods](http://img.shields.io/cocoapods/p/YYModel.svg?style=flat)](http://cocoapods.org/?q= YYModel)&nbsp;
+[![CocoaPods](http://img.shields.io/cocoapods/v/YYModel.svg?style=flat)](http://cocoapods.org/?q= YYModel)&nbsp;
+[![CocoaPods](http://img.shields.io/cocoapods/p/YYModel.svg?style=flat)](http://cocoapods.org/?q= YYModel)&nbsp;
 [![Support](https://img.shields.io/badge/support-iOS%206%2B%20-blue.svg?style=flat)](https://www.apple.com/nl/ios/)&nbsp;
 [![Build Status](https://travis-ci.org/ibireme/YYModel.svg?branch=master)](https://travis-ci.org/ibireme/YYModel)
 
@@ -261,7 +261,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 Installation
 ==============
 
-### Cocoapods
+### CocoaPods
 
 1. Add `pod "YYModel"` to your Podfile.
 2. Run `pod install` or `pod update`.
@@ -562,7 +562,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 安装
 ==============
 
-### Cocoapods
+### CocoaPods
 
 1. 在 Podfile 中添加 `pod "YYModel"`。
 2. 执行 `pod install` 或 `pod update`。
