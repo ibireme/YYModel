@@ -796,7 +796,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 if ([oneValue isKindOfClass:[NSDictionary class]]) {
                                     Class clazz = meta->_genericCls;
                                     if (meta->_hasCustomClassFromDictionary) {
-                                        clazz = [clazz modelCustomClassForDictionary:oneValue] ?: clazz;
+                                        clazz = [clazz modelCustomClassForDictionary:(NSDictionary *)oneValue] ?: clazz;
                                     }
 
                                     NSObject *o = [clazz new];
