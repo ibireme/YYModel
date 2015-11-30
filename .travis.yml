@@ -2,6 +2,5 @@ language: objective-c
 osx_image: xcode7
 xcode_project: Framework/YYModel.xcodeproj
 xcode_scheme: YYModel
-
 script:
-- xctool -project Framework/YYModel.xcodeproj -scheme YYModel build test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+- xcodebuild -project Framework/YYModel.xcodeproj -scheme YYModel test GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES
