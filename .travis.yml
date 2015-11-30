@@ -4,5 +4,4 @@ xcode_project: Framework/YYModel.xcodeproj
 xcode_scheme: YYModel
 
 script:
-- xctool -project Framework/YYModel.xcodeproj -scheme YYModel build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-- xctool -project Framework/YYModel.xcodeproj -scheme YYModel test -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
+- xctool -project Framework/YYModel.xcodeproj -scheme YYModel build test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
