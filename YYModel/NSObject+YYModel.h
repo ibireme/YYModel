@@ -400,3 +400,42 @@
 - (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic;
 
 @end
+
+
+
+
+/*
+ *  sometimes server will give sevrial key about one value in diffrent protocol, like
+ *  {@"name":@"apple, @"key":@"1"},
+ *  {@"name1":@"apple, @"key":@"1"}
+ *  {@"name2":@"apple, @"key":@"1"}
+ *  the struct is same, but key is diffrent. Creating a subclass is so complicated, so you can just dynamic subclass and change the mapper.
+ */
+
+/**
+ *  dynamic create a subclass for changing mapper
+ *  @param originClass the origin class that container the origin struct
+ *  @param kindKey     just for diffrent biz
+ *  @param mapper      the new mapper
+ *
+ *  @return a subclass that can decode with the new mapper
+ */
+
+FOUNDATION_EXTERN Class YYRegisterCustomPropertyMapper(Class originClass,
+                                                       NSString* kindKey,
+                                                       NSDictionary* mapper);
+
+/**
+ *  dynamic create a subclass for changing GenericClass
+ *
+ *  @param originClass the origin class that container the origin struct
+ *  @param kindKey     just for diffrent biz
+ *  @param customContainer  the new genericClass mapper
+ *
+ *  @return a subclass that can decode with the new mapper
+ */
+FOUNDATION_EXTERN Class YYRegisterCustomContainerPropertyGenericClass(Class originClass,
+                                                                      NSString* kindKey,
+                                                                      NSDictionary* customContainer);
+
+

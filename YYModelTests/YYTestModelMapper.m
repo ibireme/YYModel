@@ -231,4 +231,108 @@
     XCTAssertTrue([[model.mArray firstObject] isKindOfClass:[YYTestPropertyMapperModelAuto class]]);
 }
 
+
+- (void) testRemapKey {
+    
+    NSString *json;
+    NSDictionary *jsonObject = nil;
+    YYTestPropertyMapperModelContainer *model;
+    
+    /**
+     *  name 使用 xxx解析
+     *
+     */
+    static NSString* kYYKindTest = @"test";
+    Class c =  YYRegisterCustomPropertyMapper([YYTestPropertyMapperModelAuto class],
+                                              kYYKindTest,
+                                              @{@"name":@"xxx"});
+    
+    // 重新定义array使用新类解析
+    c = YYRegisterCustomContainerPropertyGenericClass(YYTestPropertyMapperModelContainerGeneric.class,
+                                                      @"xxx",
+                                                      @{@"array":c,
+                                                        @"mArray" :c ,
+                                                        @"dict" :c ,
+                                                        @"mDict" : c ,
+                                                        @"set" : c,
+                                                        @"mSet":c });
+    json = @"{\"array\":[\n  {\"xxx\":\"Apple\", \"count\":10},\n  {\"xxx\":\"Banana\", \"count\":11},\n  {\"xxx\":\"Pear\", \"count\":12},\n  null\n]}";
+    
+    model = [c yy_modelWithJSON:json];
+    XCTAssertTrue([model.array isKindOfClass:[NSArray class]]);
+    XCTAssertTrue(model.array.count == 3);
+    
+    jsonObject = [model yy_modelToJSONObject];
+    XCTAssertTrue([jsonObject[@"array"] isKindOfClass:[NSArray class]]);
+    
+    model = [c yy_modelWithJSON:json];
+    XCTAssertTrue([model.array isKindOfClass:[NSArray class]]);
+    XCTAssertTrue(model.array.count == 3);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.array[0]).name isEqualToString:@"Apple"]);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.array[0]).count isEqual:@10]);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.array[2]).name isEqualToString:@"Pear"]);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.array[2]).count isEqual:@12]);
+    XCTAssertTrue([model.mArray isKindOfClass:[NSMutableArray class]]);
+    
+    jsonObject = [model yy_modelToJSONObject];
+    XCTAssertTrue([jsonObject[@"array"] isKindOfClass:[NSArray class]]);
+    
+    json = @"{\"dict\":{\n  \"A\":{\"name\":\"Apple\", \"count\":10},\n  \"B\":{\"name\":\"Banana\", \"count\":11},\n  \"P\":{\"name\":\"Pear\", \"count\":12},\n  \"N\":null\n}}";
+    
+    model = [YYTestPropertyMapperModelContainer yy_modelWithJSON:json];
+    XCTAssertTrue([model.dict isKindOfClass:[NSDictionary class]]);
+    XCTAssertTrue(model.dict.count == 4);
+    
+    jsonObject = [model yy_modelToJSONObject];
+    XCTAssertTrue(jsonObject != nil);
+    
+    model = [YYTestPropertyMapperModelContainerGeneric yy_modelWithJSON:json];
+    XCTAssertTrue([model.dict isKindOfClass:[NSDictionary class]]);
+    XCTAssertTrue(model.dict.count == 3);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.dict[@"A"]).name isEqualToString:@"Apple"]);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.dict[@"A"]).count isEqual:@10]);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.dict[@"P"]).name isEqualToString:@"Pear"]);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.dict[@"P"]).count isEqual:@12]);
+    XCTAssertTrue([model.mDict isKindOfClass:[NSMutableDictionary class]]);
+    
+    jsonObject = [model yy_modelToJSONObject];
+    XCTAssertTrue(jsonObject != nil);
+    
+    json = @"{\"set\":[\n  {\"name\":\"Apple\", \"count\":10},\n  {\"name\":\"Banana\", \"count\":11},\n  {\"name\":\"Pear\", \"count\":12},\n  null\n]}";
+    
+    model = [YYTestPropertyMapperModelContainer yy_modelWithJSON:json];
+    XCTAssertTrue([model.set isKindOfClass:[NSSet class]]);
+    XCTAssertTrue(model.set.count == 4);
+    
+    jsonObject = [model yy_modelToJSONObject];
+    XCTAssertTrue(jsonObject != nil);
+    
+    model = [YYTestPropertyMapperModelContainerGeneric yy_modelWithJSON:json];
+    XCTAssertTrue([model.set isKindOfClass:[NSSet class]]);
+    XCTAssertTrue(model.set.count == 3);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.set.anyObject).name isKindOfClass:[NSString class]]);
+    XCTAssertTrue([model.mSet isKindOfClass:[NSMutableSet class]]);
+    
+    jsonObject = [model yy_modelToJSONObject];
+    XCTAssertTrue(jsonObject != nil);
+    
+    model = [YYTestPropertyMapperModelContainerGeneric yy_modelWithJSON:@{@"set" : @[[YYTestPropertyMapperModelAuto new]]}];
+    XCTAssertTrue([model.set isKindOfClass:[NSSet class]]);
+    XCTAssertTrue([[model.set anyObject] isKindOfClass:[YYTestPropertyMapperModelAuto class]]);
+    
+    model = [YYTestPropertyMapperModelContainerGeneric yy_modelWithJSON:@{@"array" : [NSSet setWithArray:@[[YYTestPropertyMapperModelAuto new]]]}];
+    XCTAssertTrue([model.array isKindOfClass:[NSArray class]]);
+    XCTAssertTrue([[model.array firstObject] isKindOfClass:[YYTestPropertyMapperModelAuto class]]);
+    
+    model = [YYTestPropertyMapperModelContainer yy_modelWithJSON:@{@"mArray" : @[[YYTestPropertyMapperModelAuto new]]}];
+    XCTAssertTrue([model.mArray isKindOfClass:[NSMutableArray class]]);
+    XCTAssertTrue([[model.mArray firstObject] isKindOfClass:[YYTestPropertyMapperModelAuto class]]);
+    
+    model = [YYTestPropertyMapperModelContainer yy_modelWithJSON:@{@"mArray" : [NSSet setWithArray:@[[YYTestPropertyMapperModelAuto new]]]}];
+    XCTAssertTrue([model.mArray isKindOfClass:[NSMutableArray class]]);
+    XCTAssertTrue([[model.mArray firstObject] isKindOfClass:[YYTestPropertyMapperModelAuto class]]);
+}
+
+
+
 @end
