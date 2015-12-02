@@ -1563,3 +1563,83 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
 }
 
 @end
+
+
+
+
+
+typedef NSDictionary*(^YYIMPDictionaryBlock)();
+
+
+static void* kYYCustomMapperIMP = &kYYCustomMapperIMP;
+static void* kYYCustomGenericClassIMP = &kYYCustomGenericClassIMP;
+
+NSDictionary* __YYCustomMapper(id self, SEL _cmd)
+{
+    YYIMPDictionaryBlock block = objc_getAssociatedObject(self, kYYCustomMapperIMP);
+    if (block) {
+        return block();
+    }
+    return @{};
+}
+
+NSDictionary* __YYCustomGeneratorClass(id self, SEL _cmd)
+{
+    Class superClass = class_getSuperclass(self);
+    NSDictionary* superInfos;
+    if ([(id)superClass respondsToSelector:@selector(modelContainerPropertyGenericClass)]) {
+        superInfos = [superClass modelContainerPropertyGenericClass];
+    }
+    
+    NSMutableDictionary* outInfos = [NSMutableDictionary dictionaryWithDictionary:superInfos];
+    
+    YYIMPDictionaryBlock block = objc_getAssociatedObject(self, kYYCustomGenericClassIMP);
+    if (block) {
+        NSDictionary* subInfos = block();
+        NSArray* allKeys = subInfos.allKeys;
+        for (NSString* key in allKeys) {
+            [outInfos setObject:subInfos[key] forKey:key];
+        }
+    }
+    return [outInfos copy];
+}
+
+Class __YYCreateClass(Class originClass , NSString* kindKey)
+{
+    NSString* className = [NSString stringWithFormat:@"YYPrefix%@%@", NSStringFromClass(originClass), kindKey];
+    Class produceClass = objc_getClass(className.UTF8String);
+    if (!produceClass) {
+        produceClass = objc_allocateClassPair(originClass, className.UTF8String, 0);
+        objc_registerClassPair(produceClass);
+    }
+    return produceClass;
+}
+
+Class YYRegisterCustomPropertyMapper(Class originClass, NSString* kindKey, NSDictionary* mapper)
+{
+    YYIMPDictionaryBlock block = ^()
+    {
+        return mapper;
+    };
+    
+    Class produceClass = __YYCreateClass(originClass, kindKey);
+    Class metaClass = object_getClass((id)produceClass);
+    class_addMethod(metaClass, @selector(modelCustomPropertyMapper), (IMP)__YYCustomMapper, "@@:@");
+    objc_setAssociatedObject(produceClass, kYYCustomMapperIMP, [block copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return produceClass;
+}
+
+
+Class YYRegisterCustomContainerPropertyGenericClass(Class originClass, NSString* kindKey, NSDictionary* mapper)
+{
+    YYIMPDictionaryBlock block = ^()
+    {
+        return mapper;
+    };
+    
+    Class produceClass = __YYCreateClass(originClass, kindKey);
+    Class metaClass = object_getClass((id)produceClass);
+    class_addMethod(metaClass, @selector(modelContainerPropertyGenericClass), (IMP)__YYCustomGeneratorClass, "@@:@");
+    objc_setAssociatedObject(produceClass, kYYCustomGenericClassIMP, [block copy], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return produceClass;
+}
