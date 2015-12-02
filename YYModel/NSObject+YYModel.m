@@ -183,9 +183,7 @@ static NSDate *YYNSDateFromString(__unsafe_unretained NSString *string) {
             NSDateFormatter *formatter = [NSDateFormatter new];
             formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
-            blocks[20] = ^(NSString *string) {
-                return [formatter dateFromString:string];
-            };
+            blocks[20] = ^(NSString *string) { return [formatter dateFromString:string]; };
             blocks[24] = ^(NSString *string) { return [formatter dateFromString:string]; };
             blocks[25] = ^(NSString *string) { return [formatter dateFromString:string]; };
         }
