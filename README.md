@@ -138,7 +138,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@property NSString *desc;
 	@end
 	@implementation Book
-	+ (NSDictionary *)modelCustomPropertyMapper {
+	+ (NSDictionary *)yy_modelCustomPropertyMapper {
 	    return @{@"name" : @"n",
 	             @"page" : @"p",
 	             @"desc" : @"ext.desc"};
@@ -187,7 +187,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@end
 
 	@implementation Attributes
-	+ (NSDictionary *)modelContainerPropertyGenericClass {
+	+ (NSDictionary *)yy_modelContainerPropertyGenericClass {
 		// value should be Class or Class name.
 	    return @{@"shadows" : [Shadow class],
 	             @"borders" : Border.class,
@@ -206,10 +206,10 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@end
 	
 	@implementation Attributes
-	+ (NSArray *)modelPropertyBlacklist {
+	+ (NSArray *)yy_modelPropertyBlacklist {
 	    return @{@"test1", @"test2"};
 	}
-	+ (NSArray *)modelPropertyWhitelist {
+	+ (NSArray *)yy_modelPropertyWhitelist {
 	    return @{@"name"};
 	}
 	@end
@@ -229,13 +229,13 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@end
 
 	@implementation User
-	- (BOOL))modelCustomTransformFromDictionary:(NSDictionary *)dic {
+	- (BOOL))yy_modelCustomTransformFromDictionary:(NSDictionary *)dic {
 	    NSNumber *timestamp = dic[@"timestamp"];
 	    if (![timestamp isKindOfClass:[NSNumber class]]) return NO;
 	    _createdAt = [NSDate dateWithTimeIntervalSince1970:timestamp.floatValue];
 	    return YES;
 	}
-	- (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic {
+	- (BOOL)yy_modelCustomTransformToDictionary:(NSMutableDictionary *)dic {
 	    if (!_createdAt) return NO;
 	    dic[@"timestamp"] = @(n.timeIntervalSince1970);
 	    return YES;
@@ -429,7 +429,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@end
 	@implementation Book
 	//返回一个 Dict，将 Model 属性名对映射到 JSON 的 Key。
-	+ (NSDictionary *)modelCustomPropertyMapper {
+	+ (NSDictionary *)yy_modelCustomPropertyMapper {
 	    return @{@"name" : @"n",
 	             @"page" : @"p",
 	             @"desc" : @"ext.desc"};
@@ -479,7 +479,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 
 	@implementation Attributes
 	// 返回容器类中的所需要存放的数据类型 (以 Class 或 Class Name 的形式)。
-	+ (NSDictionary *)modelContainerPropertyGenericClass {
+	+ (NSDictionary *)yy_modelContainerPropertyGenericClass {
 	    return @{@"shadows" : [Shadow class],
 	             @"borders" : Border.class,
 	             @"attachments" : @"Attachment" };
@@ -498,11 +498,11 @@ EEE MMM dd HH:mm:ss Z yyyy
 	
 	@implementation Attributes
 	// 如果实现了该方法，则处理过程中会忽略该列表内的所有属性
-	+ (NSArray *)modelPropertyBlacklist {
+	+ (NSArray *)yy_modelPropertyBlacklist {
 	    return @{@"test1", @"test2"};
 	}
 	// 如果实现了该方法，则处理过程中不会处理该列表外的属性。
-	+ (NSArray *)modelPropertyWhitelist {
+	+ (NSArray *)yy_modelPropertyWhitelist {
 	    return @{@"name"};
 	}
 	@end
@@ -525,7 +525,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	// 当 JSON 转为 Model 完成后，该方法会被调用。
 	// 你可以在这里对数据进行校验，如果校验不通过，可以返回 NO，则该 Model 会被忽略。
 	// 你也可以在这里做一些自动转换不能完成的工作。
-	- (BOOL))modelCustomTransformFromDictionary:(NSDictionary *)dic {
+	- (BOOL))yy_modelCustomTransformFromDictionary:(NSDictionary *)dic {
 	    NSNumber *timestamp = dic[@"timestamp"];
 	    if (![timestamp isKindOfClass:[NSNumber class]]) return NO;
 	    _createdAt = [NSDate dateWithTimeIntervalSince1970:timestamp.floatValue];
@@ -535,7 +535,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	// 当 Model 转为 JSON 完成后，该方法会被调用。
 	// 你可以在这里对数据进行校验，如果校验不通过，可以返回 NO，则该 Model 会被忽略。
 	// 你也可以在这里做一些自动转换不能完成的工作。
-	- (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic {
+	- (BOOL)yy_modelCustomTransformToDictionary:(NSMutableDictionary *)dic {
 	    if (!_createdAt) return NO;
 	    dic[@"timestamp"] = @(n.timeIntervalSince1970);
 	    return YES;
