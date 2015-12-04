@@ -21,7 +21,7 @@ typedef NS_ENUM (NSUInteger, YYEncodingNSType) {
     YYEncodingTypeNSUnknown = 0,
     YYEncodingTypeNSString,
     YYEncodingTypeNSMutableString,
-    YYEncodingTypeNSValue,
+    YYEncodingTypeNSValue,->_next = 
     YYEncodingTypeNSNumber,
     YYEncodingTypeNSDecimalNumber,
     YYEncodingTypeNSData,
@@ -481,7 +481,12 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
                 }
                 [allPropertyMetas removeObjectForKey:propertyName];
                 if (mapper[mappedToKey]) {
-                    propertyMeta->_next = mapper[mappedToKey];
+                    _YYModelPropertyMeta *meta = (_YYModelPropertyMeta *)mapper[mappedToKey];
+                    while (meta->_next) {
+                        meta = meta->_next;
+                    }
+                    meta->_next = propertyMeta;
+                    // propertyMeta->_next = mapper[mappedToKey];
                 }
                 mapper[mappedToKey] = propertyMeta;
             }
@@ -490,7 +495,11 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     [allPropertyMetas enumerateKeysAndObjectsUsingBlock:^(NSString *name, _YYModelPropertyMeta *propertyMeta, BOOL *stop) {
         propertyMeta->_mappedToKey = name;
         if (mapper[name]) {
-            propertyMeta->_next = mapper[name];
+            while (meta->_next) {
+                meta = meta->_next;
+            }
+            meta->_next = propertyMeta;
+            // propertyMeta->_next = mapper[name];
         }
         mapper[name] = propertyMeta;
     }];
