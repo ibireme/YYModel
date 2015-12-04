@@ -21,7 +21,7 @@ typedef NS_ENUM (NSUInteger, YYEncodingNSType) {
     YYEncodingTypeNSUnknown = 0,
     YYEncodingTypeNSString,
     YYEncodingTypeNSMutableString,
-    YYEncodingTypeNSValue, 
+    YYEncodingTypeNSValue,
     YYEncodingTypeNSNumber,
     YYEncodingTypeNSDecimalNumber,
     YYEncodingTypeNSData,
