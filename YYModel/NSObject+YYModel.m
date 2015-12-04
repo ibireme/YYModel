@@ -481,7 +481,11 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
                 }
                 [allPropertyMetas removeObjectForKey:propertyName];
                 if (mapper[mappedToKey]) {
-                    propertyMeta->_next = mapper[mappedToKey];
+                    _YYModelPropertyMeta *meta = (_YYModelPropertyMeta *)mapper[mappedToKey];
+                    while (meta->_next) {
+                        meta = meta->_next;
+                    }
+                    meta->_next = propertyMeta;
                 }
                 mapper[mappedToKey] = propertyMeta;
             }
@@ -490,7 +494,11 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     [allPropertyMetas enumerateKeysAndObjectsUsingBlock:^(NSString *name, _YYModelPropertyMeta *propertyMeta, BOOL *stop) {
         propertyMeta->_mappedToKey = name;
         if (mapper[name]) {
-            propertyMeta->_next = mapper[name];
+            _YYModelPropertyMeta *meta = (_YYModelPropertyMeta *)mapper[name];
+            while (meta->_next) {
+                meta = meta->_next;
+            }
+            meta->_next = propertyMeta;
         }
         mapper[name] = propertyMeta;
     }];
@@ -1489,6 +1497,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         if (this == that) continue;
         if (this == nil || that == nil) return NO;
         if ([this isEqual:that]) continue;
+        return NO;
     }
     return YES;
 }
