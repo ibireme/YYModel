@@ -1496,6 +1496,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         if (this == that) continue;
         if (this == nil || that == nil) return NO;
         if ([this isEqual:that]) continue;
+        return NO;
     }
     return YES;
 }
