@@ -494,6 +494,7 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     [allPropertyMetas enumerateKeysAndObjectsUsingBlock:^(NSString *name, _YYModelPropertyMeta *propertyMeta, BOOL *stop) {
         propertyMeta->_mappedToKey = name;
         if (mapper[name]) {
+            _YYModelPropertyMeta *meta = (_YYModelPropertyMeta *)mapper[name];
             while (meta->_next) {
                 meta = meta->_next;
             }
