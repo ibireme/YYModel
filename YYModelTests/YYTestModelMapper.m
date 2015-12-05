@@ -28,6 +28,7 @@
 @property (nonatomic, assign) NSString *desc2;
 @property (nonatomic, assign) NSString *desc3;
 @property (nonatomic, assign) NSString *desc4;
+@property (nonatomic, assign) NSString *modelID;
 @end
 
 @implementation YYTestPropertyMapperModelCustom
@@ -37,7 +38,8 @@
               @"desc1" : @"ext.d", // mapped to same key path
               @"desc2" : @"ext.d", // mapped to same key path
               @"desc3" : @"ext.d.e",
-              @"desc4" : @".ext"};
+              @"desc4" : @".ext",
+              @"modelID" : @[@"ID", @"Id", @"id"]};
 }
 @end
 
@@ -109,6 +111,7 @@
 
 - (void)testCustom {
     NSString *json;
+    NSDictionary *jsonObject;
     YYTestPropertyMapperModelCustom *model;
     
     json = @"{\"n\":\"Apple\",\"ext\":{\"c\":12}}";
@@ -133,6 +136,9 @@
     XCTAssertTrue([model.desc1 isEqualToString:@"Apple"]);
     XCTAssertTrue([model.desc2 isEqualToString:@"Apple"]);
     
+    jsonObject = [model yy_modelToJSONObject];
+    XCTAssertTrue([((NSDictionary *)jsonObject[@"ext"])[@"d"] isEqualToString:@"Apple"]);
+    
     json = @"{\"ext\":{\"d\":{ \"e\" : \"Apple\"}}}";
     model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
     XCTAssertTrue([model.desc3 isEqualToString:@"Apple"]);
@@ -140,6 +146,18 @@
     json = @"{\".ext\":\"Apple\"}";
     model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
     XCTAssertTrue([model.desc4 isEqualToString:@"Apple"]);
+    
+    json = @"{\"id\":\"abcd\"}";
+    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    XCTAssertTrue([model.modelID isEqualToString:@"abcd"]);
+    
+    json = @"{\"id\":\"abcd\",\"ID\":\"ABCD\",\"Id\":\"Abcd\"}";
+    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    XCTAssertTrue([model.modelID isEqualToString:@"ABCD"]);
+    
+    jsonObject = [model yy_modelToJSONObject];
+    XCTAssertTrue(jsonObject[@"id"] == nil);
+    XCTAssertTrue([jsonObject[@"ID"] isEqualToString:@"ABCD"]);
 }
 
 - (void)testWarn {
