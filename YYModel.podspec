@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name         = 'YYModel'
   s.summary      = 'High performance model framework for iOS.'
-  s.version      = '0.9.6'
+  s.version      = '0.9.7'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.authors      = { 'ibireme' => 'ibireme@gmail.com' }
   s.social_media_url = 'http://blog.ibireme.com'
