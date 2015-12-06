@@ -148,6 +148,8 @@ EEE MMM dd HH:mm:ss Z yyyy
 	}
 	@end
 
+You can map a json key (key path) or an array of json key (key path) to one or multiple property name. If there's no mapper for a property, it will use the property's name as default.
+
 ###Nested model
 
 	// JSON
@@ -441,6 +443,12 @@ EEE MMM dd HH:mm:ss Z yyyy
 	             @"bookID" : @[@"id",@"ID",@"book_id"]};
 	}
 	@end
+	
+你可以把一个或一组 json key (key path) 映射到一个或多个属性。如果一个属性没有映射关系，那默认会使用相同属性名作为映射。
+
+在 json->model 的过程中：如果一个属性对应了多个 json key，那么转换过程会按顺序查找，并使用第一个不为空的值。
+	
+在 model->json 的过程中：如果一个属性对应了多个 json key (key path)，那么转换过程仅会处理第一个 json key (key path)；如果多个属性对应了同一个 json key，则转换过过程会使用其中任意一个不为空的值。
 
 ###Model 包含其他 Model
 
