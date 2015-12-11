@@ -39,7 +39,7 @@
               @"desc2" : @"ext.d", // mapped to same key path
               @"desc3" : @"ext.d.e",
               @"desc4" : @".ext",
-              @"modelID" : @[@"ID", @"Id", @"id"]};
+              @"modelID" : @[@"ID", @"Id", @"id", @"ext.id"]};
 }
 @end
 
@@ -148,6 +148,10 @@
     XCTAssertTrue([model.desc4 isEqualToString:@"Apple"]);
     
     json = @"{\"id\":\"abcd\"}";
+    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    XCTAssertTrue([model.modelID isEqualToString:@"abcd"]);
+    
+    json = @"{\"ext\":{\"id\":\"abcd\"}}";
     model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
     XCTAssertTrue([model.modelID isEqualToString:@"abcd"]);
     

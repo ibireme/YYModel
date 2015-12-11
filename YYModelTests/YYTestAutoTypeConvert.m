@@ -370,6 +370,16 @@
     XCTAssertTrue(model.object == nil);
 }
 
+- (void)testBlock {
+    int (^block)(void) = ^{return 12;};
+    NSDictionary *dic = @{@"v":block};
+    YYTestAutoTypeModel *model = [YYTestAutoTypeModel yy_modelWithDictionary:dic];
+    XCTAssertNotNil(model.blockValue);
+    
+    block = (id)model.blockValue;
+    XCTAssertTrue(block() == 12);
+}
+
 - (void)testArrayAndDic {
     NSString *json;
     

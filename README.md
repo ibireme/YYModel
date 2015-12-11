@@ -31,7 +31,7 @@ Features
 - **Type Safe**: All data types will be verified to ensure type-safe during the conversion process.
 - **Non-intrusive**: There is no need to make the model class inherit from other base class.
 - **Lightwight**: This library contains only 5 files.
-
+- **Docs and unit testing**: Coverage 100%.
 
 Usage
 ==============
@@ -328,7 +328,7 @@ YYModel is provided under the MIT license. See LICENSE file for details.
 - **类型安全**: 转换过程中，所有的数据类型都会被检测一遍，以保证类型安全，避免崩溃问题。
 - **无侵入性**: 模型无需继承自其他基类。
 - **轻量**: 该框架只有 5 个文件 (包括.h文件)。
-
+- **文档和单元测试**: 覆盖率 100%。
 
 使用方法
 ==============
