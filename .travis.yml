@@ -5,6 +5,9 @@ xcode_scheme: YYModel
 before_install:
 - brew update
 - brew upgrade xctool
+- pip install codecov
 script:
 - xctool -project Framework/YYModel.xcodeproj -scheme YYModel build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 - xctool -project Framework/YYModel.xcodeproj -scheme YYModel test -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
+after_success:
+- codecov
