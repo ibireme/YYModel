@@ -1198,10 +1198,8 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
                 subDic = superDic[key];
                 if (subDic) {
                     if ([subDic isKindOfClass:[NSDictionary class]]) {
-                        if (![subDic isKindOfClass:[NSMutableDictionary class]]) {
-                            subDic = subDic.mutableCopy;
-                            superDic[key] = subDic;
-                        }
+                        subDic = subDic.mutableCopy;
+                        superDic[key] = subDic;
                     } else {
                         break;
                     }

@@ -138,6 +138,9 @@
     XCTAssert([ext[@"b"] isEqualToString:@"b"]);
     XCTAssert([ext[@"a"] isEqualToString:@"a"] || [ext[@"a"] isEqualToString:@"c"]);
     
+    model.f = @{@"g" : @""};
+    dic = [model yy_modelToJSONObject];
+    
 }
 
 - (void)testDate {
