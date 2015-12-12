@@ -6,8 +6,8 @@ YYModel <a href="#中文介绍">中文介绍</a>
 [![CocoaPods](http://img.shields.io/cocoapods/v/YYModel.svg?style=flat)](http://cocoapods.org/?q= YYModel)&nbsp;
 [![CocoaPods](http://img.shields.io/cocoapods/p/YYModel.svg?style=flat)](http://cocoapods.org/?q= YYModel)&nbsp;
 [![Support](https://img.shields.io/badge/support-iOS%206%2B%20-blue.svg?style=flat)](https://www.apple.com/nl/ios/)&nbsp;
-[![Build Status](https://travis-ci.org/ibireme/YYModel.svg?branch=master)](https://travis-ci.org/ibireme/YYModel)
-
+[![Build Status](https://travis-ci.org/ibireme/YYModel.svg?branch=master)](https://travis-ci.org/ibireme/YYModel)&nbsp;
+[![codecov.io](https://codecov.io/github/ibireme/YYModel/coverage.svg?branch=master)](https://codecov.io/github/ibireme/YYModel?branch=master)
 
 High performance model framework for iOS.<br/>
 (It's a component of [YYKit](https://github.com/ibireme/YYKit))

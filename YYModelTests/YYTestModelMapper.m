@@ -253,15 +253,4 @@
     XCTAssertTrue([[model.mArray firstObject] isKindOfClass:[YYTestPropertyMapperModelAuto class]]);
 }
 
-- (void)testForCodeCoverage {
-    Class cls = NSClassFromString(@"_YYModelPropertyMeta");
-    [cls new];
-    
-    cls = NSClassFromString(@"_YYModelMeta");
-    [cls new];
-    
-    cls = NSClassFromString(@"YYClassInfo");
-    [cls new];
-}
-
 @end
