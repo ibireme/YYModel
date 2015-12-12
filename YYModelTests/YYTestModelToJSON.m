@@ -67,6 +67,31 @@
 @end
 
 
+
+@interface YYTestKeyPathModelToJSONModel : NSObject
+@property (nonatomic, strong) NSString *a;
+@property (nonatomic, strong) NSString *b;
+@property (nonatomic, strong) NSString *c;
+@property (nonatomic, strong) NSString *d;
+@property (nonatomic, strong) NSString *e;
+@property (nonatomic, strong) NSDictionary *f;
+@property (nonatomic, strong) NSString *g;
+@end
+
+@implementation YYTestKeyPathModelToJSONModel
++ (NSDictionary *)modelCustomPropertyMapper {
+    return @{
+             @"a" : @"ext.a",
+             @"b" : @"ext.b",
+             @"c" : @"ext.a",
+             @"e" : @"d.e",
+             @"g" : @"f.g.g"
+             };
+}
+@end
+
+
+
 @interface YYTestModelToJSON : XCTestCase
 
 @end
@@ -97,6 +122,22 @@
     
     model = [YYTestModelToJSONModel yy_modelWithJSON:jsonData];
     XCTAssert(model.intValue == 1);
+}
+
+- (void)testKeyPath {
+    YYTestKeyPathModelToJSONModel *model = [YYTestKeyPathModelToJSONModel new];
+    model.a = @"a";
+    model.b = @"b";
+    model.c = @"c";
+    model.d = @"d";
+    model.e = @"e";
+    model.f = @{};
+    
+    NSDictionary *dic = [model yy_modelToJSONObject];
+    NSDictionary *ext = dic[@"ext"];
+    XCTAssert([ext[@"b"] isEqualToString:@"b"]);
+    XCTAssert([ext[@"a"] isEqualToString:@"a"] || [ext[@"a"] isEqualToString:@"c"]);
+    
 }
 
 - (void)testDate {

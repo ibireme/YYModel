@@ -44,6 +44,7 @@
 
 @interface YYTestCustomClassModel : NSObject
 @property (nonatomic, strong) NSArray *users;
+@property (nonatomic, strong) NSDictionary *userDict;
 @property (nonatomic, strong) NSSet *userSet;
 @property (nonatomic, strong) YYBaseUser *user;
 @end
@@ -52,6 +53,7 @@
 
 + (NSDictionary *)modelContainerPropertyGenericClass {
     return @{@"users" : YYBaseUser.class,
+             @"userDict" : YYBaseUser.class,
              @"userSet" : YYBaseUser.class};
 }
 + (Class)modelCustomClassForDictionary:(NSDictionary*)dictionary {
@@ -96,6 +98,11 @@
     XCTAssert([model.users[0] isMemberOfClass:[YYBaseUser class]]);
     XCTAssert([model.users[1] isMemberOfClass:[YYLocalUser class]]);
     XCTAssert([model.users[2] isMemberOfClass:[YYRemoteUser class]]);
+    
+    model = [YYTestCustomClassModel yy_modelWithJSON:@{@"userDict" : @{@"a" : jsonUserBase, @"b" : jsonUserLocal, @"c" : jsonUserRemote}}];
+    XCTAssert([model.userDict[@"a"] isKindOfClass:[YYBaseUser class]]);
+    XCTAssert([model.userDict[@"b"] isKindOfClass:[YYLocalUser class]]);
+    XCTAssert([model.userDict[@"c"] isKindOfClass:[YYRemoteUser class]]);
     
     model = [YYTestCustomClassModel yy_modelWithJSON:@{@"userSet" : @[jsonUserBase, jsonUserLocal, jsonUserRemote]}];
     XCTAssert([model.userSet.anyObject isKindOfClass:[YYBaseUser class]]);

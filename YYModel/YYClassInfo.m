@@ -214,7 +214,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                 if (attrs[i].value) {
                     _setter = [NSString stringWithUTF8String:attrs[i].value];
                 }
-            } break;
+            } // break; commented for code coverage in next line
             default: break;
         }
     }

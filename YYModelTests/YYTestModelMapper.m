@@ -81,8 +81,8 @@
              @"mArray" : YYTestPropertyMapperModelAuto.class,
              @"dict" : YYTestPropertyMapperModelAuto.class,
              @"mDict" : YYTestPropertyMapperModelAuto.class,
-             @"set" : YYTestPropertyMapperModelAuto.class,
-             @"mSet" : YYTestPropertyMapperModelAuto.class};
+             @"set" : @"YYTestPropertyMapperModelAuto",
+             @"mSet" : @"YYTestPropertyMapperModelAuto"};
 }
 @end
 
