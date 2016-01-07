@@ -9,7 +9,7 @@
 //  LICENSE file in the root directory of this source tree.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 #if __has_include(<YYModel/YYModel.h>)
 FOUNDATION_EXPORT double YYModelVersionNumber;
