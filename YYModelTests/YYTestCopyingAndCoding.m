@@ -118,8 +118,8 @@ typedef struct my_struct {
     XCTAssertTrue([model1 isEqual:model2]);
     
     model1.string = @"Apple";
-    model1.string = @"Apple";
-    model1.string2 = @"Steve Jobs";
+    model1.string2 = @"Apple";
+    model2.string = @"Steve Jobs";
     model2.string2 = @"Steve Jobs";
     XCTAssertTrue(model1.hash == model2.hash);
     XCTAssertFalse([model1 isEqual:model2]);
