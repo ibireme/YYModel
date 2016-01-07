@@ -57,6 +57,7 @@ typedef struct my_struct {
 @property (nonatomic, strong) NSNumber *number;
 @property (nonatomic, strong) NSDecimalNumber *decimal;
 @property (nonatomic, strong) NSString *string;
+@property (nonatomic, strong) NSString *string2;
 @property (nonatomic, strong) NSMutableString *mString;
 @property (nonatomic, strong) NSData *data;
 @property (nonatomic, strong) NSMutableData *mData;
@@ -115,6 +116,13 @@ typedef struct my_struct {
     
     model2.myStructValue = my;
     XCTAssertTrue([model1 isEqual:model2]);
+    
+    model1.string = @"Apple";
+    model1.string = @"Apple";
+    model1.string2 = @"Steve Jobs";
+    model2.string2 = @"Steve Jobs";
+    XCTAssertTrue(model1.hash == model2.hash);
+    XCTAssertFalse([model1 isEqual:model2]);
 }
 
 - (void)testCopying {
