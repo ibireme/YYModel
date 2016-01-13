@@ -201,6 +201,13 @@
  */
 - (BOOL)yy_modelIsEqual:(id)model;
 
+/**
+ Description method for debugging purposes based on properties.
+ 
+ @return A string that describes the contents of the receiver.
+ */
+- (NSString *)yy_modelDescription;
+
 @end
 
 

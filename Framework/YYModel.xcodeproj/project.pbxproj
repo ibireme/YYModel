@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		AB1DAC8F1C0AF02B00442613 /* YYTestModelToJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = AB1DAC8E1C0AF02B00442613 /* YYTestModelToJSON.m */; };
+		AB5032881C4627B100FC6C42 /* YYTestDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = AB5032871C4627B100FC6C42 /* YYTestDescription.m */; };
 		ABA06CAC1C08514D00AD2108 /* YYModel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9D41A071BD0FABE00CD8EBF /* YYModel.framework */; };
 		ABA06CB21C08566100AD2108 /* NSObject+YYModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D41A171BD0FB3300CD8EBF /* NSObject+YYModel.m */; };
 		ABA06CB31C08566100AD2108 /* YYClassInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D41A191BD0FB3300CD8EBF /* YYClassInfo.m */; };
@@ -39,6 +40,7 @@
 
 /* Begin PBXFileReference section */
 		AB1DAC8E1C0AF02B00442613 /* YYTestModelToJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestModelToJSON.m; sourceTree = "<group>"; };
+		AB5032871C4627B100FC6C42 /* YYTestDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestDescription.m; sourceTree = "<group>"; };
 		ABA06CA71C08514D00AD2108 /* YYModelTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YYModelTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABA06CB51C08589300AD2108 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ABA06CB91C08595900AD2108 /* YYTestModelMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestModelMapper.m; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 				D95943EF1C0B6467002D88BD /* YYTestBlacklistWhitelist.m */,
 				ABFEC7181C0BE7A900B3D8C5 /* YYTestCustomTransform.m */,
 				ABFEC71A1C0BF23200B3D8C5 /* YYTestCustomClass.m */,
+				AB5032871C4627B100FC6C42 /* YYTestDescription.m */,
 				ABA06CB51C08589300AD2108 /* Info.plist */,
 			);
 			name = YYModelTests;
@@ -253,6 +256,7 @@
 				D95943F01C0B6467002D88BD /* YYTestBlacklistWhitelist.m in Sources */,
 				ABA06CB21C08566100AD2108 /* NSObject+YYModel.m in Sources */,
 				ABA06CBA1C08595900AD2108 /* YYTestModelMapper.m in Sources */,
+				AB5032881C4627B100FC6C42 /* YYTestDescription.m in Sources */,
 				D9B26FF61C08D13F004880F0 /* YYTestHelper.m in Sources */,
 				ABFEC71D1C0C284B00B3D8C5 /* YYTestNestModel.m in Sources */,
 				D9B270271C09FDF8004880F0 /* YYTestAutoTypeConvert.m in Sources */,

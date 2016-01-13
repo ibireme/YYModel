@@ -30,7 +30,7 @@ Features
 - **Type Safe**: All data types will be verified to ensure type-safe during the conversion process.
 - **Non-intrusive**: There is no need to make the model class inherit from other base class.
 - **Lightwight**: This library contains only 5 files.
-- **Docs and unit testing**: Coverage 100%.
+- **Docs and unit testing**: 100% docs coverage, 99% code coverage.
 
 Usage
 ==============
@@ -246,7 +246,7 @@ You can map a json key (key path) or an array of json key (key path) to one or m
 	}
 	@end
 
-###Coding/Copying/hash/equal
+###Coding/Copying/hash/equal/description
 
 	@interface YYShadow :NSObject <NSCoding, NSCopying>
 	@property (nonatomic, copy) NSString *name;
@@ -259,6 +259,7 @@ You can map a json key (key path) or an array of json key (key path) to one or m
 	- (id)copyWithZone:(NSZone *)zone { return [self yy_modelCopy]; }
 	- (NSUInteger)hash { return [self yy_modelHash]; }
 	- (BOOL)isEqual:(id)object { return [self yy_modelIsEqual:object]; }
+	- (NSString *)description { return [self yy_modelDescription]; }
 	@end
 
 
@@ -327,7 +328,7 @@ YYModel is provided under the MIT license. See LICENSE file for details.
 - **类型安全**: 转换过程中，所有的数据类型都会被检测一遍，以保证类型安全，避免崩溃问题。
 - **无侵入性**: 模型无需继承自其他基类。
 - **轻量**: 该框架只有 5 个文件 (包括.h文件)。
-- **文档和单元测试**: 覆盖率 100%。
+- **文档和单元测试**: 文档覆盖率100%, 代码覆盖率99%。
 
 使用方法
 ==============
@@ -555,7 +556,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	}
 	@end
 
-###Coding/Copying/hash/equal
+###Coding/Copying/hash/equal/description
 
 	@interface YYShadow :NSObject <NSCoding, NSCopying>
 	@property (nonatomic, copy) NSString *name;
@@ -569,6 +570,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	- (id)copyWithZone:(NSZone *)zone { return [self yy_modelCopy]; }
 	- (NSUInteger)hash { return [self yy_modelHash]; }
 	- (BOOL)isEqual:(id)object { return [self yy_modelIsEqual:object]; }
+	- (NSString *)description { return [self yy_modelDescription]; }
 	@end
 
 
