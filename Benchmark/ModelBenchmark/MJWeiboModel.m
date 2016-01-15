@@ -19,7 +19,7 @@ MJExtensionCodingImplementation
 
 @implementation MJWeiboPicture
 MJExtensionCodingImplementation
-+ (NSDictionary *)replacedKeyFromPropertyName {
++ (NSDictionary *)mj_replacedKeyFromPropertyName {
     return @{@"picID" : @"pic_id",
              @"keepSize" : @"keep_size",
              @"photoTag" : @"photo_tag",
@@ -31,7 +31,7 @@ MJExtensionCodingImplementation
 
 @implementation MJWeiboURL
 MJExtensionCodingImplementation
-+ (NSDictionary *)replacedKeyFromPropertyName {
++ (NSDictionary *)mj_replacedKeyFromPropertyName {
     return @{@"oriURL" : @"ori_url",
              @"urlTitle" : @"url_title",
              @"urlTypePic" : @"url_type_pic",
@@ -46,7 +46,7 @@ MJExtensionCodingImplementation
 
 @implementation MJWeiboUser
 MJExtensionCodingImplementation
-+ (NSDictionary *)replacedKeyFromPropertyName {
++ (NSDictionary *)mj_replacedKeyFromPropertyName {
     return @{@"userID" : @"id",
              @"idString" : @"idstr",
              @"genderString" : @"gender",
@@ -90,7 +90,7 @@ MJExtensionCodingImplementation
              @"verifiedSource" : @"verified_source",
              @"userAbility" : @"user_ability"};
 }
-- (id)newValueFromOldValue:(id)oldValue property:(MJProperty *)property {
+- (id)mj_newValueFromOldValue:(id)oldValue property:(MJProperty *)property {
     if ([property.name isEqualToString:@"createdAt"]) {
         return [[DateFormatter weiboDataFormatter] dateFromString:oldValue];
     }
@@ -100,7 +100,7 @@ MJExtensionCodingImplementation
 
 @implementation MJWeiboStatus
 MJExtensionCodingImplementation
-+ (NSDictionary *)replacedKeyFromPropertyName {
++ (NSDictionary *)mj_replacedKeyFromPropertyName {
     return @{@"statusID" : @"id",
              @"createdAt" : @"created_at",
              @"attitudesStatus" : @"attitudes_status",
@@ -122,11 +122,11 @@ MJExtensionCodingImplementation
              @"picInfos" : @"pic_infos",
              @"inReplyToUserId" : @"in_reply_to_user_id"};
 }
-+ (NSDictionary *)objectClassInArray {
++ (NSDictionary *)mj_objectClassInArray {
     return @{@"picIds" : @"NSString",
              @"urlStruct" : @"MJWeiboURL"};
 }
-- (id)newValueFromOldValue:(id)oldValue property:(MJProperty *)property {
+- (id)mj_newValueFromOldValue:(id)oldValue property:(MJProperty *)property {
     if ([property.name isEqualToString:@"createdAt"]) {
         if ([oldValue isKindOfClass:[NSString class]]) {
             return [[DateFormatter weiboDataFormatter] dateFromString:oldValue];
@@ -138,7 +138,7 @@ MJExtensionCodingImplementation
         NSMutableDictionary *pics = [NSMutableDictionary new];
         [((NSDictionary *)oldValue) enumerateKeysAndObjectsUsingBlock:^(id key, NSDictionary *obj, BOOL *stop) {
             if ([obj isKindOfClass:[NSDictionary class]]) {
-                MJWeiboPicture *pic = [MJWeiboPicture objectWithKeyValues:obj];
+                MJWeiboPicture *pic = [MJWeiboPicture mj_objectWithKeyValues:obj];
                 if (pic) pics[key] = pic;
             }
         }];

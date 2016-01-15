@@ -1,18 +1,18 @@
 //
 //  JSONAPI.h
 //
-//  @version 1.0.2
-//  @author Marin Todorov, http://www.touch-code-magazine.com
+//  @version 1.2
+//  @author Marin Todorov (http://www.underplot.com) and contributors
 //
 
-// Copyright (c) 2012-2014 Marin Todorov, Underplot ltd.
+// Copyright (c) 2012-2015 Marin Todorov, Underplot ltd.
 // This code is distributed under the terms and conditions of the MIT license.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// The MIT License in plain English: http://www.touch-code-magazine.com/JSONModel/MITLicense
+
 
 #import <Foundation/Foundation.h>
 #import "JSONHTTPClient.h"
@@ -46,7 +46,7 @@
 
 /** @name Making GET API requests */
 /**
- * Makes an asynchronious GET request to the API
+ * Makes an asynchronous GET request to the API
  * @param path the URL path to add to the base API URL for this HTTP call
  * @param params the variables to pass to the API
  * @param completeBlock a JSONObjectBlock block to execute upon completion
@@ -68,7 +68,7 @@
 
 /** @name JSON RPC methods */
 /**
- * Makes an asynchronious JSON RPC request to the API. Read more: http://www.jsonrpc.org
+ * Makes an asynchronous JSON RPC request to the API. Read more: http://www.jsonrpc.org
  * @param method the HTTP method name; GET or POST only
  * @param args the list of arguments to pass to the API
  * @param completeBlock JSONObjectBlock to execute upon completion
@@ -77,7 +77,7 @@
 
 /** @name JSON RPC (2.0) request method */
 /**
- * Makes an asynchronious JSON RPC 2.0 request to the API. Read more: http://www.jsonrpc.org
+ * Makes an asynchronous JSON RPC 2.0 request to the API. Read more: http://www.jsonrpc.org
  * @param method the HTTP method name; GET or POST only
  * @param params the params to pass to the API - an NSArray or an NSDictionary, 
  * depending whether you're using named or unnamed parameters

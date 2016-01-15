@@ -1,18 +1,18 @@
 //
 //  JSONValueTransformer.m
 //
-//  @version 1.0.2
-//  @author Marin Todorov, http://www.touch-code-magazine.com
+//  @version 1.2
+//  @author Marin Todorov (http://www.underplot.com) and contributors
 //
 
-// Copyright (c) 2012-2014 Marin Todorov, Underplot ltd.
+// Copyright (c) 2012-2015 Marin Todorov, Underplot ltd.
 // This code is distributed under the terms and conditions of the MIT license.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// The MIT License in plain English: http://www.touch-code-magazine.com/JSONModel/MITLicense
+
 
 #import "JSONValueTransformer.h"
 #import "JSONModelArray.h"
@@ -33,7 +33,7 @@ extern BOOL isNull(id value)
     self = [super init];
     if (self) {
         _primitivesNames = @{@"f":@"float", @"i":@"int", @"d":@"double", @"l":@"long", @"c":@"BOOL", @"s":@"short", @"q":@"long",
-                             //and some famos aliases of primitive types
+                             //and some famous aliases of primitive types
                              // BOOL is now "B" on iOS __LP64 builds
                              @"I":@"NSInteger", @"Q":@"NSUInteger", @"B":@"BOOL",
                              
@@ -179,7 +179,7 @@ extern BOOL isNull(id value)
 #pragma mark - string <-> number
 -(NSNumber*)NSNumberFromNSString:(NSString*)string
 {
-    return [NSNumber numberWithFloat: [string doubleValue]];
+    return [NSNumber numberWithDouble:[string doubleValue]];
 }
 
 -(NSString*)NSStringFromNSNumber:(NSNumber*)number
@@ -200,7 +200,9 @@ extern BOOL isNull(id value)
 #pragma mark - string <-> url
 -(NSURL*)NSURLFromNSString:(NSString*)string
 {
-    return [NSURL URLWithString:[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    // do not change this behavior - there are other ways of overriding it
+    // see: https://github.com/icanzilb/JSONModel/pull/119
+    return [NSURL URLWithString:string];
 }
 
 -(NSString*)JSONObjectFromNSURL:(NSURL*)url
