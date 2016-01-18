@@ -211,10 +211,10 @@ You can map a json key (key path) or an array of json key (key path) to one or m
 	
 	@implementation Attributes
 	+ (NSArray *)modelPropertyBlacklist {
-	    return @{@"test1", @"test2"};
+	    return @[@"test1", @"test2"];
 	}
 	+ (NSArray *)modelPropertyWhitelist {
-	    return @{@"name"};
+	    return @[@"name"];
 	}
 	@end
 
@@ -513,11 +513,11 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@implementation Attributes
 	// 如果实现了该方法，则处理过程中会忽略该列表内的所有属性
 	+ (NSArray *)modelPropertyBlacklist {
-	    return @{@"test1", @"test2"};
+	    return @[@"test1", @"test2"];
 	}
 	// 如果实现了该方法，则处理过程中不会处理该列表外的属性。
 	+ (NSArray *)modelPropertyWhitelist {
-	    return @{@"name"};
+	    return @[@"name"];
 	}
 	@end
 
