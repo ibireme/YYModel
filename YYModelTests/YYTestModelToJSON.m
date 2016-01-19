@@ -10,6 +10,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <UIKit/UIKit.h>
 #import "YYModel.h"
 #import "YYTestHelper.h"
 
@@ -53,6 +54,7 @@
 @property (nonatomic, strong) NSMutableDictionary *mDict;
 @property (nonatomic, strong) NSSet *set;
 @property (nonatomic, strong) NSMutableSet *mSet;
+@property (nonatomic, strong) UIColor *color;
 @end
 
 @implementation YYTestModelToJSONModel
@@ -107,12 +109,14 @@
     model.shortValue = 4;
     model.array = @[@1,@"2",[NSURL URLWithString:@"https://github.com"]];
     model.set = [NSSet setWithArray:model.array];
+    model.color = [UIColor redColor];
     
     NSDictionary *jsonObject = [model yy_modelToJSONObject];
     XCTAssert([jsonObject isKindOfClass:[NSDictionary class]]);
     XCTAssert([jsonObject[@"int"] isEqual:@(1)]);
     XCTAssert([jsonObject[@"long"] isEqual:@(2)] || [jsonObject[@"long"] isEqual:@(3)]);
     XCTAssert([ ((NSDictionary *)jsonObject[@"ext"])[@"short"] isEqual:@(4)]);
+    XCTAssert(jsonObject[@"color"] != nil);
     
     NSString *jsonString = [model yy_modelToJSONString];
     XCTAssert([[YYTestHelper jsonObjectFromString:jsonString] isKindOfClass:[NSDictionary class]]);

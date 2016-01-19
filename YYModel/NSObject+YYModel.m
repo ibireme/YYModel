@@ -1167,8 +1167,18 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         } else {
             switch (propertyMeta->_type & YYEncodingTypeMask) {
                 case YYEncodingTypeObject: {
-                    id v = ((id (*)(id, SEL))(void *) objc_msgSend)((id)model, propertyMeta->_getter);
-                    value = ModelToJSONObjectRecursive(v);
+                    /*
+                     When send the getter message to some object (for example:[[UIColor redColor] CIColor]),
+                     it may throws an exception.
+                     */
+                    @try {
+                        id v = ((id (*)(id, SEL))(void *) objc_msgSend)((id)model, propertyMeta->_getter);
+                        value = ModelToJSONObjectRecursive(v);
+                    }
+                    @catch (NSException *exception) {
+                        // Log the exception and ignore this value.
+                        NSLog(@"%@",exception);
+                    }
                     if (value == (id)kCFNull) value = nil;
                 } break;
                 case YYEncodingTypeClass: {
