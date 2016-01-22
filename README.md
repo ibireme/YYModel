@@ -1,4 +1,4 @@
-YYModel <a href="#中文介绍">中文介绍</a>
+YYModel
 ==============
 
 [![License MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/ibireme/YYModel/master/LICENSE)&nbsp;
