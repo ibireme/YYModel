@@ -583,12 +583,12 @@ static force_inline void ModelSetNumberToProperty(__unsafe_unretained id model,
             ((void (*)(id, SEL, float))(void *) objc_msgSend)((id)model, meta->_setter, f);
         } break;
         case YYEncodingTypeDouble: {
-            double d = num.floatValue;
+            double d = num.doubleValue;
             if (isnan(d) || isinf(d)) d = 0;
             ((void (*)(id, SEL, double))(void *) objc_msgSend)((id)model, meta->_setter, d);
         } break;
         case YYEncodingTypeLongDouble: {
-            double d = num.floatValue;
+            double d = num.longValue;
             if (isnan(d) || isinf(d)) d = 0;
             ((void (*)(id, SEL, long double))(void *) objc_msgSend)((id)model, meta->_setter, (long double)d);
         } break;
