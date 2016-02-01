@@ -39,6 +39,14 @@
     }
 }
 
+- (void)customTransformContentFromNSNumber:(NSNumber *)type {
+    if (type.intValue == 0) {
+        _content = @"0000";
+    } else {
+        _content = @"AAAA";
+    }
+}
+
 @end
 
 
@@ -74,6 +82,10 @@
     model.time = nil;
     jsonObject = [model yy_modelToJSONObject];
     XCTAssert(jsonObject == nil);
+    
+    json = @"{\"id\":5472746497,\"content\":2,\"time\":1401234567000}";
+    model = [YYTestCustomTransformModel yy_modelWithJSON:json];
+    XCTAssert([model.content isEqualToString:@"AAAA"]);
 }
 
 @end

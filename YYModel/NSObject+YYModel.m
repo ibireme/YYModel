@@ -38,21 +38,21 @@ typedef NS_ENUM (NSUInteger, YYEncodingNSType) {
 /// Get the Foundation class type from property info.
 static force_inline YYEncodingNSType YYClassGetNSType(Class cls) {
     if (!cls) return YYEncodingTypeNSUnknown;
-    if ([cls isSubclassOfClass:[NSMutableString class]]) return YYEncodingTypeNSMutableString;
-    if ([cls isSubclassOfClass:[NSString class]]) return YYEncodingTypeNSString;
-    if ([cls isSubclassOfClass:[NSDecimalNumber class]]) return YYEncodingTypeNSDecimalNumber;
-    if ([cls isSubclassOfClass:[NSNumber class]]) return YYEncodingTypeNSNumber;
-    if ([cls isSubclassOfClass:[NSValue class]]) return YYEncodingTypeNSValue;
-    if ([cls isSubclassOfClass:[NSMutableData class]]) return YYEncodingTypeNSMutableData;
-    if ([cls isSubclassOfClass:[NSData class]]) return YYEncodingTypeNSData;
-    if ([cls isSubclassOfClass:[NSDate class]]) return YYEncodingTypeNSDate;
-    if ([cls isSubclassOfClass:[NSURL class]]) return YYEncodingTypeNSURL;
-    if ([cls isSubclassOfClass:[NSMutableArray class]]) return YYEncodingTypeNSMutableArray;
-    if ([cls isSubclassOfClass:[NSArray class]]) return YYEncodingTypeNSArray;
+    if ([cls isSubclassOfClass:[NSMutableString class]])    return YYEncodingTypeNSMutableString;
+    if ([cls isSubclassOfClass:[NSString class]])           return YYEncodingTypeNSString;
+    if ([cls isSubclassOfClass:[NSDecimalNumber class]])    return YYEncodingTypeNSDecimalNumber;
+    if ([cls isSubclassOfClass:[NSNumber class]])           return YYEncodingTypeNSNumber;
+    if ([cls isSubclassOfClass:[NSValue class]])            return YYEncodingTypeNSValue;
+    if ([cls isSubclassOfClass:[NSMutableData class]])      return YYEncodingTypeNSMutableData;
+    if ([cls isSubclassOfClass:[NSData class]])             return YYEncodingTypeNSData;
+    if ([cls isSubclassOfClass:[NSDate class]])             return YYEncodingTypeNSDate;
+    if ([cls isSubclassOfClass:[NSURL class]])              return YYEncodingTypeNSURL;
+    if ([cls isSubclassOfClass:[NSMutableArray class]])     return YYEncodingTypeNSMutableArray;
+    if ([cls isSubclassOfClass:[NSArray class]])            return YYEncodingTypeNSArray;
     if ([cls isSubclassOfClass:[NSMutableDictionary class]]) return YYEncodingTypeNSMutableDictionary;
-    if ([cls isSubclassOfClass:[NSDictionary class]]) return YYEncodingTypeNSDictionary;
-    if ([cls isSubclassOfClass:[NSMutableSet class]]) return YYEncodingTypeNSMutableSet;
-    if ([cls isSubclassOfClass:[NSSet class]]) return YYEncodingTypeNSSet;
+    if ([cls isSubclassOfClass:[NSDictionary class]])       return YYEncodingTypeNSDictionary;
+    if ([cls isSubclassOfClass:[NSMutableSet class]])       return YYEncodingTypeNSMutableSet;
+    if ([cls isSubclassOfClass:[NSSet class]])              return YYEncodingTypeNSSet;
     return YYEncodingTypeNSUnknown;
 }
 
@@ -277,6 +277,15 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
 }
 
 
+@interface _YYModelPropertyCustomTransformSelector : NSObject {
+    @package
+    SEL   _selector;  /// selector; should be: "customTransformPropertyNameToClassName" (getter) or
+                      ///                      "customTransformPropertyNameFromClassName:" (setter)
+    Class _classType; /// transform Class Type
+}
+@end
+@implementation _YYModelPropertyCustomTransformSelector
+@end
 
 
 /// A property info in object model.
@@ -290,6 +299,8 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     Class _genericCls;           ///< container's generic class, or nil if threr's no generic class
     SEL _getter;                 ///< getter, or nil if the instances cannot respond
     SEL _setter;                 ///< setter, or nil if the instances cannot respond
+    //NSArray<_YYModelPropertyCustomTransformSelector *> *_customGetters; /// custom value transform
+    NSArray<_YYModelPropertyCustomTransformSelector *> *_customSetters; /// custom value transform
     BOOL _isKVCCompatible;       ///< YES if it can access with key-value coding
     BOOL _isStructAvailableForKeyedArchiver; ///< YES if the struct can encoded with keyed archiver/unarchiver
     BOOL _hasCustomClassFromDictionary; ///< class/generic class implements +modelCustomClassForDictionary:
@@ -368,7 +379,34 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
             meta->_setter = sel;
         }
     }
-    
+
+    NSMutableArray *customSetters = [[NSMutableArray alloc] init];
+    [classInfo.methodInfos enumerateKeysAndObjectsUsingBlock:^(NSString          *_Nonnull key,
+                                                               YYClassMethodInfo *_Nonnull obj,
+                                                               BOOL              *_Nonnull stop) {
+
+        NSString *customSetterNamePrefix = [NSString stringWithFormat:@"customTransform%@From", propertyInfo.name.capitalizedString];
+        if ([key hasPrefix:customSetterNamePrefix] && [key hasSuffix:@":"]) {
+            NSString *fromType = [key substringWithRange:NSMakeRange(customSetterNamePrefix.length,
+                                                                     key.length - 1 - customSetterNamePrefix.length)];
+            Class clazz = NSClassFromString(fromType);
+            if (clazz != nil) {
+                _YYModelPropertyCustomTransformSelector *customSelector = [_YYModelPropertyCustomTransformSelector new];
+                customSelector->_selector = obj.sel;
+                customSelector->_classType = clazz;
+                [customSetters addObject:customSelector];
+            }
+        }
+    }];
+    if (customSetters.count > 0) {
+        [customSetters addObjectsFromArray:meta->_customSetters];
+        [customSetters sortUsingComparator:^NSComparisonResult(_YYModelPropertyCustomTransformSelector *  _Nonnull obj1,
+                                                               _YYModelPropertyCustomTransformSelector *  _Nonnull obj2) {
+            return [obj1->_classType isSubclassOfClass:obj2->_classType] ? NSOrderedAscending : NSOrderedDescending;
+        }];
+        meta->_customSetters = customSetters;
+    }
+
     if (meta->_getter && meta->_setter) {
         /*
          KVC invalid type:
@@ -725,6 +763,14 @@ static force_inline void ModelSetNumberToProperty(__unsafe_unretained id model,
 static void ModelSetValueForProperty(__unsafe_unretained id model,
                                      __unsafe_unretained id value,
                                      __unsafe_unretained _YYModelPropertyMeta *meta) {
+    
+    for (_YYModelPropertyCustomTransformSelector * _Nonnull obj in meta->_customSetters) {
+        if ([value isKindOfClass:obj->_classType]) {
+            ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, obj->_selector, value);
+            return;
+        }
+    }
+
     if (meta->_isCNumber) {
         NSNumber *num = YYNSNumberCreateFromID(value);
         ModelSetNumberToProperty(model, num, meta);
@@ -814,7 +860,21 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                     if ([value isKindOfClass:[NSDate class]]) {
                         ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, value);
                     } else if ([value isKindOfClass:[NSString class]]) {
-                        ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, YYNSDateFromString(value));
+                        NSDate *date = YYNSDateFromString(value);
+                        if (date == nil) {
+                            NSNumber *numVal = YYNSNumberCreateFromID(value);
+                            if (numVal != nil) {
+                                date = [NSDate dateWithTimeIntervalSince1970:numVal.doubleValue];
+                            }
+                        }
+                        ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, date);
+                    } else if ([value isKindOfClass:[NSNumber class]]) {
+                        NSNumber *numVal = YYNSNumberCreateFromID(value);
+                        NSDate *date = nil;
+                        if (numVal != nil) {
+                            date = [NSDate dateWithTimeIntervalSince1970:numVal.doubleValue];
+                        }
+                        ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, date);
                     }
                 } break;
                     

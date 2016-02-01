@@ -312,6 +312,14 @@
     
     model = [YYTestAutoTypeModel yy_modelWithJSON:@{@"v" : [NSDate new]}];
     XCTAssert([model.date isKindOfClass:[NSDate class]]);
+    
+    json = @"{\"v\" : \"1453258293.876\"}";
+    model = [YYTestAutoTypeModel yy_modelWithJSON:json];
+    XCTAssert([model.date isKindOfClass:[NSDate class]]);
+    
+    json = @"{\"v\" : 1453258298.123}";
+    model = [YYTestAutoTypeModel yy_modelWithJSON:json];
+    XCTAssert([model.date isKindOfClass:[NSDate class]]);
 }
 
 - (void)testString {
