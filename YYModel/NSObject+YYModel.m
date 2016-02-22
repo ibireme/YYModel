@@ -484,7 +484,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
                                                                     propertyInfo:propertyInfo
                                                                          generic:genericMapper[propertyInfo.name]];
             if (!meta || !meta->_name) continue;
-            if (!meta->_getter && !meta->_setter) continue;
+            if (!meta->_getter || !meta->_setter) continue;
             if (allPropertyMetas[meta->_name]) continue;
             allPropertyMetas[meta->_name] = meta;
         }
@@ -1167,18 +1167,8 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         } else {
             switch (propertyMeta->_type & YYEncodingTypeMask) {
                 case YYEncodingTypeObject: {
-                    /*
-                     When send the getter message to some object (for example:[[UIColor redColor] CIColor]),
-                     it may throws an exception.
-                     */
-                    @try {
-                        id v = ((id (*)(id, SEL))(void *) objc_msgSend)((id)model, propertyMeta->_getter);
-                        value = ModelToJSONObjectRecursive(v);
-                    }
-                    @catch (NSException *exception) {
-                        // Log the exception and ignore this value.
-                        NSLog(@"%@",exception);
-                    }
+                    id v = ((id (*)(id, SEL))(void *) objc_msgSend)((id)model, propertyMeta->_getter);
+                    value = ModelToJSONObjectRecursive(v);
                     if (value == (id)kCFNull) value = nil;
                 } break;
                 case YYEncodingTypeClass: {
@@ -1287,7 +1277,7 @@ static NSString *ModelDescription(NSObject *model) {
             NSArray *array = (id)model;
             NSMutableString *desc = [NSMutableString new];
             if (array.count == 0) {
-                 return [desc stringByAppendingString:@"[]"];
+                return [desc stringByAppendingString:@"[]"];
             } else {
                 [desc appendFormat:@"[\n"];
                 for (NSUInteger i = 0, max = array.count; i < max; i++) {

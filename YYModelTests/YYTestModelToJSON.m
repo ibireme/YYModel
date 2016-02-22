@@ -109,7 +109,7 @@
     model.shortValue = 4;
     model.array = @[@1,@"2",[NSURL URLWithString:@"https://github.com"]];
     model.set = [NSSet setWithArray:model.array];
-    model.color = [UIColor redColor];
+    model.color = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.5];
     
     NSDictionary *jsonObject = [model yy_modelToJSONObject];
     XCTAssert([jsonObject isKindOfClass:[NSDictionary class]]);
