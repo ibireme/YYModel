@@ -30,11 +30,11 @@
 
 
 
-@interface YYTextNestModel : XCTestCase
+@interface YYTestNestModel : XCTestCase
 
 @end
 
-@implementation YYTextNestModel
+@implementation YYTestNestModel
 
 - (void)test {
     NSString *json = @"{\"repoID\":1234,\"name\":\"YYModel\",\"user\":{\"uid\":5678,\"name\":\"ibireme\"}}";
