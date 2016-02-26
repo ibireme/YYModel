@@ -12,6 +12,8 @@
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  Type encoding's type.
  */
@@ -104,7 +106,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @property (nonatomic, assign, readonly) IMP imp;                        ///< method's implementation
 @property (nonatomic, strong, readonly) NSString *typeEncoding;         ///< method's parameter and return types
 @property (nonatomic, strong, readonly) NSString *returnTypeEncoding;   ///< return value's type
-@property (nonatomic, strong, readonly) NSArray *argumentTypeEncodings; ///< array of arguments' type
+@property (nonatomic, strong, readonly) NSArray<NSString *> *argumentTypeEncodings; ///< array of arguments' type
 
 /**
  Creates and returns a method info object.
@@ -125,7 +127,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @property (nonatomic, assign, readonly) YYEncodingType type;      ///< property's type
 @property (nonatomic, strong, readonly) NSString *typeEncoding;   ///< property's encoding value
 @property (nonatomic, strong, readonly) NSString *ivarName;       ///< property's ivar name
-@property (nonatomic, assign, readonly) Class cls;                ///< may be nil
+@property (nullable, nonatomic, assign, readonly) Class cls;      ///< may be nil
 @property (nonatomic, assign, readonly) SEL getter;               ///< getter (nonnull)
 @property (nonatomic, assign, readonly) SEL setter;               ///< setter (nonnull)
 
@@ -143,15 +145,15 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
  Class information for a class.
  */
 @interface YYClassInfo : NSObject
-@property (nonatomic, assign, readonly) Class cls;      ///< class object
-@property (nonatomic, assign, readonly) Class superCls; ///< super class object
-@property (nonatomic, assign, readonly) Class metaCls;  ///< class's meta class object
-@property (nonatomic, assign, readonly) BOOL isMeta;    ///< whether this class is meta class
+@property (nonatomic, assign, readonly) Class cls; ///< class object
+@property (nullable, nonatomic, assign, readonly) Class superCls; ///< super class object
+@property (nullable, nonatomic, assign, readonly) Class metaCls;  ///< class's meta class object
+@property (nonatomic, assign, readonly) BOOL isMeta; ///< whether this class is meta class
 @property (nonatomic, strong, readonly) NSString *name; ///< class name
-@property (nonatomic, strong, readonly) YYClassInfo *superClassInfo; ///< super class's class info
-@property (nonatomic, strong, readonly) NSDictionary *ivarInfos;     ///< key:NSString(ivar),     value:YYClassIvarInfo
-@property (nonatomic, strong, readonly) NSDictionary *methodInfos;   ///< key:NSString(selector), value:YYClassMethodInfo
-@property (nonatomic, strong, readonly) NSDictionary *propertyInfos; ///< key:NSString(property), value:YYClassPropertyInfo
+@property (nullable, nonatomic, strong, readonly) YYClassInfo *superClassInfo; ///< super class's class info
+@property (nullable, nonatomic, strong, readonly) NSDictionary<NSString *, YYClassIvarInfo *> *ivarInfos; ///< ivars
+@property (nullable, nonatomic, strong, readonly) NSDictionary<NSString *, YYClassMethodInfo *> *methodInfos; ///< methods
+@property (nullable, nonatomic, strong, readonly) NSDictionary<NSString *, YYClassPropertyInfo *> *propertyInfos; ///< properties
 
 /**
  If the class is changed (for example: you add a method to this class with
@@ -171,7 +173,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
  @param cls A class.
  @return A class info, or nil if an error occurs.
  */
-+ (instancetype)classInfoWithClass:(Class)cls;
++ (nullable instancetype)classInfoWithClass:(Class)cls;
 
 /**
  Get the class info of a specified Class.
@@ -182,6 +184,8 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
  @param className A class name.
  @return A class info, or nil if an error occurs.
  */
-+ (instancetype)classInfoWithClassName:(NSString *)className;
++ (nullable instancetype)classInfoWithClassName:(NSString *)className;
 
 @end
+
+NS_ASSUME_NONNULL_END

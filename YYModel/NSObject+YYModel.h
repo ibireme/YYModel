@@ -11,6 +11,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  Provide some data-model method:
  
@@ -73,7 +75,7 @@
  
  @return A new instance created from the json, or nil if an error occurs.
  */
-+ (instancetype)yy_modelWithJSON:(id)json;
++ (nullable instancetype)yy_modelWithJSON:(id)json;
 
 /**
  Creates and returns a new instance of the receiver from a key-value dictionary.
@@ -94,7 +96,7 @@
      `NSValue` -> struct or union, such as CGRect, CGSize, ...
      `NSString` -> SEL, Class.
  */
-+ (instancetype)yy_modelWithDictionary:(NSDictionary *)dictionary;
++ (nullable instancetype)yy_modelWithDictionary:(NSDictionary *)dictionary;
 
 /**
  Set the receiver's properties with a json object.
@@ -138,7 +140,7 @@
  If the reciver is `NSArray`, `NSDictionary` or `NSSet`, it just convert
  the inner object to json object.
  */
-- (id)yy_modelToJSONObject;
+- (nullable id)yy_modelToJSONObject;
 
 /**
  Generate a json string's data from the receiver's properties.
@@ -149,7 +151,7 @@
  If the reciver is `NSArray`, `NSDictionary` or `NSSet`, it will also convert the 
  inner object to json string.
  */
-- (NSData *)yy_modelToJSONData;
+- (nullable NSData *)yy_modelToJSONData;
 
 /**
  Generate a json string from the receiver's properties.
@@ -160,14 +162,14 @@
  If the reciver is `NSArray`, `NSDictionary` or `NSSet`, it will also convert the 
  inner object to json string.
  */
-- (NSString *)yy_modelToJSONString;
+- (nullable NSString *)yy_modelToJSONString;
 
 /**
  Copy a instance with the receiver's properties.
  
  @return A copied instance, or nil if an error occurs.
  */
-- (id)yy_modelCopy;
+- (nullable id)yy_modelCopy;
 
 /**
  Encode the receiver's properties to a coder.
@@ -227,7 +229,7 @@
  
  @return A array, or nil if an error occurs.
  */
-+ (NSArray *)yy_modelArrayWithClass:(Class)cls json:(id)json;
++ (nullable NSArray *)yy_modelArrayWithClass:(Class)cls json:(id)json;
 
 @end
 
@@ -248,7 +250,7 @@
  
  @return A array, or nil if an error occurs.
  */
-+ (NSDictionary *)yy_modelDictionaryWithClass:(Class)cls json:(id)json;
++ (nullable NSDictionary *)yy_modelDictionaryWithClass:(Class)cls json:(id)json;
 @end
 
 
@@ -298,7 +300,7 @@
  
  @return A custom mapper for properties.
  */
-+ (NSDictionary *)modelCustomPropertyMapper;
++ (NSDictionary<NSString *, id> *)modelCustomPropertyMapper;
 
 /**
  The generic class mapper for container properties.
@@ -327,7 +329,7 @@
  
  @return A class mapper.
  */
-+ (NSDictionary *)modelContainerPropertyGenericClass;
++ (NSDictionary<NSString *, id> *)modelContainerPropertyGenericClass;
 
 /**
  If you need to create instances of different classes during json->object transform,
@@ -361,23 +363,23 @@
  @return Class to create from this dictionary, `nil` to use current class.
 
  */
-+ (Class)modelCustomClassForDictionary:(NSDictionary*)dictionary;
++ (nullable Class)modelCustomClassForDictionary:(NSDictionary *)dictionary;
 
 /**
  All the properties in blacklist will be ignored in model transform process.
  Returns nil to ignore this feature.
  
- @return An array of property's name (Array<NSString>).
+ @return An array of property's name.
  */
-+ (NSArray *)modelPropertyBlacklist;
++ (NSArray<NSString *> *)modelPropertyBlacklist;
 
 /**
  If a property is not in the whitelist, it will be ignored in model transform process.
  Returns nil to ignore this feature.
  
- @return An array of property's name (Array<NSString>).
+ @return An array of property's name.
  */
-+ (NSArray *)modelPropertyWhitelist;
++ (NSArray<NSString *> *)modelPropertyWhitelist;
 
 /**
  If the default json-to-model transform does not fit to your model object, implement
@@ -410,3 +412,5 @@
 - (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic;
 
 @end
+
+NS_ASSUME_NONNULL_END
