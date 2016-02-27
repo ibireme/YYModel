@@ -300,7 +300,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return A custom mapper for properties.
  */
-+ (NSDictionary<NSString *, id> *)modelCustomPropertyMapper;
++ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper;
 
 /**
  The generic class mapper for container properties.
@@ -329,7 +329,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return A class mapper.
  */
-+ (NSDictionary<NSString *, id> *)modelContainerPropertyGenericClass;
++ (nullable NSDictionary<NSString *, id> *)modelContainerPropertyGenericClass;
 
 /**
  If you need to create instances of different classes during json->object transform,
@@ -371,7 +371,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return An array of property's name.
  */
-+ (NSArray<NSString *> *)modelPropertyBlacklist;
++ (nullable NSArray<NSString *> *)modelPropertyBlacklist;
 
 /**
  If a property is not in the whitelist, it will be ignored in model transform process.
@@ -379,7 +379,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return An array of property's name.
  */
-+ (NSArray<NSString *> *)modelPropertyWhitelist;
++ (nullable NSArray<NSString *> *)modelPropertyWhitelist;
 
 /**
  If the default json-to-model transform does not fit to your model object, implement

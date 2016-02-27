@@ -106,7 +106,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @property (nonatomic, assign, readonly) IMP imp;                        ///< method's implementation
 @property (nonatomic, strong, readonly) NSString *typeEncoding;         ///< method's parameter and return types
 @property (nonatomic, strong, readonly) NSString *returnTypeEncoding;   ///< return value's type
-@property (nonatomic, strong, readonly) NSArray<NSString *> *argumentTypeEncodings; ///< array of arguments' type
+@property (nullable, nonatomic, strong, readonly) NSArray<NSString *> *argumentTypeEncodings; ///< array of arguments' type
 
 /**
  Creates and returns a method info object.
@@ -148,7 +148,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @property (nonatomic, assign, readonly) Class cls; ///< class object
 @property (nullable, nonatomic, assign, readonly) Class superCls; ///< super class object
 @property (nullable, nonatomic, assign, readonly) Class metaCls;  ///< class's meta class object
-@property (nonatomic, assign, readonly) BOOL isMeta; ///< whether this class is meta class
+@property (nonatomic, readonly) BOOL isMeta; ///< whether this class is meta class
 @property (nonatomic, strong, readonly) NSString *name; ///< class name
 @property (nullable, nonatomic, strong, readonly) YYClassInfo *superClassInfo; ///< super class's class info
 @property (nullable, nonatomic, strong, readonly) NSDictionary<NSString *, YYClassIvarInfo *> *ivarInfos; ///< ivars
