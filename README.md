@@ -268,7 +268,7 @@ Installation
 
 ### CocoaPods
 
-1. Add `pod "YYModel"` to your Podfile.
+1. Add `pod 'YYModel'` to your Podfile.
 2. Run `pod install` or `pod update`.
 3. Import \<YYModel/YYModel.h\>.
 
@@ -295,7 +295,7 @@ You can also install documentation locally using [appledoc](https://github.com/t
 
 Requirements
 ==============
-This library requires a deployment target of iOS 6.0 or greater.
+This library requires `iOS 6.0+` and `Xcode 7.0+`.
 
 
 License
@@ -579,7 +579,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 
 ### CocoaPods
 
-1. 在 Podfile 中添加 `pod "YYModel"`。
+1. 在 Podfile 中添加 `pod 'YYModel'`。
 2. 执行 `pod install` 或 `pod update`。
 3. 导入 \<YYModel/YYModel.h\>。
 
@@ -603,10 +603,9 @@ EEE MMM dd HH:mm:ss Z yyyy
 你可以在 [CocoaDocs](http://cocoadocs.org/docsets/YYModel/) 查看在线 API 文档，也可以用 [appledoc](https://github.com/tomaz/appledoc) 本地生成文档。
 
 
-
 系统要求
 ==============
-该项目最低支持 iOS 6.0。
+该项目最低支持 `iOS 6.0` 和 `Xcode 7.0`。
 
 
 许可证
