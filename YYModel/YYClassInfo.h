@@ -159,10 +159,18 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
  If the class is changed (for example: you add a method to this class with
  'class_addMethod()'), you should call this method to refresh the class info cache.
  
- After called this method, you may call 'classInfoWithClass' or 
- 'classInfoWithClassName' to get the updated class info.
+ After called this method, `needUpdate` will returns `YES`, and you should call 
+ 'classInfoWithClass' or 'classInfoWithClassName' to get the updated class info.
  */
 - (void)setNeedUpdate;
+
+/**
+ If this method returns `YES`, you should stop using this instance and call
+ `classInfoWithClass` or `classInfoWithClassName` to get the updated class info.
+ 
+ @return Whether this class info need update.
+ */
+- (BOOL)needUpdate;
 
 /**
  Get the class info of a specified Class.
