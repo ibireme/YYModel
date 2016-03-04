@@ -152,6 +152,7 @@
     formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
     formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
     
+    //NOTE: the test 'XCTAssert([newModel.date isEqualToDate:date]);' in the following would be failed if time interval is not int
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:100000000];
     NSString *dateString = [formatter stringFromDate:date];
     
