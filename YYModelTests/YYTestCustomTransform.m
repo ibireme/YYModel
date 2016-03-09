@@ -20,6 +20,18 @@
 
 @implementation YYTestCustomTransformModel
 
+
+-(NSDictionary *)modelCustomWillTransformFromDictionary:(NSDictionary *)dic{
+    if (dic) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:dic];
+        if (dict[@"date"]) {
+            dict[@"time"] = dict[@"date"];
+        }
+        return dict;
+    }
+    return dic;
+}
+
 - (BOOL)modelCustomTransformFromDictionary:(NSDictionary *)dic {
     NSNumber *time = dic[@"time"];
     if ([time isKindOfClass:[NSNumber class]] && time.unsignedLongLongValue != 0) {
@@ -74,6 +86,11 @@
     model.time = nil;
     jsonObject = [model yy_modelToJSONObject];
     XCTAssert(jsonObject == nil);
+    
+    json = @"{\"id\":5472746497,\"content\":\"Hello\",\"date\":1401234567000}";
+    model = [YYTestCustomTransformModel yy_modelWithJSON:json];
+    XCTAssert(model.time != nil);
+    
 }
 
 @end
