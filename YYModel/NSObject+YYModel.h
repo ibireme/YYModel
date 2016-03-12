@@ -225,11 +225,25 @@ NS_ASSUME_NONNULL_BEGIN
  
  @param cls  The instance's class in array.
  @param json  A json array of `NSArray`, `NSString` or `NSData`.
-              Example: [{"name","Mary"},{name:"Joe"}]
+              Example: [{"name","Mary"},{"name":"Joe"}]
  
  @return A array, or nil if an error occurs.
  */
 + (nullable NSArray *)yy_modelArrayWithClass:(Class)cls json:(id)json;
+
+/**
+ Creates and returns an Jsonstring from a MutableArray,
+  and the MutableArray contains dictionary.
+ 
+ @param Example:[{"name","Mart"},{"name","Joe"}...]
+        the MutableArray will convert to the Jsonstring.
+        It belongs to NSString.
+ 
+ 
+ @return A Jsonstring,or nil if an error occurs
+ */
+
+- (NSString *)yy_modelArrayToJSONString;
 
 @end
 

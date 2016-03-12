@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "C3339B365A7E5D6D5058E70B093D4E7EA5F9D6A9",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "671C94D0B6C9BEFD737DE3554FB6637D3F4F0E69" : 0,
+    "C3339B365A7E5D6D5058E70B093D4E7EA5F9D6A9" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "330B35E9-BDEE-468A-9F42-46BFB245CF1D",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "671C94D0B6C9BEFD737DE3554FB6637D3F4F0E69" : "",
+    "C3339B365A7E5D6D5058E70B093D4E7EA5F9D6A9" : "YYModel\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "YYModel",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Framework\/YYModel.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/sasuke6\/App---WeatherXu.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "671C94D0B6C9BEFD737DE3554FB6637D3F4F0E69"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/sasuke6\/YYModel.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "C3339B365A7E5D6D5058E70B093D4E7EA5F9D6A9"
+    }
+  ]
+}
