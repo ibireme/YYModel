@@ -36,6 +36,7 @@
 @property CGRect structValue;
 @property CGPoint pointValue;
 
+@property (nonatomic, strong) id anyObject;
 @property (nonatomic, strong) NSObject *object;
 @property (nonatomic, strong) NSNumber *number;
 @property (nonatomic, strong) NSDecimalNumber *decimal;
@@ -79,6 +80,7 @@
               @"structValue" : @"v",
               @"pointValue" : @"v",
               
+              @"anyObject" : @"v",
               @"object" : @"v",
               @"number" : @"v",
               @"decimal" : @"v",
@@ -131,12 +133,18 @@
     XCTAssert(model.floatValue == 1);
     XCTAssert(model.doubleValue == 1);
     XCTAssert(model.longDoubleValue == 1);
+    XCTAssert([model.anyObject isEqual:@(1)]);
     XCTAssert([model.object isEqual:@(1)]);
     XCTAssert([model.number isEqual:@(1)]);
     XCTAssert([model.decimal isEqual:@(1)]);
     XCTAssert([model.string isEqualToString:@"1"]);
     XCTAssert([model.mString isEqualToString:@"1"]);
     XCTAssert([model.mString isKindOfClass:[NSMutableString class]]);
+    XCTAssert(model.classValue == nil);
+    XCTAssert(model.selectorValue == nil);
+    XCTAssert(model.blockValue == nil);
+    XCTAssert(model.pointerValue == nil);
+    
     
     json = @"{\"v\" : 1.5}";
     model = [YYTestAutoTypeModel yy_modelWithJSON:json];
@@ -155,6 +163,7 @@
     XCTAssert(model.floatValue == 1.5);
     XCTAssert(model.doubleValue == 1.5);
     XCTAssert(model.longDoubleValue == 1.5);
+    XCTAssert([model.anyObject isEqual:@(1.5)]);
     XCTAssert([model.object isEqual:@(1.5)]);
     XCTAssert([model.number isEqual:@(1.5)]);
     XCTAssert([model.decimal isEqual:@(1.5)]);
@@ -179,6 +188,7 @@
     XCTAssert(model.floatValue == -1);
     XCTAssert(model.doubleValue == -1);
     XCTAssert(model.longDoubleValue == -1);
+    XCTAssert([model.anyObject isEqual:@(-1)]);
     XCTAssert([model.object isEqual:@(-1)]);
     XCTAssert([model.number isEqual:@(-1)]);
     XCTAssert([model.decimal isEqual:@(-1)]);
@@ -203,6 +213,7 @@
     XCTAssert(model.floatValue == 2);
     XCTAssert(model.doubleValue == 2);
     XCTAssert(model.longDoubleValue == 2);
+    XCTAssert([model.anyObject isEqual:@"2"]);
     XCTAssert([model.object isEqual:@"2"]);
     XCTAssert([model.number isEqual:@(2)]);
     XCTAssert([model.decimal isEqual:@(2)]);
