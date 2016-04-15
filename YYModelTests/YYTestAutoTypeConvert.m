@@ -320,6 +320,30 @@
     json = @"{\"v\" : \"Fri Sep 04 00:12:21 +0800 2015\"}";
     model = [YYTestAutoTypeModel yy_modelWithJSON:json];
     XCTAssert([model.date isKindOfClass:[NSDate class]]);
+
+    json = @"{\"v\" : \"2014-05-06 07:08:09.000\"}";
+    model = [YYTestAutoTypeModel yy_modelWithJSON:json];
+    XCTAssert([model.date isKindOfClass:[NSDate class]]);
+
+    json = @"{\"v\" : \"2014-05-06T07:08:09.000\"}";
+    model = [YYTestAutoTypeModel yy_modelWithJSON:json];
+    XCTAssert([model.date isKindOfClass:[NSDate class]]);
+
+    json = @"{\"v\" : \"2014-01-20T12:24:48.000Z\"}";
+    model = [YYTestAutoTypeModel yy_modelWithJSON:json];
+    XCTAssert([model.date isKindOfClass:[NSDate class]]);
+
+    json = @"{\"v\" : \"2014-01-20T12:24:48.000Z\"}";
+    model = [YYTestAutoTypeModel yy_modelWithJSON:json];
+    XCTAssert([model.date isKindOfClass:[NSDate class]]);
+
+    json = @"{\"v\" : \"2014-01-20T12:24:48.000+12:00\"}";
+    model = [YYTestAutoTypeModel yy_modelWithJSON:json];
+    XCTAssert([model.date isKindOfClass:[NSDate class]]);
+
+    json = @"{\"v\" : \"Fri Sep 04 00:12:21.000 +0800 2015\"}";
+    model = [YYTestAutoTypeModel yy_modelWithJSON:json];
+    XCTAssert([model.date isKindOfClass:[NSDate class]]);
     
     model = [YYTestAutoTypeModel yy_modelWithJSON:@{@"v" : [NSDate new]}];
     XCTAssert([model.date isKindOfClass:[NSDate class]]);
