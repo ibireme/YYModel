@@ -1,18 +1,18 @@
 //
 //  JSONModel.h
 //
-//  @version 1.0.2
-//  @author Marin Todorov, http://www.touch-code-magazine.com
+//  @version 1.2
+//  @author Marin Todorov (http://www.underplot.com) and contributors
 //
 
-// Copyright (c) 2012-2014 Marin Todorov, Underplot ltd.
+// Copyright (c) 2012-2015 Marin Todorov, Underplot ltd.
 // This code is distributed under the terms and conditions of the MIT license.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// The MIT License in plain English: http://www.touch-code-magazine.com/JSONModel/MITLicense
+
 
 #import <Foundation/Foundation.h>
 
@@ -108,7 +108,7 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
  * should suffice, but developers have the option ot also overwrite it if needed.
  *
  * @param data representing a JSON response (usually fetched from web), to be imported in the model.
- * @param err an error or NULL
+ * @param error an error or NULL
  */
 -(instancetype)initWithData:(NSData*)data error:(NSError**)error;
 
@@ -152,7 +152,7 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
    * Create a new model instance and initialize it with the JSON from a text parameter. The method assumes UTF8 encoded input text.
    * @param string JSON text data
    * @param err an initialization error or nil
-   * @exception JSONModelTypeNotAllowedException thrown when unsported type is found in the incoming JSON, 
+   * @exception JSONModelTypeNotAllowedException thrown when unsupported type is found in the incoming JSON,
    * or a property type in your model is not supported by JSONValueTransformer and its categories
    * @see initWithString:usingEncoding:error: for use of custom text encodings
    */
@@ -163,7 +163,7 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
    * @param string JSON text data
    * @param encoding the text encoding to use when parsing the string (see NSStringEncoding)
    * @param err an initialization error or nil
-   * @exception JSONModelTypeNotAllowedException thrown when unsported type is found in the incoming JSON, 
+   * @exception JSONModelTypeNotAllowedException thrown when unsupported type is found in the incoming JSON,
    * or a property type in your model is not supported by JSONValueTransformer and its categories
    */
   -(instancetype)initWithString:(NSString *)string usingEncoding:(NSStringEncoding)encoding error:(JSONModelError**)err;
@@ -222,29 +222,30 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
    *
    * @param array list of dictionaries to be imported as models
    * @return list of initialized data model objects
-   * @exception JSONModelTypeNotAllowedException thrown when unsported type is found in the incoming JSON, 
+   * @exception JSONModelTypeNotAllowedException thrown when unsupported type is found in the incoming JSON,
    * or a property type in your model is not supported by JSONValueTransformer and its categories
    * @exception JSONModelInvalidDataException thrown when the input data does not include all required keys
    * @see arrayOfDictionariesFromModels:
    */
-  +(NSMutableArray*)arrayOfModelsFromDictionaries:(NSArray*)array;
-
+  +(NSMutableArray*)arrayOfModelsFromDictionaries:(NSArray*)array __attribute__((deprecated("use arrayOfModelsFromDictionaries:error:")));
   +(NSMutableArray*)arrayOfModelsFromDictionaries:(NSArray*)array error:(NSError**)err;
-
   +(NSMutableArray*)arrayOfModelsFromData:(NSData*)data error:(NSError**)err;
+  +(NSMutableArray*)arrayOfModelsFromString:(NSString*)string error:(NSError**)err;
+  +(NSMutableDictionary*)dictionaryOfModelsFromDictionary:(NSDictionary*)dictionary error:(NSError**)err;
+  +(NSMutableDictionary*)dictionaryOfModelsFromData:(NSData*)data error:(NSError**)err;
+  +(NSMutableDictionary*)dictionaryOfModelsFromString:(NSString*)string error:(NSError**)err;
 
   /**
    * If you have an NSArray of data model objects, this method takes it in and outputs a list of the 
    * matching dictionaries. This method does the opposite of arrayOfObjectsFromDictionaries:
    * @param array list of JSONModel objects
    * @return a list of NSDictionary objects
-   * @exception JSONModelTypeNotAllowedException thrown when unsported type is found in the incoming JSON, 
+   * @exception JSONModelTypeNotAllowedException thrown when unsupported type is found in the incoming JSON,
    * or a property type in your model is not supported by JSONValueTransformer and its categories
    * @see arrayOfModelsFromDictionaries:
    */
   +(NSMutableArray*)arrayOfDictionariesFromModels:(NSArray*)array;
-
-
+  +(NSMutableDictionary*)dictionaryOfDictionariesFromModels:(NSDictionary*)dictionary;
 
 /** @name Comparing models */
 
@@ -256,14 +257,14 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
   -(NSString*)indexPropertyName;
 
   /**
-   * Overriden NSObject method to compare model objects. Compares the &lt;Index&gt; property of the two models,
+   * Overridden NSObject method to compare model objects. Compares the &lt;Index&gt; property of the two models,
    * if an index property is defined.
    * @param object a JSONModel instance to compare to for equality
    */
   -(BOOL)isEqual:(id)object;
 
   /**
-   * Comparision method, which uses the defined &lt;Index&gt; property of the two models, to compare them.
+   * Comparison method, which uses the defined &lt;Index&gt; property of the two models, to compare them.
    * If there isn't an index property throws an exception. If the Index property does not have a compare: method
    * also throws an exception. NSString and NSNumber have compare: methods, and in case the Index property is 
    * a another custom class, the programmer should create a custom compare: method then.
@@ -276,7 +277,7 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
   /**
    * Overwrite the validate method in your own models if you need to perform some custom validation over the model data.
    * This method gets called at the very end of the JSONModel initializer, thus the model is in the state that you would
-   * get it back when initialzed. Check the values of any property that needs to be validated and if any invalid values
+   * get it back when initialized. Check the values of any property that needs to be validated and if any invalid values
    * are encountered return NO and set the error parameter to an NSError object. If the model is valid return YES.
    *
    * NB: Only setting the error parameter is not enough to fail the validation, you also need to return a NO value.
@@ -298,7 +299,7 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
  * Sets a key mapper which affects ALL the models in your project. Use this if you need only one mapper to work
  * with your API. For example if you are using the [JSONKeyMapper mapperFromUnderscoreCaseToCamelCase] it is more
  * likely that you will need to use it with ALL of your models.
- * NB: Custom key mappers take precendence over the global key mapper.
+ * NB: Custom key mappers take precedence over the global key mapper.
  * @param globalKeyMapper a key mapper to apply to all models in your project.
  *
  * Lookup JSONKeyMapper docs for more details.
@@ -324,11 +325,26 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
 +(BOOL)propertyIsIgnored:(NSString*)propertyName;
 
 /**
+ * Indicates the protocol name for an array property.
+ * Rather than using:
+ *     @property (strong) NSArray<MyType>* things;
+ * You can implement protocolForArrayProperty: and keep your property 
+ * defined like:
+ *     @property (strong) NSArray* things;
+ * @param propertyName the name of the property
+ * @return an NSString result indicating the name of the protocol/class
+ * that should be contained in this array property. Return nil to indicate
+ * no contained protocol.
+ */
++(NSString*)protocolForArrayProperty:(NSString *)propertyName;
+
+/**
  * Merges values from the given dictionary into the model instance.
  * @param dict dictionary with values
  * @param useKeyMapping if YES the method will use the model's key mapper and the global key mapper, if NO 
  * it'll just try to match the dictionary keys to the model's properties
  */
--(void)mergeFromDictionary:(NSDictionary*)dict useKeyMapping:(BOOL)useKeyMapping;
+- (void)mergeFromDictionary:(NSDictionary *)dict useKeyMapping:(BOOL)useKeyMapping __attribute__((deprecated("use mergeFromDictionary:useKeyMapping:error:")));
+- (void)mergeFromDictionary:(NSDictionary *)dict useKeyMapping:(BOOL)useKeyMapping error:(NSError **)error;
 
 @end

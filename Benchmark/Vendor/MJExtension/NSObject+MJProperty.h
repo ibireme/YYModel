@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MJExtensionConst.h"
 
 @class MJProperty;
 
@@ -34,7 +35,7 @@ typedef id (^MJNewValueFromOldValue)(id object, id oldValue, MJProperty *propert
 /**
  *  遍历所有的成员
  */
-+ (void)enumerateProperties:(MJPropertiesEnumeration)enumeration;
++ (void)mj_enumerateProperties:(MJPropertiesEnumeration)enumeration;
 
 #pragma mark - 新值配置
 /**
@@ -42,8 +43,8 @@ typedef id (^MJNewValueFromOldValue)(id object, id oldValue, MJProperty *propert
  *
  *  @param newValueFormOldValue 用于过滤字典中的值
  */
-+ (void)setupNewValueFromOldValue:(MJNewValueFromOldValue)newValueFormOldValue;
-+ (id)getNewValueFromObject:(__weak id)object oldValue:(__weak id)oldValue property:(__weak MJProperty *)property;
++ (void)mj_setupNewValueFromOldValue:(MJNewValueFromOldValue)newValueFormOldValue;
++ (id)mj_getNewValueFromObject:(__unsafe_unretained id)object oldValue:(__unsafe_unretained id)oldValue property:(__unsafe_unretained MJProperty *)property;
 
 #pragma mark - key配置
 /**
@@ -51,13 +52,13 @@ typedef id (^MJNewValueFromOldValue)(id object, id oldValue, MJProperty *propert
  *
  *  @param replacedKeyFromPropertyName 将属性名换为其他key去字典中取值
  */
-+ (void)setupReplacedKeyFromPropertyName:(MJReplacedKeyFromPropertyName)replacedKeyFromPropertyName;
++ (void)mj_setupReplacedKeyFromPropertyName:(MJReplacedKeyFromPropertyName)replacedKeyFromPropertyName;
 /**
  *  将属性名换为其他key去字典中取值
  *
  *  @param replacedKeyFromPropertyName121 将属性名换为其他key去字典中取值
  */
-+ (void)setupReplacedKeyFromPropertyName121:(MJReplacedKeyFromPropertyName121)replacedKeyFromPropertyName121;
++ (void)mj_setupReplacedKeyFromPropertyName121:(MJReplacedKeyFromPropertyName121)replacedKeyFromPropertyName121;
 
 #pragma mark - array model class配置
 /**
@@ -65,5 +66,14 @@ typedef id (^MJNewValueFromOldValue)(id object, id oldValue, MJProperty *propert
  *
  *  @param objectClassInArray          数组中需要转换的模型类
  */
-+ (void)setupObjectClassInArray:(MJObjectClassInArray)objectClassInArray;
++ (void)mj_setupObjectClassInArray:(MJObjectClassInArray)objectClassInArray;
+@end
+
+@interface NSObject (MJPropertyDeprecated_v_2_5_16)
++ (void)enumerateProperties:(MJPropertiesEnumeration)enumeration MJExtensionDeprecated("请在方法名前面加上mj_前缀，使用mj_***");
++ (void)setupNewValueFromOldValue:(MJNewValueFromOldValue)newValueFormOldValue MJExtensionDeprecated("请在方法名前面加上mj_前缀，使用mj_***");
++ (id)getNewValueFromObject:(__unsafe_unretained id)object oldValue:(__unsafe_unretained id)oldValue property:(__unsafe_unretained MJProperty *)property MJExtensionDeprecated("请在方法名前面加上mj_前缀，使用mj_***");
++ (void)setupReplacedKeyFromPropertyName:(MJReplacedKeyFromPropertyName)replacedKeyFromPropertyName MJExtensionDeprecated("请在方法名前面加上mj_前缀，使用mj_***");
++ (void)setupReplacedKeyFromPropertyName121:(MJReplacedKeyFromPropertyName121)replacedKeyFromPropertyName121 MJExtensionDeprecated("请在方法名前面加上mj_前缀，使用mj_***");
++ (void)setupObjectClassInArray:(MJObjectClassInArray)objectClassInArray MJExtensionDeprecated("请在方法名前面加上mj_前缀，使用mj_***");
 @end

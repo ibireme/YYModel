@@ -18,7 +18,7 @@
 //#import "ModelBenchmark-Swift.h"
 
 /*
- Benchmark: (update to 2015-09-18)
+ Benchmark: (update to 2016-01-15)
  YYModel: https://github.com/ibireme/YYKit
  Mantle: https://github.com/Mantle/Mantle
  JSONModel: https://github.com/icanzilb/JSONModel
@@ -83,7 +83,7 @@
             [adapter modelFromJSONDictionary:json error:nil];
             
             // MJExtension
-            [MJGHUser objectWithKeyValues:json];
+            [MJGHUser mj_objectWithKeyValues:json];
         }
     }
     /// warm up holder
@@ -327,7 +327,7 @@
         begin = CACurrentMediaTime();
         @autoreleasepool {
             for (int i = 0; i < count; i++) {
-                MJGHUser *user = [MJGHUser objectWithKeyValues:json];
+                MJGHUser *user = [MJGHUser mj_objectWithKeyValues:json];
                 [user class];
             }
         }
@@ -335,7 +335,7 @@
         printf("MJExtension:     %8.2f   ", (end - begin) * 1000);
         
         
-        MJGHUser *user = [MJGHUser objectWithKeyValues:json];
+        MJGHUser *user = [MJGHUser mj_objectWithKeyValues:json];
         if (user.userID == 0) NSLog(@"error!");
         if (!user.login) NSLog(@"error!");
         if (!user.htmlURL) NSLog(@"error");
@@ -344,12 +344,12 @@
         begin = CACurrentMediaTime();
         @autoreleasepool {
             for (int i = 0; i < count; i++) {
-                NSDictionary *json = [user JSONObject];
+                NSDictionary *json = [user mj_JSONObject];
                 [holder addObject:json];
             }
         }
         end = CACurrentMediaTime();
-        if ([NSJSONSerialization isValidJSONObject:[user JSONObject]]) {
+        if ([NSJSONSerialization isValidJSONObject:[user mj_JSONObject]]) {
             printf("%8.2f   ", (end - begin) * 1000);
         } else {
             printf("   error   ");
@@ -407,7 +407,7 @@
             [adapter modelFromJSONDictionary:json error:nil];
             
             // MJExtension
-            [MJWeiboStatus objectWithKeyValues:json];
+            [MJWeiboStatus mj_objectWithKeyValues:json];
         }
     }
     
@@ -589,7 +589,7 @@
         begin = CACurrentMediaTime();
         @autoreleasepool {
             for (int i = 0; i < count; i++) {
-                MJWeiboStatus *feed = [MJWeiboStatus objectWithKeyValues:json];
+                MJWeiboStatus *feed = [MJWeiboStatus mj_objectWithKeyValues:json];
                 [holder addObject:feed];
             }
         }
@@ -597,17 +597,17 @@
         printf("MJExtension:     %8.2f   ", (end - begin) * 1000);
         
         
-        MJWeiboStatus *feed = [MJWeiboStatus objectWithKeyValues:json];
+        MJWeiboStatus *feed = [MJWeiboStatus mj_objectWithKeyValues:json];
         [holder removeAllObjects];
         begin = CACurrentMediaTime();
         @autoreleasepool {
             for (int i = 0; i < count; i++) {
-                NSDictionary *json = [feed JSONObject];
+                NSDictionary *json = [feed mj_JSONObject];
                 [holder addObject:json];
             }
         }
         end = CACurrentMediaTime();
-        if ([NSJSONSerialization isValidJSONObject:[feed JSONObject]]) {
+        if ([NSJSONSerialization isValidJSONObject:[feed mj_JSONObject]]) {
             printf("%8.2f   ", (end - begin) * 1000);
         } else {
             printf("   error   ");
@@ -673,7 +673,7 @@
         logError(@"Mantle:         ", mtUser);
         
         // MJExtension
-        MJGHUser *mjUser = [MJGHUser objectWithKeyValues:json];
+        MJGHUser *mjUser = [MJGHUser mj_objectWithKeyValues:json];
         logError(@"MJExtension:    ", mjUser);
         
         printf("\n");
@@ -730,7 +730,7 @@
         logError(@"Mantle:         ", mtUser);
         
         // MJExtension
-        MJGHUser *mjUser = [MJGHUser objectWithKeyValues:json];
+        MJGHUser *mjUser = [MJGHUser mj_objectWithKeyValues:json];
         logError(@"MJExtension:    ", mjUser);
     }
     
@@ -777,7 +777,7 @@
         logError(@"Mantle:         ", mtUser);
         
         // MJExtension
-        MJGHUser *mjUser = [MJGHUser objectWithKeyValues:json];
+        MJGHUser *mjUser = [MJGHUser mj_objectWithKeyValues:json];
         logError(@"MJExtension:    ", mjUser);
         
         printf("\n");
@@ -830,7 +830,7 @@
         logError(@"Mantle:         ", mtUser);
         
         // MJExtension
-        MJGHUser *mjUser = [MJGHUser objectWithKeyValues:json];
+        MJGHUser *mjUser = [MJGHUser mj_objectWithKeyValues:json];
         logError(@"MJExtension:    ", mjUser);
         
         printf("\n");

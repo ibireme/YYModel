@@ -11,7 +11,6 @@
 
 #import "NSObject+YYModel.h"
 #import "YYClassInfo.h"
-#import <libkern/OSAtomic.h>
 #import <objc/message.h>
 
 #define force_inline __inline__ __attribute__((always_inline))
@@ -133,9 +132,9 @@ static force_inline NSNumber *YYNSNumberCreateFromID(__unsafe_unretained id valu
 }
 
 /// Parse string to date.
-static NSDate *YYNSDateFromString(__unsafe_unretained NSString *string) {
+static force_inline NSDate *YYNSDateFromString(__unsafe_unretained NSString *string) {
     typedef NSDate* (^YYNSDateParseBlock)(NSString *string);
-    #define kParserNum 32
+    #define kParserNum 34
     static YYNSDateParseBlock blocks[kParserNum + 1] = {0};
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -154,6 +153,8 @@ static NSDate *YYNSDateFromString(__unsafe_unretained NSString *string) {
             /*
              2014-01-20 12:24:48
              2014-01-20T12:24:48   // Google
+             2014-01-20 12:24:48.000
+             2014-01-20T12:24:48.000
              */
             NSDateFormatter *formatter1 = [[NSDateFormatter alloc] init];
             formatter1.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
@@ -164,21 +165,30 @@ static NSDate *YYNSDateFromString(__unsafe_unretained NSString *string) {
             formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter2.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
             formatter2.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+
+            NSDateFormatter *formatter3 = [[NSDateFormatter alloc] init];
+            formatter3.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter3.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            formatter3.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSS";
+
+            NSDateFormatter *formatter4 = [[NSDateFormatter alloc] init];
+            formatter4.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter4.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            formatter4.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS";
             
             blocks[19] = ^(NSString *string) {
                 if ([string characterAtIndex:10] == 'T') {
                     return [formatter1 dateFromString:string];
                 } else {
-                    time_t t = 0;
-                    struct tm tm = {0};
-                    strptime([string cStringUsingEncoding:NSUTF8StringEncoding], "%Y-%m-%d %H:%M:%S", &tm);
-                    tm.tm_isdst = -1;
-                    t = mktime(&tm);
-                    if (t >= 0) {
-                        NSDate *date = [NSDate dateWithTimeIntervalSince1970:t + [[NSTimeZone localTimeZone] secondsFromGMT]];
-                        if (date) return date;
-                    }
                     return [formatter2 dateFromString:string];
+                }
+            };
+
+            blocks[23] = ^(NSString *string) {
+                if ([string characterAtIndex:10] == 'T') {
+                    return [formatter3 dateFromString:string];
+                } else {
+                    return [formatter4 dateFromString:string];
                 }
             };
         }
@@ -188,34 +198,40 @@ static NSDate *YYNSDateFromString(__unsafe_unretained NSString *string) {
              2014-01-20T12:24:48Z        // Github, Apple
              2014-01-20T12:24:48+0800    // Facebook
              2014-01-20T12:24:48+12:00   // Google
+             2014-01-20T12:24:48.000Z
+             2014-01-20T12:24:48.000+0800
+             2014-01-20T12:24:48.000+12:00
              */
             NSDateFormatter *formatter = [NSDateFormatter new];
             formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
-            blocks[20] = ^(NSString *string) {
-                time_t t = 0;
-                struct tm tm = {0};
-                strptime([string cStringUsingEncoding:NSUTF8StringEncoding], "%Y-%m-%dT%H:%M:%S%z", &tm);
-                tm.tm_isdst = -1;
-                t = mktime(&tm);
-                if (t >= 0) {
-                    NSDate *date = [NSDate dateWithTimeIntervalSince1970:t + [[NSTimeZone localTimeZone] secondsFromGMT]];
-                    if (date) return date;
-                }
-                return [formatter dateFromString:string];
-            };
-            blocks[24] = ^(NSString *string) { return [formatter dateFromString:string]; };
+
+            NSDateFormatter *formatter2 = [NSDateFormatter new];
+            formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter2.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+
+            blocks[20] = ^(NSString *string) { return [formatter dateFromString:string]; };
+            blocks[24] = ^(NSString *string) { return [formatter dateFromString:string]?: [formatter2 dateFromString:string]; };
             blocks[25] = ^(NSString *string) { return [formatter dateFromString:string]; };
+            blocks[28] = ^(NSString *string) { return [formatter2 dateFromString:string]; };
+            blocks[29] = ^(NSString *string) { return [formatter2 dateFromString:string]; };
         }
         
         {
             /*
              Fri Sep 04 00:12:21 +0800 2015 // Weibo, Twitter
+             Fri Sep 04 00:12:21.000 +0800 2015
              */
             NSDateFormatter *formatter = [NSDateFormatter new];
             formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter.dateFormat = @"EEE MMM dd HH:mm:ss Z yyyy";
+
+            NSDateFormatter *formatter2 = [NSDateFormatter new];
+            formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter2.dateFormat = @"EEE MMM dd HH:mm:ss.SSS Z yyyy";
+
             blocks[30] = ^(NSString *string) { return [formatter dateFromString:string]; };
+            blocks[34] = ^(NSString *string) { return [formatter2 dateFromString:string]; };
         }
     });
     if (!string) return nil;
@@ -281,9 +297,28 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     return value;
 }
 
+/// Get the value with multi key (or key path) from dictionary
+/// The dic should be NSDictionary
+static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic, __unsafe_unretained NSArray *multiKeys) {
+    id value = nil;
+    for (NSString *key in multiKeys) {
+        if ([key isKindOfClass:[NSString class]]) {
+            value = dic[key];
+            if (value) break;
+        } else {
+            value = YYValueForKeyPath(dic, (NSArray *)key);
+            if (value) break;
+        }
+    }
+    return value;
+}
+
+
+
+
 /// A property info in object model.
 @interface _YYModelPropertyMeta : NSObject {
-    @public
+    @package
     NSString *_name;             ///< property's name
     YYEncodingType _type;        ///< property's type
     YYEncodingNSType _nsType;    ///< property's Foundation type
@@ -292,9 +327,19 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     Class _genericCls;           ///< container's generic class, or nil if threr's no generic class
     SEL _getter;                 ///< getter, or nil if the instances cannot respond
     SEL _setter;                 ///< setter, or nil if the instances cannot respond
+    BOOL _isKVCCompatible;       ///< YES if it can access with key-value coding
+    BOOL _isStructAvailableForKeyedArchiver; ///< YES if the struct can encoded with keyed archiver/unarchiver
     BOOL _hasCustomClassFromDictionary; ///< class/generic class implements +modelCustomClassForDictionary:
+    
+    /*
+     property->key:       _mappedToKey:key     _mappedToKeyPath:nil            _mappedToKeyArray:nil
+     property->keyPath:   _mappedToKey:keyPath _mappedToKeyPath:keyPath(array) _mappedToKeyArray:nil
+     property->keys:      _mappedToKey:keys[0] _mappedToKeyPath:nil/keyPath    _mappedToKeyArray:keys(array)
+     */
     NSString *_mappedToKey;      ///< the key mapped to
     NSArray *_mappedToKeyPath;   ///< the key path mapped to (nil if the name is not key path)
+    NSArray *_mappedToKeyArray;  ///< the key(NSString) or keyPath(NSArray) array (nil if not mapped to multiple keys)
+    YYClassPropertyInfo *_info;  ///< property's info
     _YYModelPropertyMeta *_next; ///< next meta if there are multiple properties mapped to the same key.
 }
 @end
@@ -304,31 +349,87 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     _YYModelPropertyMeta *meta = [self new];
     meta->_name = propertyInfo.name;
     meta->_type = propertyInfo.type;
+    meta->_info = propertyInfo;
     meta->_genericCls = generic;
+    
     if ((meta->_type & YYEncodingTypeMask) == YYEncodingTypeObject) {
         meta->_nsType = YYClassGetNSType(propertyInfo.cls);
     } else {
         meta->_isCNumber = YYEncodingTypeIsCNumber(meta->_type);
     }
+    if ((meta->_type & YYEncodingTypeMask) == YYEncodingTypeStruct) {
+        /*
+         It seems that NSKeyedUnarchiver cannot decode NSValue except these structs:
+         */
+        static NSSet *types = nil;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            NSMutableSet *set = [NSMutableSet new];
+            // 32 bit
+            [set addObject:@"{CGSize=ff}"];
+            [set addObject:@"{CGPoint=ff}"];
+            [set addObject:@"{CGRect={CGPoint=ff}{CGSize=ff}}"];
+            [set addObject:@"{CGAffineTransform=ffffff}"];
+            [set addObject:@"{UIEdgeInsets=ffff}"];
+            [set addObject:@"{UIOffset=ff}"];
+            // 64 bit
+            [set addObject:@"{CGSize=dd}"];
+            [set addObject:@"{CGPoint=dd}"];
+            [set addObject:@"{CGRect={CGPoint=dd}{CGSize=dd}}"];
+            [set addObject:@"{CGAffineTransform=dddddd}"];
+            [set addObject:@"{UIEdgeInsets=dddd}"];
+            [set addObject:@"{UIOffset=dd}"];
+            types = set;
+        });
+        if ([types containsObject:propertyInfo.typeEncoding]) {
+            meta->_isStructAvailableForKeyedArchiver = YES;
+        }
+    }
     meta->_cls = propertyInfo.cls;
-
+    
     if (generic) {
         meta->_hasCustomClassFromDictionary = [generic respondsToSelector:@selector(modelCustomClassForDictionary:)];
-    } else if (meta->_cls && meta->_type == YYEncodingTypeNSUnknown) {
+    } else if (meta->_cls && meta->_nsType == YYEncodingTypeNSUnknown) {
         meta->_hasCustomClassFromDictionary = [meta->_cls respondsToSelector:@selector(modelCustomClassForDictionary:)];
     }
-
     
     if (propertyInfo.getter) {
-        SEL sel = NSSelectorFromString(propertyInfo.getter);
-        if ([classInfo.cls instancesRespondToSelector:sel]) {
-            meta->_getter = sel;
+        if ([classInfo.cls instancesRespondToSelector:propertyInfo.getter]) {
+            meta->_getter = propertyInfo.getter;
         }
     }
     if (propertyInfo.setter) {
-        SEL sel = NSSelectorFromString(propertyInfo.setter);
-        if ([classInfo.cls instancesRespondToSelector:sel]) {
-            meta->_setter = sel;
+        if ([classInfo.cls instancesRespondToSelector:propertyInfo.setter]) {
+            meta->_setter = propertyInfo.setter;
+        }
+    }
+    
+    if (meta->_getter && meta->_setter) {
+        /*
+         KVC invalid type:
+         long double
+         pointer (such as SEL/CoreFoundation object)
+         */
+        switch (meta->_type & YYEncodingTypeMask) {
+            case YYEncodingTypeBool:
+            case YYEncodingTypeInt8:
+            case YYEncodingTypeUInt8:
+            case YYEncodingTypeInt16:
+            case YYEncodingTypeUInt16:
+            case YYEncodingTypeInt32:
+            case YYEncodingTypeUInt32:
+            case YYEncodingTypeInt64:
+            case YYEncodingTypeUInt64:
+            case YYEncodingTypeFloat:
+            case YYEncodingTypeDouble:
+            case YYEncodingTypeObject:
+            case YYEncodingTypeClass:
+            case YYEncodingTypeBlock:
+            case YYEncodingTypeStruct:
+            case YYEncodingTypeUnion: {
+                meta->_isKVCCompatible = YES;
+            } break;
+            default: break;
         }
     }
     
@@ -339,18 +440,22 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
 
 /// A class info in object model.
 @interface _YYModelMeta : NSObject {
-    @public
+    @package
+    YYClassInfo *_classInfo;
     /// Key:mapped key and key path, Value:_YYModelPropertyInfo.
     NSDictionary *_mapper;
-    /// Array<_YYModelPropertyInfo>, all property meta of this model.
+    /// Array<_YYModelPropertyMeta>, all property meta of this model.
     NSArray *_allPropertyMetas;
-    /// Array<_YYModelPropertyInfo>, property meta which is mapped to a key path.
+    /// Array<_YYModelPropertyMeta>, property meta which is mapped to a key path.
     NSArray *_keyPathPropertyMetas;
+    /// Array<_YYModelPropertyMeta>, property meta which is mapped to multi keys.
+    NSArray *_multiKeysPropertyMetas;
     /// The number of mapped key (and key path), same to _mapper.count.
     NSUInteger _keyMappedCount;
     /// Model class type.
     YYEncodingNSType _nsType;
     
+    BOOL _hasCustomWillTransformFromDictionary;
     BOOL _hasCustomTransformFromDictionary;
     BOOL _hasCustomTransformToDictionary;
     BOOL _hasCustomClassFromDictionary;
@@ -386,7 +491,7 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     if ([cls respondsToSelector:@selector(modelContainerPropertyGenericClass)]) {
         genericMapper = [(id<YYModel>)cls modelContainerPropertyGenericClass];
         if (genericMapper) {
-            NSMutableDictionary *tmp = genericMapper.mutableCopy;
+            NSMutableDictionary *tmp = [NSMutableDictionary new];
             [genericMapper enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
                 if (![key isKindOfClass:[NSString class]]) return;
                 Class meta = object_getClass(obj);
@@ -416,7 +521,7 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
                                                                     propertyInfo:propertyInfo
                                                                          generic:genericMapper[propertyInfo.name]];
             if (!meta || !meta->_name) continue;
-            if (!meta->_getter && !meta->_setter) continue;
+            if (!meta->_getter || !meta->_setter) continue;
             if (allPropertyMetas[meta->_name]) continue;
             allPropertyMetas[meta->_name] = meta;
         }
@@ -427,39 +532,71 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     // create mapper
     NSMutableDictionary *mapper = [NSMutableDictionary new];
     NSMutableArray *keyPathPropertyMetas = [NSMutableArray new];
+    NSMutableArray *multiKeysPropertyMetas = [NSMutableArray new];
+    
     if ([cls respondsToSelector:@selector(modelCustomPropertyMapper)]) {
         NSDictionary *customMapper = [(id <YYModel>)cls modelCustomPropertyMapper];
         [customMapper enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSString *mappedToKey, BOOL *stop) {
             _YYModelPropertyMeta *propertyMeta = allPropertyMetas[propertyName];
-            if (propertyMeta) {
-                NSArray *keyPath = [mappedToKey componentsSeparatedByString:@"."];
+            if (!propertyMeta) return;
+            [allPropertyMetas removeObjectForKey:propertyName];
+            
+            if ([mappedToKey isKindOfClass:[NSString class]]) {
+                if (mappedToKey.length == 0) return;
+                
                 propertyMeta->_mappedToKey = mappedToKey;
+                NSArray *keyPath = [mappedToKey componentsSeparatedByString:@"."];
                 if (keyPath.count > 1) {
                     propertyMeta->_mappedToKeyPath = keyPath;
                     [keyPathPropertyMetas addObject:propertyMeta];
                 }
-                [allPropertyMetas removeObjectForKey:propertyName];
-                if (mapper[mappedToKey]) {
-                    ((_YYModelPropertyMeta *)mapper[mappedToKey])->_next = propertyMeta;
-                } else {
-                    mapper[mappedToKey] = propertyMeta;
+                propertyMeta->_next = mapper[mappedToKey] ?: nil;
+                mapper[mappedToKey] = propertyMeta;
+                
+            } else if ([mappedToKey isKindOfClass:[NSArray class]]) {
+                
+                NSMutableArray *mappedToKeyArray = [NSMutableArray new];
+                for (NSString *oneKey in ((NSArray *)mappedToKey)) {
+                    if (![oneKey isKindOfClass:[NSString class]]) continue;
+                    if (oneKey.length == 0) continue;
+                    
+                    NSArray *keyPath = [oneKey componentsSeparatedByString:@"."];
+                    if (keyPath.count > 1) {
+                        [mappedToKeyArray addObject:keyPath];
+                    } else {
+                        [mappedToKeyArray addObject:oneKey];
+                    }
+                    
+                    if (!propertyMeta->_mappedToKey) {
+                        propertyMeta->_mappedToKey = oneKey;
+                        propertyMeta->_mappedToKeyPath = keyPath.count > 1 ? keyPath : nil;
+                    }
                 }
+                if (!propertyMeta->_mappedToKey) return;
+                
+                propertyMeta->_mappedToKeyArray = mappedToKeyArray;
+                [multiKeysPropertyMetas addObject:propertyMeta];
+                
+                propertyMeta->_next = mapper[mappedToKey] ?: nil;
+                mapper[mappedToKey] = propertyMeta;
             }
         }];
     }
+    
     [allPropertyMetas enumerateKeysAndObjectsUsingBlock:^(NSString *name, _YYModelPropertyMeta *propertyMeta, BOOL *stop) {
         propertyMeta->_mappedToKey = name;
-        if (mapper[name]) {
-            ((_YYModelPropertyMeta *)mapper[name])->_next = propertyMeta;
-        } else {
-            mapper[name] = propertyMeta;
-        }
+        propertyMeta->_next = mapper[name] ?: nil;
+        mapper[name] = propertyMeta;
     }];
     
     if (mapper.count) _mapper = mapper;
-    if(keyPathPropertyMetas) _keyPathPropertyMetas = keyPathPropertyMetas;
+    if (keyPathPropertyMetas) _keyPathPropertyMetas = keyPathPropertyMetas;
+    if (multiKeysPropertyMetas) _multiKeysPropertyMetas = multiKeysPropertyMetas;
+    
+    _classInfo = classInfo;
     _keyMappedCount = _allPropertyMetas.count;
     _nsType = YYClassGetNSType(cls);
+    _hasCustomWillTransformFromDictionary = ([cls instancesRespondToSelector:@selector(modelCustomWillTransformFromDictionary:)]);
     _hasCustomTransformFromDictionary = ([cls instancesRespondToSelector:@selector(modelCustomTransformFromDictionary:)]);
     _hasCustomTransformToDictionary = ([cls instancesRespondToSelector:@selector(modelCustomTransformToDictionary:)]);
     _hasCustomClassFromDictionary = ([cls respondsToSelector:@selector(modelCustomClassForDictionary:)]);
@@ -472,20 +609,20 @@ static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, 
     if (!cls) return nil;
     static CFMutableDictionaryRef cache;
     static dispatch_once_t onceToken;
-    static OSSpinLock lock;
+    static dispatch_semaphore_t lock;
     dispatch_once(&onceToken, ^{
         cache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        lock = OS_SPINLOCK_INIT;
+        lock = dispatch_semaphore_create(1);
     });
-    OSSpinLockLock(&lock);
+    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
     _YYModelMeta *meta = CFDictionaryGetValue(cache, (__bridge const void *)(cls));
-    OSSpinLockUnlock(&lock);
-    if (!meta) {
+    dispatch_semaphore_signal(lock);
+    if (!meta || meta->_classInfo.needUpdate) {
         meta = [[_YYModelMeta alloc] initWithClass:cls];
         if (meta) {
-            OSSpinLockLock(&lock);
+            dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
             CFDictionarySetValue(cache, (__bridge const void *)(cls), (__bridge const void *)(meta));
-            OSSpinLockUnlock(&lock);
+            dispatch_semaphore_signal(lock);
         }
     }
     return meta;
@@ -506,46 +643,46 @@ static force_inline NSNumber *ModelCreateNumberFromProperty(__unsafe_unretained 
     switch (meta->_type & YYEncodingTypeMask) {
         case YYEncodingTypeBool: {
             return @(((bool (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter));
-        } break;
+        }
         case YYEncodingTypeInt8: {
             return @(((int8_t (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter));
-        } break;
+        }
         case YYEncodingTypeUInt8: {
             return @(((uint8_t (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter));
-        } break;
+        }
         case YYEncodingTypeInt16: {
             return @(((int16_t (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter));
-        } break;
+        }
         case YYEncodingTypeUInt16: {
             return @(((uint16_t (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter));
-        } break;
+        }
         case YYEncodingTypeInt32: {
             return @(((int32_t (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter));
-        } break;
+        }
         case YYEncodingTypeUInt32: {
             return @(((uint32_t (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter));
-        } break;
+        }
         case YYEncodingTypeInt64: {
             return @(((int64_t (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter));
-        } break;
+        }
         case YYEncodingTypeUInt64: {
             return @(((uint64_t (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter));
-        } break;
+        }
         case YYEncodingTypeFloat: {
             float num = ((float (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter);
             if (isnan(num) || isinf(num)) return nil;
             return @(num);
-        } break;
+        }
         case YYEncodingTypeDouble: {
             double num = ((double (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter);
             if (isnan(num) || isinf(num)) return nil;
             return @(num);
-        } break;
+        }
         case YYEncodingTypeLongDouble: {
             double num = ((long double (*)(id, SEL))(void *) objc_msgSend)((id)model, meta->_getter);
             if (isnan(num) || isinf(num)) return nil;
             return @(num);
-        } break;
+        }
         default: return nil;
     }
 }
@@ -602,15 +739,15 @@ static force_inline void ModelSetNumberToProperty(__unsafe_unretained id model,
             ((void (*)(id, SEL, float))(void *) objc_msgSend)((id)model, meta->_setter, f);
         } break;
         case YYEncodingTypeDouble: {
-            double d = num.floatValue;
+            double d = num.doubleValue;
             if (isnan(d) || isinf(d)) d = 0;
             ((void (*)(id, SEL, double))(void *) objc_msgSend)((id)model, meta->_setter, d);
         } break;
         case YYEncodingTypeLongDouble: {
-            double d = num.floatValue;
+            long double d = num.doubleValue;
             if (isnan(d) || isinf(d)) d = 0;
             ((void (*)(id, SEL, long double))(void *) objc_msgSend)((id)model, meta->_setter, (long double)d);
-        } break;
+        } // break; commented for code coverage in next line
         default: break;
     }
 }
@@ -642,11 +779,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         if (meta->_nsType == YYEncodingTypeNSString) {
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, value);
                         } else {
-                            if ([value isKindOfClass:[NSMutableString class]]) {
-                                ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, value);
-                            } else {
-                                ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, ((NSString *)value).mutableCopy);
-                            }
+                            ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, ((NSString *)value).mutableCopy);
                         }
                     } else if ([value isKindOfClass:[NSNumber class]]) {
                         ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
@@ -704,7 +837,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         if (meta->_nsType == YYEncodingTypeNSData) {
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, value);
                         } else {
-                            NSMutableData *data = [value isKindOfClass:[NSMutableData class]] ? value : ((NSData *)value).mutableCopy;
+                            NSMutableData *data = ((NSData *)value).mutableCopy;
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, data);
                         }
                     } else if ([value isKindOfClass:[NSString class]]) {
@@ -750,12 +883,12 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 if ([one isKindOfClass:meta->_genericCls]) {
                                     [objectArr addObject:one];
                                 } else if ([one isKindOfClass:[NSDictionary class]]) {
-                                    Class clazz = meta->_genericCls;
+                                    Class cls = meta->_genericCls;
                                     if (meta->_hasCustomClassFromDictionary) {
-                                        clazz = [clazz modelCustomClassForDictionary:one] ?: clazz;
+                                        cls = [cls modelCustomClassForDictionary:one];
+                                        if (!cls) cls = meta->_genericCls; // for xcode code coverage
                                     }
-                                    
-                                    NSObject *newOne = [clazz new];
+                                    NSObject *newOne = [cls new];
                                     [newOne yy_modelSetWithDictionary:one];
                                     if (newOne) [objectArr addObject:newOne];
                                 }
@@ -769,8 +902,6 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             } else {
                                 ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
                                                                                meta->_setter,
-                                                                               [value isKindOfClass:[NSMutableArray class]] ?
-                                                                               value :
                                                                                ((NSArray *)value).mutableCopy);
                             }
                         } else if ([value isKindOfClass:[NSSet class]]) {
@@ -779,8 +910,6 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             } else {
                                 ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
                                                                                meta->_setter,
-                                                                               [value isKindOfClass:[NSMutableArray class]] ?
-                                                                               ((NSSet *)value).allObjects :
                                                                                ((NSSet *)value).allObjects.mutableCopy);
                             }
                         }
@@ -792,16 +921,16 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                     if ([value isKindOfClass:[NSDictionary class]]) {
                         if (meta->_genericCls) {
                             NSMutableDictionary *dic = [NSMutableDictionary new];
-                            [((NSDictionary *)value) enumerateKeysAndObjectsUsingBlock:^(NSString *oneKey, NSObject *oneValue, BOOL *stop) {
+                            [((NSDictionary *)value) enumerateKeysAndObjectsUsingBlock:^(NSString *oneKey, id oneValue, BOOL *stop) {
                                 if ([oneValue isKindOfClass:[NSDictionary class]]) {
-                                    Class clazz = meta->_genericCls;
+                                    Class cls = meta->_genericCls;
                                     if (meta->_hasCustomClassFromDictionary) {
-                                        clazz = [clazz modelCustomClassForDictionary:(NSDictionary *)oneValue] ?: clazz;
+                                        cls = [cls modelCustomClassForDictionary:oneValue];
+                                        if (!cls) cls = meta->_genericCls; // for xcode code coverage
                                     }
-
-                                    NSObject *o = [clazz new];
-                                    [o yy_modelSetWithDictionary:(id)oneValue];
-                                    if (o) dic[oneKey] = o;
+                                    NSObject *newOne = [cls new];
+                                    [newOne yy_modelSetWithDictionary:(id)oneValue];
+                                    if (newOne) dic[oneKey] = newOne;
                                 }
                             }];
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, dic);
@@ -811,8 +940,6 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             } else {
                                 ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
                                                                                meta->_setter,
-                                                                               [value isKindOfClass:[NSMutableDictionary class]] ?
-                                                                               value :
                                                                                ((NSDictionary *)value).mutableCopy);
                             }
                         }
@@ -831,28 +958,27 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             if ([one isKindOfClass:meta->_genericCls]) {
                                 [set addObject:one];
                             } else if ([one isKindOfClass:[NSDictionary class]]) {
-                                Class clazz = meta->_genericCls;
+                                Class cls = meta->_genericCls;
                                 if (meta->_hasCustomClassFromDictionary) {
-                                    clazz = [clazz modelCustomClassForDictionary:one] ?: clazz;
+                                    cls = [cls modelCustomClassForDictionary:one];
+                                    if (!cls) cls = meta->_genericCls; // for xcode code coverage
                                 }
-                                NSObject *newOne = [clazz new];
+                                NSObject *newOne = [cls new];
                                 [newOne yy_modelSetWithDictionary:one];
                                 if (newOne) [set addObject:newOne];
                             }
                         }
-                        ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, valueSet);
+                        ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, set);
                     } else {
                         if (meta->_nsType == YYEncodingTypeNSSet) {
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, valueSet);
                         } else {
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
                                                                            meta->_setter,
-                                                                           [valueSet isKindOfClass:[NSMutableSet class]] ?
-                                                                           valueSet :
                                                                            ((NSSet *)valueSet).mutableCopy);
                         }
                     }
-                } break;
+                } // break; commented for code coverage in next line
                     
                 default: break;
             }
@@ -863,7 +989,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
             case YYEncodingTypeObject: {
                 if (isNull) {
                     ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, (id)nil);
-                } else if ([value isKindOfClass:meta->_cls]) {
+                } else if ([value isKindOfClass:meta->_cls] || !meta->_cls) {
                     ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, (id)value);
                 } else if ([value isKindOfClass:[NSDictionary class]]) {
                     NSObject *one = nil;
@@ -873,11 +999,12 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                     if (one) {
                         [one yy_modelSetWithDictionary:value];
                     } else {
-                        Class clazz = meta->_cls;
+                        Class cls = meta->_cls;
                         if (meta->_hasCustomClassFromDictionary) {
-                            clazz = [clazz modelCustomClassForDictionary:value] ?: clazz;
+                            cls = [cls modelCustomClassForDictionary:value];
+                            if (!cls) cls = meta->_genericCls; // for xcode code coverage
                         }
-                        one = [clazz new];
+                        one = [cls new];
                         [one yy_modelSetWithDictionary:value];
                         ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, (id)one);
                     }
@@ -888,9 +1015,19 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                 if (isNull) {
                     ((void (*)(id, SEL, Class))(void *) objc_msgSend)((id)model, meta->_setter, (Class)NULL);
                 } else {
-                    Class cls = ((NSObject *)value).class;
-                    if (cls && class_isMetaClass(cls)) {
-                        ((void (*)(id, SEL, Class))(void *) objc_msgSend)((id)model, meta->_setter, (Class)value);
+                    Class cls = nil;
+                    if ([value isKindOfClass:[NSString class]]) {
+                        cls = NSClassFromString(value);
+                        if (cls) {
+                            ((void (*)(id, SEL, Class))(void *) objc_msgSend)((id)model, meta->_setter, (Class)cls);
+                        }
+                    } else {
+                        cls = object_getClass(value);
+                        if (cls) {
+                            if (class_isMetaClass(cls)) {
+                                ((void (*)(id, SEL, Class))(void *) objc_msgSend)((id)model, meta->_setter, (Class)value);
+                            }
+                        }
                     }
                 }
             } break;
@@ -916,7 +1053,11 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
             case YYEncodingTypeUnion:
             case YYEncodingTypeCArray: {
                 if ([value isKindOfClass:[NSValue class]]) {
-                    [model setValue:value forKey:meta->_name];
+                    const char *valueType = ((NSValue *)value).objCType;
+                    const char *metaType = meta->_info.typeEncoding.UTF8String;
+                    if (valueType && metaType && strcmp(valueType, metaType) == 0) {
+                        [model setValue:value forKey:meta->_name];
+                    }
                 }
             } break;
                 
@@ -925,10 +1066,12 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                 if (isNull) {
                     ((void (*)(id, SEL, void *))(void *) objc_msgSend)((id)model, meta->_setter, (void *)NULL);
                 } else if ([value isKindOfClass:[NSValue class]]) {
-                    void *pointer = ((NSValue *)value).pointerValue;
-                    ((void (*)(id, SEL, void *))(void *) objc_msgSend)((id)model, meta->_setter, (void *)pointer);
+                    NSValue *nsValue = value;
+                    if (nsValue.objCType && strcmp(nsValue.objCType, "^v") == 0) {
+                        ((void (*)(id, SEL, void *))(void *) objc_msgSend)((id)model, meta->_setter, nsValue.pointerValue);
+                    }
                 }
-            } break;
+            } // break; commented for code coverage in next line
                 
             default: break;
         }
@@ -974,11 +1117,15 @@ static void ModelSetWithPropertyMetaArrayFunction(const void *_propertyMeta, voi
     __unsafe_unretained _YYModelPropertyMeta *propertyMeta = (__bridge _YYModelPropertyMeta *)(_propertyMeta);
     if (!propertyMeta->_setter) return;
     id value = nil;
-    if (propertyMeta->_mappedToKeyPath) {
-        value = (YYValueForKeyPath(dictionary, propertyMeta->_mappedToKeyPath));
+    
+    if (propertyMeta->_mappedToKeyArray) {
+        value = YYValueForMultiKeys(dictionary, propertyMeta->_mappedToKeyArray);
+    } else if (propertyMeta->_mappedToKeyPath) {
+        value = YYValueForKeyPath(dictionary, propertyMeta->_mappedToKeyPath);
     } else {
         value = [dictionary objectForKey:propertyMeta->_mappedToKey];
     }
+    
     if (value) {
         __unsafe_unretained id model = (__bridge id)(context->model);
         ModelSetValueForProperty(model, value, propertyMeta);
@@ -1087,10 +1234,8 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
                 subDic = superDic[key];
                 if (subDic) {
                     if ([subDic isKindOfClass:[NSDictionary class]]) {
-                        if (![subDic isKindOfClass:[NSMutableDictionary class]]) {
-                            subDic = subDic.mutableCopy;
-                            superDic[key] = subDic;
-                        }
+                        subDic = subDic.mutableCopy;
+                        superDic[key] = subDic;
                     } else {
                         break;
                     }
@@ -1115,33 +1260,160 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     return result;
 }
 
+/// Add indent to string (exclude first line)
+static NSMutableString *ModelDescriptionAddIndent(NSMutableString *desc, NSUInteger indent) {
+    for (NSUInteger i = 0, max = desc.length; i < max; i++) {
+        unichar c = [desc characterAtIndex:i];
+        if (c == '\n') {
+            for (NSUInteger j = 0; j < indent; j++) {
+                [desc insertString:@"    " atIndex:i + 1];
+            }
+            i += indent * 4;
+            max += indent * 4;
+        }
+    }
+    return desc;
+}
+
+/// Generaate a description string
+static NSString *ModelDescription(NSObject *model) {
+    static const int kDescMaxLength = 100;
+    if (!model) return @"<nil>";
+    if (model == (id)kCFNull) return @"<null>";
+    if (![model isKindOfClass:[NSObject class]]) return [NSString stringWithFormat:@"%@",model];
+    
+    
+    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:model.class];
+    switch (modelMeta->_nsType) {
+        case YYEncodingTypeNSString: case YYEncodingTypeNSMutableString: {
+            return [NSString stringWithFormat:@"\"%@\"",model];
+        }
+        
+        case YYEncodingTypeNSValue:
+        case YYEncodingTypeNSData: case YYEncodingTypeNSMutableData: {
+            NSString *tmp = model.description;
+            if (tmp.length > kDescMaxLength) {
+                tmp = [tmp substringToIndex:kDescMaxLength];
+                tmp = [tmp stringByAppendingString:@"..."];
+            }
+            return tmp;
+        }
+            
+        case YYEncodingTypeNSNumber:
+        case YYEncodingTypeNSDecimalNumber:
+        case YYEncodingTypeNSDate:
+        case YYEncodingTypeNSURL: {
+            return [NSString stringWithFormat:@"%@",model];
+        }
+            
+        case YYEncodingTypeNSSet: case YYEncodingTypeNSMutableSet: {
+            model = ((NSSet *)model).allObjects;
+        } // no break
+            
+        case YYEncodingTypeNSArray: case YYEncodingTypeNSMutableArray: {
+            NSArray *array = (id)model;
+            NSMutableString *desc = [NSMutableString new];
+            if (array.count == 0) {
+                return [desc stringByAppendingString:@"[]"];
+            } else {
+                [desc appendFormat:@"[\n"];
+                for (NSUInteger i = 0, max = array.count; i < max; i++) {
+                    NSObject *obj = array[i];
+                    [desc appendString:@"    "];
+                    [desc appendString:ModelDescriptionAddIndent(ModelDescription(obj).mutableCopy, 1)];
+                    [desc appendString:(i + 1 == max) ? @"\n" : @";\n"];
+                }
+                [desc appendString:@"]"];
+                return desc;
+            }
+        }
+        case YYEncodingTypeNSDictionary: case YYEncodingTypeNSMutableDictionary: {
+            NSDictionary *dic = (id)model;
+            NSMutableString *desc = [NSMutableString new];
+            if (dic.count == 0) {
+                return [desc stringByAppendingString:@"{}"];
+            } else {
+                NSArray *keys = dic.allKeys;
+                
+                [desc appendFormat:@"{\n"];
+                for (NSUInteger i = 0, max = keys.count; i < max; i++) {
+                    NSString *key = keys[i];
+                    NSObject *value = dic[key];
+                    [desc appendString:@"    "];
+                    [desc appendFormat:@"%@ = %@",key, ModelDescriptionAddIndent(ModelDescription(value).mutableCopy, 1)];
+                    [desc appendString:(i + 1 == max) ? @"\n" : @";\n"];
+                }
+                [desc appendString:@"}"];
+            }
+            return desc;
+        }
+        
+        default: {
+            NSMutableString *desc = [NSMutableString new];
+            [desc appendFormat:@"<%@: %p>", model.class, model];
+            if (modelMeta->_allPropertyMetas.count == 0) return desc;
+            
+            // sort property names
+            NSArray *properties = [modelMeta->_allPropertyMetas
+                                   sortedArrayUsingComparator:^NSComparisonResult(_YYModelPropertyMeta *p1, _YYModelPropertyMeta *p2) {
+                                       return [p1->_name compare:p2->_name];
+                                   }];
+            
+            [desc appendFormat:@" {\n"];
+            for (NSUInteger i = 0, max = properties.count; i < max; i++) {
+                _YYModelPropertyMeta *property = properties[i];
+                NSString *propertyDesc;
+                if (property->_isCNumber) {
+                    NSNumber *num = ModelCreateNumberFromProperty(model, property);
+                    propertyDesc = num.stringValue;
+                } else {
+                    switch (property->_type & YYEncodingTypeMask) {
+                        case YYEncodingTypeObject: {
+                            id v = ((id (*)(id, SEL))(void *) objc_msgSend)((id)model, property->_getter);
+                            propertyDesc = ModelDescription(v);
+                            if (!propertyDesc) propertyDesc = @"<nil>";
+                        } break;
+                        case YYEncodingTypeClass: {
+                            id v = ((id (*)(id, SEL))(void *) objc_msgSend)((id)model, property->_getter);
+                            propertyDesc = ((NSObject *)v).description;
+                            if (!propertyDesc) propertyDesc = @"<nil>";
+                        } break;
+                        case YYEncodingTypeSEL: {
+                            SEL sel = ((SEL (*)(id, SEL))(void *) objc_msgSend)((id)model, property->_getter);
+                            if (sel) propertyDesc = NSStringFromSelector(sel);
+                            else propertyDesc = @"<NULL>";
+                        } break;
+                        case YYEncodingTypeBlock: {
+                            id block = ((id (*)(id, SEL))(void *) objc_msgSend)((id)model, property->_getter);
+                            propertyDesc = block ? ((NSObject *)block).description : @"<nil>";
+                        } break;
+                        case YYEncodingTypeCArray: case YYEncodingTypeCString: case YYEncodingTypePointer: {
+                            void *pointer = ((void* (*)(id, SEL))(void *) objc_msgSend)((id)model, property->_getter);
+                            propertyDesc = [NSString stringWithFormat:@"%p",pointer];
+                        } break;
+                        case YYEncodingTypeStruct: case YYEncodingTypeUnion: {
+                            NSValue *value = [model valueForKey:property->_name];
+                            propertyDesc = value ? value.description : @"{unknown}";
+                        } break;
+                        default: propertyDesc = @"<unknown>";
+                    }
+                }
+                
+                propertyDesc = ModelDescriptionAddIndent(propertyDesc.mutableCopy, 1);
+                [desc appendFormat:@"    %@ = %@",property->_name, propertyDesc];
+                [desc appendString:(i + 1 == max) ? @"\n" : @";\n"];
+            }
+            [desc appendFormat:@"}"];
+            return desc;
+        }
+    }
+}
 
 
 @implementation NSObject (YYModel)
 
-+ (instancetype)yy_modelWithJSON:(id)json {
++ (NSDictionary *)_yy_dictionaryWithJSON:(id)json {
     if (!json || json == (id)kCFNull) return nil;
-    NSObject *one = [self new];
-    [one yy_modelSetWithJSON:json];
-    return one;
-}
-
-+ (instancetype)yy_modelWithDictionary:(NSDictionary *)dictionary {
-    if (!dictionary || dictionary == (id)kCFNull) return nil;
-    if (![dictionary isKindOfClass:[NSDictionary class]]) return nil;
-    Class clazz = [self class];
-    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:clazz];
-    if (modelMeta->_hasCustomClassFromDictionary) {
-        clazz = [clazz modelCustomClassForDictionary:dictionary] ?: clazz;
-    }
-
-    NSObject *one = [clazz new];
-    [one yy_modelSetWithDictionary:dictionary];
-    return one;
-}
-
-- (BOOL)yy_modelSetWithJSON:(id)json {
-    if (!json || json == (id)kCFNull) return NO;
     NSDictionary *dic = nil;
     NSData *jsonData = nil;
     if ([json isKindOfClass:[NSDictionary class]]) {
@@ -1155,6 +1427,31 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         dic = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:NULL];
         if (![dic isKindOfClass:[NSDictionary class]]) dic = nil;
     }
+    return dic;
+}
+
++ (instancetype)yy_modelWithJSON:(id)json {
+    NSDictionary *dic = [self _yy_dictionaryWithJSON:json];
+    return [self yy_modelWithDictionary:dic];
+}
+
++ (instancetype)yy_modelWithDictionary:(NSDictionary *)dictionary {
+    if (!dictionary || dictionary == (id)kCFNull) return nil;
+    if (![dictionary isKindOfClass:[NSDictionary class]]) return nil;
+    
+    Class cls = [self class];
+    _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:cls];
+    if (modelMeta->_hasCustomClassFromDictionary) {
+        cls = [cls modelCustomClassForDictionary:dictionary] ?: cls;
+    }
+    
+    NSObject *one = [cls new];
+    if ([one yy_modelSetWithDictionary:dictionary]) return one;
+    return nil;
+}
+
+- (BOOL)yy_modelSetWithJSON:(id)json {
+    NSDictionary *dic = [NSObject _yy_dictionaryWithJSON:json];
     return [self yy_modelSetWithDictionary:dic];
 }
 
@@ -1162,18 +1459,32 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     if (!dic || dic == (id)kCFNull) return NO;
     if (![dic isKindOfClass:[NSDictionary class]]) return NO;
     
+
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:object_getClass(self)];
     if (modelMeta->_keyMappedCount == 0) return NO;
+    
+    if (modelMeta->_hasCustomWillTransformFromDictionary) {
+        dic = [((id<YYModel>)self) modelCustomWillTransformFromDictionary:dic];
+        if (![dic isKindOfClass:[NSDictionary class]]) return NO;
+    }
+    
     ModelSetContext context = {0};
     context.modelMeta = (__bridge void *)(modelMeta);
     context.model = (__bridge void *)(self);
     context.dictionary = (__bridge void *)(dic);
+    
     
     if (modelMeta->_keyMappedCount >= CFDictionaryGetCount((CFDictionaryRef)dic)) {
         CFDictionaryApplyFunction((CFDictionaryRef)dic, ModelSetWithDictionaryFunction, &context);
         if (modelMeta->_keyPathPropertyMetas) {
             CFArrayApplyFunction((CFArrayRef)modelMeta->_keyPathPropertyMetas,
                                  CFRangeMake(0, CFArrayGetCount((CFArrayRef)modelMeta->_keyPathPropertyMetas)),
+                                 ModelSetWithPropertyMetaArrayFunction,
+                                 &context);
+        }
+        if (modelMeta->_multiKeysPropertyMetas) {
+            CFArrayApplyFunction((CFArrayRef)modelMeta->_multiKeysPropertyMetas,
+                                 CFRangeMake(0, CFArrayGetCount((CFArrayRef)modelMeta->_multiKeysPropertyMetas)),
                                  ModelSetWithPropertyMetaArrayFunction,
                                  &context);
         }
@@ -1262,7 +1573,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
                 case YYEncodingTypeLongDouble: {
                     long double num = ((long double (*)(id, SEL))(void *) objc_msgSend)((id)self, propertyMeta->_getter);
                     ((void (*)(id, SEL, long double))(void *) objc_msgSend)((id)one, propertyMeta->_setter, num);
-                } break;
+                } // break; commented for code coverage in next line
                 default: break;
             }
         } else {
@@ -1280,13 +1591,14 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
                     ((void (*)(id, SEL, size_t))(void *) objc_msgSend)((id)one, propertyMeta->_setter, value);
                 } break;
                 case YYEncodingTypeStruct:
-                case YYEncodingTypeUnion:
-                case YYEncodingTypeCArray: {
-                    NSValue *value = [self valueForKey:NSStringFromSelector(propertyMeta->_getter)];
-                    if (value) {
-                        [self setValue:value forKey:propertyMeta->_name];
-                    }
-                } break;
+                case YYEncodingTypeUnion: {
+                    @try {
+                        NSValue *value = [self valueForKey:NSStringFromSelector(propertyMeta->_getter)];
+                        if (value) {
+                            [one setValue:value forKey:propertyMeta->_name];
+                        }
+                    } @catch (NSException *exception) {}
+                } // break; commented for code coverage in next line
                 default: break;
             }
         }
@@ -1318,7 +1630,13 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
                 case YYEncodingTypeObject: {
                     id value = ((id (*)(id, SEL))(void *)objc_msgSend)((id)self, propertyMeta->_getter);
                     if (value && (propertyMeta->_nsType || [value respondsToSelector:@selector(encodeWithCoder:)])) {
-                        [aCoder encodeObject:value forKey:propertyMeta->_name];
+                        if ([value isKindOfClass:[NSValue class]]) {
+                            if ([value isKindOfClass:[NSNumber class]]) {
+                                [aCoder encodeObject:value forKey:propertyMeta->_name];
+                            }
+                        } else {
+                            [aCoder encodeObject:value forKey:propertyMeta->_name];
+                        }
                     }
                 } break;
                 case YYEncodingTypeSEL: {
@@ -1329,10 +1647,13 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
                     }
                 } break;
                 case YYEncodingTypeStruct:
-                case YYEncodingTypeUnion:
-                case YYEncodingTypeCArray: {
-                    NSValue *value = [self valueForKey:NSStringFromSelector(propertyMeta->_getter)];
-                    [aCoder encodeObject:value forKey:propertyMeta->_name];
+                case YYEncodingTypeUnion: {
+                    if (propertyMeta->_isKVCCompatible && propertyMeta->_isStructAvailableForKeyedArchiver) {
+                        @try {
+                            NSValue *value = [self valueForKey:NSStringFromSelector(propertyMeta->_getter)];
+                            [aCoder encodeObject:value forKey:propertyMeta->_name];
+                        } @catch (NSException *exception) {}
+                    }
                 } break;
                     
                 default:
@@ -1344,7 +1665,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
 
 - (id)yy_modelInitWithCoder:(NSCoder *)aDecoder {
     if (!aDecoder) return self;
-    if (self == (id)kCFNull) return self;
+    if (self == (id)kCFNull) return self;    
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:self.class];
     if (modelMeta->_nsType) return self;
     
@@ -1352,8 +1673,11 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         if (!propertyMeta->_setter) continue;
         
         if (propertyMeta->_isCNumber) {
-            NSValue *value = [aDecoder decodeObjectForKey:propertyMeta->_name];
-            if (value) [self setValue:value forKey:propertyMeta->_name];
+            NSNumber *value = [aDecoder decodeObjectForKey:propertyMeta->_name];
+            if ([value isKindOfClass:[NSNumber class]]) {
+                ModelSetNumberToProperty(self, value, propertyMeta);
+                [value class];
+            }
         } else {
             YYEncodingType type = propertyMeta->_type & YYEncodingTypeMask;
             switch (type) {
@@ -1369,10 +1693,13 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
                     }
                 } break;
                 case YYEncodingTypeStruct:
-                case YYEncodingTypeUnion:
-                case YYEncodingTypeCArray: {
-                    NSValue *value = [aDecoder decodeObjectForKey:propertyMeta->_name];
-                    if (value) [self setValue:value forKey:propertyMeta->_name];
+                case YYEncodingTypeUnion: {
+                    if (propertyMeta->_isKVCCompatible) {
+                        @try {
+                            NSValue *value = [aDecoder decodeObjectForKey:propertyMeta->_name];
+                            if (value) [self setValue:value forKey:propertyMeta->_name];
+                        } @catch (NSException *exception) {}
+                    }
                 } break;
                     
                 default:
@@ -1391,7 +1718,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     NSUInteger value = 0;
     NSUInteger count = 0;
     for (_YYModelPropertyMeta *propertyMeta in modelMeta->_allPropertyMetas) {
-        if (!propertyMeta->_getter) continue;
+        if (!propertyMeta->_isKVCCompatible) continue;
         value ^= [[self valueForKey:NSStringFromSelector(propertyMeta->_getter)] hash];
         count++;
     }
@@ -1407,14 +1734,18 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     if ([self hash] != [model hash]) return NO;
     
     for (_YYModelPropertyMeta *propertyMeta in modelMeta->_allPropertyMetas) {
-        if (!propertyMeta->_getter) continue;
+        if (!propertyMeta->_isKVCCompatible) continue;
         id this = [self valueForKey:NSStringFromSelector(propertyMeta->_getter)];
         id that = [model valueForKey:NSStringFromSelector(propertyMeta->_getter)];
         if (this == that) continue;
         if (this == nil || that == nil) return NO;
-        if ([this isEqual:that]) continue;
+        if (![this isEqual:that]) return NO;
     }
     return YES;
+}
+
+- (NSString *)yy_modelDescription {
+    return ModelDescription(self);
 }
 
 @end

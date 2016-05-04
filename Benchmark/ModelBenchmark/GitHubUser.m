@@ -269,7 +269,7 @@ SET_NUM(_following, @"following");
 
 
 @implementation MJGHUser
-+ (NSDictionary *)replacedKeyFromPropertyName {
++ (NSDictionary *)mj_replacedKeyFromPropertyName {
     return @{
         @"userID" : @"id",
         @"avatarURL" : @"avatar_url",

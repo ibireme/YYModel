@@ -7,14 +7,52 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB1DAC8F1C0AF02B00442613 /* YYTestModelToJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = AB1DAC8E1C0AF02B00442613 /* YYTestModelToJSON.m */; };
+		AB5032881C4627B100FC6C42 /* YYTestDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = AB5032871C4627B100FC6C42 /* YYTestDescription.m */; };
+		ABA06CAC1C08514D00AD2108 /* YYModel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9D41A071BD0FABE00CD8EBF /* YYModel.framework */; };
+		ABA06CB21C08566100AD2108 /* NSObject+YYModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D41A171BD0FB3300CD8EBF /* NSObject+YYModel.m */; };
+		ABA06CB31C08566100AD2108 /* YYClassInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D41A191BD0FB3300CD8EBF /* YYClassInfo.m */; };
+		ABA06CBA1C08595900AD2108 /* YYTestModelMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA06CB91C08595900AD2108 /* YYTestModelMapper.m */; };
+		ABA06CBF1C085A6D00AD2108 /* YYTestClassInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA06CBE1C085A6D00AD2108 /* YYTestClassInfo.m */; };
+		ABFEC7191C0BE7A900B3D8C5 /* YYTestCustomTransform.m in Sources */ = {isa = PBXBuildFile; fileRef = ABFEC7181C0BE7A900B3D8C5 /* YYTestCustomTransform.m */; };
+		ABFEC71B1C0BF23200B3D8C5 /* YYTestCustomClass.m in Sources */ = {isa = PBXBuildFile; fileRef = ABFEC71A1C0BF23200B3D8C5 /* YYTestCustomClass.m */; };
+		ABFEC71D1C0C284B00B3D8C5 /* YYTestNestModel.m in Sources */ = {isa = PBXBuildFile; fileRef = ABFEC71C1C0C284B00B3D8C5 /* YYTestNestModel.m */; };
+		D95943EE1C0B46B6002D88BD /* YYTestCopyingAndCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = D95943ED1C0B46B6002D88BD /* YYTestCopyingAndCoding.m */; };
+		D95943F01C0B6467002D88BD /* YYTestBlacklistWhitelist.m in Sources */ = {isa = PBXBuildFile; fileRef = D95943EF1C0B6467002D88BD /* YYTestBlacklistWhitelist.m */; };
+		D9B26FF61C08D13F004880F0 /* YYTestHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B26FF51C08D13F004880F0 /* YYTestHelper.m */; };
+		D9B270271C09FDF8004880F0 /* YYTestAutoTypeConvert.m in Sources */ = {isa = PBXBuildFile; fileRef = D9B270261C09FDF8004880F0 /* YYTestAutoTypeConvert.m */; };
 		D9D41A1B1BD0FB3300CD8EBF /* NSObject+YYModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D9D41A161BD0FB3300CD8EBF /* NSObject+YYModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D9D41A1C1BD0FB3300CD8EBF /* NSObject+YYModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D41A171BD0FB3300CD8EBF /* NSObject+YYModel.m */; settings = {ASSET_TAGS = (); }; };
+		D9D41A1C1BD0FB3300CD8EBF /* NSObject+YYModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D41A171BD0FB3300CD8EBF /* NSObject+YYModel.m */; };
 		D9D41A1D1BD0FB3300CD8EBF /* YYClassInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = D9D41A181BD0FB3300CD8EBF /* YYClassInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D9D41A1E1BD0FB3300CD8EBF /* YYClassInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D41A191BD0FB3300CD8EBF /* YYClassInfo.m */; settings = {ASSET_TAGS = (); }; };
+		D9D41A1E1BD0FB3300CD8EBF /* YYClassInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D9D41A191BD0FB3300CD8EBF /* YYClassInfo.m */; };
 		D9D41A1F1BD0FB3300CD8EBF /* YYModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D9D41A1A1BD0FB3300CD8EBF /* YYModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		ABA06CAD1C08514D00AD2108 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D9D419FE1BD0FABE00CD8EBF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D9D41A061BD0FABE00CD8EBF;
+			remoteInfo = YYModel;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		AB1DAC8E1C0AF02B00442613 /* YYTestModelToJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestModelToJSON.m; sourceTree = "<group>"; };
+		AB5032871C4627B100FC6C42 /* YYTestDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestDescription.m; sourceTree = "<group>"; };
+		ABA06CA71C08514D00AD2108 /* YYModelTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YYModelTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABA06CB51C08589300AD2108 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ABA06CB91C08595900AD2108 /* YYTestModelMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestModelMapper.m; sourceTree = "<group>"; };
+		ABA06CBE1C085A6D00AD2108 /* YYTestClassInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestClassInfo.m; sourceTree = "<group>"; };
+		ABFEC7181C0BE7A900B3D8C5 /* YYTestCustomTransform.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestCustomTransform.m; sourceTree = "<group>"; };
+		ABFEC71A1C0BF23200B3D8C5 /* YYTestCustomClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestCustomClass.m; sourceTree = "<group>"; };
+		ABFEC71C1C0C284B00B3D8C5 /* YYTestNestModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestNestModel.m; sourceTree = "<group>"; };
+		D95943ED1C0B46B6002D88BD /* YYTestCopyingAndCoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestCopyingAndCoding.m; sourceTree = "<group>"; };
+		D95943EF1C0B6467002D88BD /* YYTestBlacklistWhitelist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestBlacklistWhitelist.m; sourceTree = "<group>"; };
+		D9B26FF41C08D13F004880F0 /* YYTestHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTestHelper.h; sourceTree = "<group>"; };
+		D9B26FF51C08D13F004880F0 /* YYTestHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestHelper.m; sourceTree = "<group>"; };
+		D9B270261C09FDF8004880F0 /* YYTestAutoTypeConvert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTestAutoTypeConvert.m; sourceTree = "<group>"; };
 		D9D41A071BD0FABE00CD8EBF /* YYModel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = YYModel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9D41A121BD0FADC00CD8EBF /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D9D41A161BD0FB3300CD8EBF /* NSObject+YYModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+YYModel.h"; sourceTree = "<group>"; };
@@ -25,6 +63,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		ABA06CA41C08514D00AD2108 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABA06CAC1C08514D00AD2108 /* YYModel.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D9D41A031BD0FABE00CD8EBF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -35,10 +81,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		ABA06CB41C08589300AD2108 /* YYModelTests */ = {
+			isa = PBXGroup;
+			children = (
+				D9B26FF41C08D13F004880F0 /* YYTestHelper.h */,
+				D9B26FF51C08D13F004880F0 /* YYTestHelper.m */,
+				ABA06CBE1C085A6D00AD2108 /* YYTestClassInfo.m */,
+				ABA06CB91C08595900AD2108 /* YYTestModelMapper.m */,
+				ABFEC71C1C0C284B00B3D8C5 /* YYTestNestModel.m */,
+				D9B270261C09FDF8004880F0 /* YYTestAutoTypeConvert.m */,
+				AB1DAC8E1C0AF02B00442613 /* YYTestModelToJSON.m */,
+				D95943ED1C0B46B6002D88BD /* YYTestCopyingAndCoding.m */,
+				D95943EF1C0B6467002D88BD /* YYTestBlacklistWhitelist.m */,
+				ABFEC7181C0BE7A900B3D8C5 /* YYTestCustomTransform.m */,
+				ABFEC71A1C0BF23200B3D8C5 /* YYTestCustomClass.m */,
+				AB5032871C4627B100FC6C42 /* YYTestDescription.m */,
+				ABA06CB51C08589300AD2108 /* Info.plist */,
+			);
+			name = YYModelTests;
+			path = ../YYModelTests;
+			sourceTree = "<group>";
+		};
 		D9D419FD1BD0FABE00CD8EBF = {
 			isa = PBXGroup;
 			children = (
 				D9D41A151BD0FB3300CD8EBF /* YYModel */,
+				ABA06CB41C08589300AD2108 /* YYModelTests */,
 				D9D41A141BD0FB1900CD8EBF /* Supporting Files */,
 				D9D41A081BD0FABE00CD8EBF /* Products */,
 			);
@@ -48,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				D9D41A071BD0FABE00CD8EBF /* YYModel.framework */,
+				ABA06CA71C08514D00AD2108 /* YYModelTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,6 +158,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		ABA06CA61C08514D00AD2108 /* YYModelTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABA06CB11C08514D00AD2108 /* Build configuration list for PBXNativeTarget "YYModelTests" */;
+			buildPhases = (
+				ABA06CA31C08514D00AD2108 /* Sources */,
+				ABA06CA41C08514D00AD2108 /* Frameworks */,
+				ABA06CA51C08514D00AD2108 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				ABA06CAE1C08514D00AD2108 /* PBXTargetDependency */,
+			);
+			name = YYModelTests;
+			productName = YYModelTests;
+			productReference = ABA06CA71C08514D00AD2108 /* YYModelTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		D9D41A061BD0FABE00CD8EBF /* YYModel */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D9D41A0F1BD0FABE00CD8EBF /* Build configuration list for PBXNativeTarget "YYModel" */;
@@ -113,9 +200,12 @@
 		D9D419FE1BD0FABE00CD8EBF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = ibireme;
 				TargetAttributes = {
+					ABA06CA61C08514D00AD2108 = {
+						CreatedOnToolsVersion = 7.1;
+					};
 					D9D41A061BD0FABE00CD8EBF = {
 						CreatedOnToolsVersion = 7.0;
 					};
@@ -134,11 +224,19 @@
 			projectRoot = "";
 			targets = (
 				D9D41A061BD0FABE00CD8EBF /* YYModel */,
+				ABA06CA61C08514D00AD2108 /* YYModelTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		ABA06CA51C08514D00AD2108 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D9D41A051BD0FABE00CD8EBF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -149,6 +247,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		ABA06CA31C08514D00AD2108 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABA06CBF1C085A6D00AD2108 /* YYTestClassInfo.m in Sources */,
+				ABFEC7191C0BE7A900B3D8C5 /* YYTestCustomTransform.m in Sources */,
+				D95943F01C0B6467002D88BD /* YYTestBlacklistWhitelist.m in Sources */,
+				ABA06CB21C08566100AD2108 /* NSObject+YYModel.m in Sources */,
+				ABA06CBA1C08595900AD2108 /* YYTestModelMapper.m in Sources */,
+				AB5032881C4627B100FC6C42 /* YYTestDescription.m in Sources */,
+				D9B26FF61C08D13F004880F0 /* YYTestHelper.m in Sources */,
+				ABFEC71D1C0C284B00B3D8C5 /* YYTestNestModel.m in Sources */,
+				D9B270271C09FDF8004880F0 /* YYTestAutoTypeConvert.m in Sources */,
+				ABA06CB31C08566100AD2108 /* YYClassInfo.m in Sources */,
+				ABFEC71B1C0BF23200B3D8C5 /* YYTestCustomClass.m in Sources */,
+				D95943EE1C0B46B6002D88BD /* YYTestCopyingAndCoding.m in Sources */,
+				AB1DAC8F1C0AF02B00442613 /* YYTestModelToJSON.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D9D41A021BD0FABE00CD8EBF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -160,7 +278,38 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		ABA06CAE1C08514D00AD2108 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D9D41A061BD0FABE00CD8EBF /* YYModel */;
+			targetProxy = ABA06CAD1C08514D00AD2108 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		ABA06CAF1C08514D00AD2108 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = ../YYModelTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ibireme.YYModelTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		ABA06CB01C08514D00AD2108 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = ../YYModelTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.ibireme.YYModelTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		D9D41A0D1BD0FABE00CD8EBF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -286,6 +435,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		ABA06CB11C08514D00AD2108 /* Build configuration list for PBXNativeTarget "YYModelTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABA06CAF1C08514D00AD2108 /* Debug */,
+				ABA06CB01C08514D00AD2108 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D9D41A011BD0FABE00CD8EBF /* Build configuration list for PBXProject "YYModel" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

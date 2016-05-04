@@ -9,6 +9,7 @@
 #import "MJProperty.h"
 #import "MJFoundation.h"
 #import "MJExtensionConst.h"
+#import <objc/message.h>
 
 @interface MJProperty()
 @property (strong, nonatomic) NSMutableDictionary *propertyKeysDict;
@@ -58,9 +59,15 @@
     
     // 2.成员类型
     NSString *attrs = @(property_getAttributes(property));
+    NSUInteger dotLoc = [attrs rangeOfString:@","].location;
+    NSString *code = nil;
     NSUInteger loc = 1;
-    NSUInteger len = [attrs rangeOfString:@","].location - loc;
-    _type = [MJPropertyType cachedTypeWithCode:[attrs substringWithRange:NSMakeRange(loc, len)]];
+    if (dotLoc == NSNotFound) { // 没有,
+        code = [attrs substringFromIndex:loc];
+    } else {
+        code = [attrs substringWithRange:NSMakeRange(loc, dotLoc - loc)];
+    }
+    _type = [MJPropertyType cachedTypeWithCode:code];
 }
 
 /**

@@ -1,25 +1,25 @@
 //
 //  JSONValueTransformer.h
 //
-//  @version 1.0.2
-//  @author Marin Todorov, http://www.touch-code-magazine.com
+//  @version 1.2
+//  @author Marin Todorov (http://www.underplot.com) and contributors
 //
 
-// Copyright (c) 2012-2014 Marin Todorov, Underplot ltd.
+// Copyright (c) 2012-2015 Marin Todorov, Underplot ltd.
 // This code is distributed under the terms and conditions of the MIT license.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// The MIT License in plain English: http://www.touch-code-magazine.com/JSONModel/MITLicense
+
 
 #import <Foundation/Foundation.h>
 #import "JSONModelArray.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-#pragma mark - extern definitons
+#pragma mark - extern definitions
 /**
  * Boolean function to check for null values. Handy when you need to both check
  * for nil and [NSNUll null]
@@ -48,10 +48,10 @@ extern BOOL isNull(id value);
 
 /** @name Resolving cluster class names */
 /**
- * This method returns the ubmrella class for any standard class cluster members.
+ * This method returns the umbrella class for any standard class cluster members.
  * For example returns NSString when given as input NSString, NSMutableString, __CFString and __CFConstantString
  * The method currently looksup a pre-defined list.
- * @param sourceClass the class to get the umrella class for
+ * @param sourceClass the class to get the umbrella class for
  * @return Class
  */
 +(Class)classByResolvingClusterClasses:(Class)sourceClass;
@@ -59,7 +59,7 @@ extern BOOL isNull(id value);
 #pragma mark - NSMutableString <-> NSString
 /** @name Transforming to Mutable copies */
 /**
- * Trasnforms a string value to a mutable string value
+ * Transforms a string value to a mutable string value
  * @param string incoming string
  * @return mutable string
  */
@@ -67,7 +67,7 @@ extern BOOL isNull(id value);
 
 #pragma mark - NSMutableArray <-> NSArray
 /**
- * Trasnforms an array to a mutable array
+ * Transforms an array to a mutable array
  * @param array incoming array
  * @return mutable array
  */
@@ -75,7 +75,7 @@ extern BOOL isNull(id value);
 
 #pragma mark - NS(Mutable)Array <- JSONModelArray
 /**
- * Trasnforms an array to a JSONModelArray
+ * Transforms an array to a JSONModelArray
  * @param array incoming array
  * @return JSONModelArray
  */
@@ -84,7 +84,7 @@ extern BOOL isNull(id value);
 
 #pragma mark - NSMutableDictionary <-> NSDictionary
 /**
- * Trasnforms a dictionary to a mutable dictionary
+ * Transforms a dictionary to a mutable dictionary
  * @param dict incoming dictionary
  * @return mutable dictionary
  */

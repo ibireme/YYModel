@@ -11,7 +11,6 @@
 
 #import "YYClassInfo.h"
 #import <objc/runtime.h>
-#import <libkern/OSAtomic.h>
 
 YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     char *type = (char *)typeEncoding;
@@ -77,7 +76,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         case '#': return YYEncodingTypeClass | qualifier;
         case ':': return YYEncodingTypeSEL | qualifier;
         case '*': return YYEncodingTypeCString | qualifier;
-        case '?': return YYEncodingTypePointer | qualifier;
+        case '^': return YYEncodingTypePointer | qualifier;
         case '[': return YYEncodingTypeCArray | qualifier;
         case '(': return YYEncodingTypeUnion | qualifier;
         case '{': return YYEncodingTypeStruct | qualifier;
@@ -86,7 +85,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                 return YYEncodingTypeBlock | qualifier;
             else
                 return YYEncodingTypeObject | qualifier;
-        } break;
+        }
         default: return YYEncodingTypeUnknown | qualifier;
     }
 }
@@ -138,13 +137,9 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         NSMutableArray *argumentTypes = [NSMutableArray new];
         for (unsigned int i = 0; i < argumentCount; i++) {
             char *argumentType = method_copyArgumentType(method, i);
-            if (argumentType) {
-                NSString *type = [NSString stringWithUTF8String:argumentType];
-                [argumentTypes addObject:type ? type : @""];
-                free(argumentType);
-            } else {
-                [argumentTypes addObject:@""];
-            }
+            NSString *type = argumentType ? [NSString stringWithUTF8String:argumentType] : nil;
+            [argumentTypes addObject:type ? type : @""];
+            if (argumentType) free(argumentType);
         }
         _argumentTypeEncodings = argumentTypes;
     }
@@ -173,7 +168,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                 if (attrs[i].value) {
                     _typeEncoding = [NSString stringWithUTF8String:attrs[i].value];
                     type = YYEncodingGetType(attrs[i].value);
-                    if (type & YYEncodingTypeObject) {
+                    if ((type & YYEncodingTypeMask) == YYEncodingTypeObject) {
                         size_t len = strlen(attrs[i].value);
                         if (len > 3) {
                             char name[len - 2];
@@ -207,23 +202,19 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
             case 'W': {
                 type |= YYEncodingTypePropertyWeak;
             } break;
-            case 'P': {
-                type |= YYEncodingTypePropertyGarbage;
-            } break;
             case 'G': {
                 type |= YYEncodingTypePropertyCustomGetter;
                 if (attrs[i].value) {
-                    _getter = [NSString stringWithUTF8String:attrs[i].value];
+                    _getter = NSSelectorFromString([NSString stringWithUTF8String:attrs[i].value]);
                 }
             } break;
             case 'S': {
                 type |= YYEncodingTypePropertyCustomSetter;
                 if (attrs[i].value) {
-                    _setter = [NSString stringWithUTF8String:attrs[i].value];
+                    _setter = NSSelectorFromString([NSString stringWithUTF8String:attrs[i].value]);
                 }
-            } break;
-            default:
-                break;
+            } // break; commented for code coverage in next line
+            default: break;
         }
     }
     if (attrs) {
@@ -234,10 +225,10 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     _type = type;
     if (_name.length) {
         if (!_getter) {
-            _getter = _name;
+            _getter = NSSelectorFromString(_name);
         }
         if (!_setter) {
-            _setter = [NSString stringWithFormat:@"set%@%@:", [_name substringToIndex:1].uppercaseString, [_name substringFromIndex:1]];
+            _setter = NSSelectorFromString([NSString stringWithFormat:@"set%@%@:", [_name substringToIndex:1].uppercaseString, [_name substringFromIndex:1]]);
         }
     }
     return self;
@@ -263,11 +254,6 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
 
     _superClassInfo = [self.class classInfoWithClass:_superCls];
     return self;
-}
-
-- (instancetype)initWithClassName:(NSString *)className {
-    Class cls = NSClassFromString(className);
-    return [self initWithClass:cls];
 }
 
 - (void)_update {
@@ -310,6 +296,11 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         }
         free(ivars);
     }
+    
+    if (!_ivarInfos) _ivarInfos = @{};
+    if (!_methodInfos) _methodInfos = @{};
+    if (!_propertyInfos) _propertyInfos = @{};
+    
     _needUpdate = NO;
 }
 
@@ -317,29 +308,33 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     _needUpdate = YES;
 }
 
+- (BOOL)needUpdate {
+    return _needUpdate;
+}
+
 + (instancetype)classInfoWithClass:(Class)cls {
     if (!cls) return nil;
     static CFMutableDictionaryRef classCache;
     static CFMutableDictionaryRef metaCache;
     static dispatch_once_t onceToken;
-    static OSSpinLock lock;
+    static dispatch_semaphore_t lock;
     dispatch_once(&onceToken, ^{
         classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
         metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        lock = OS_SPINLOCK_INIT;
+        lock = dispatch_semaphore_create(1);
     });
-    OSSpinLockLock(&lock);
+    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
     YYClassInfo *info = CFDictionaryGetValue(class_isMetaClass(cls) ? metaCache : classCache, (__bridge const void *)(cls));
     if (info && info->_needUpdate) {
         [info _update];
     }
-    OSSpinLockUnlock(&lock);
+    dispatch_semaphore_signal(lock);
     if (!info) {
         info = [[YYClassInfo alloc] initWithClass:cls];
         if (info) {
-            OSSpinLockLock(&lock);
+            dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
             CFDictionarySetValue(info.isMeta ? metaCache : classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
-            OSSpinLockUnlock(&lock);
+            dispatch_semaphore_signal(lock);
         }
     }
     return info;
