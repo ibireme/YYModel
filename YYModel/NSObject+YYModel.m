@@ -776,11 +776,11 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                 case YYEncodingTypeNSString:
                 case YYEncodingTypeNSMutableString: {
                     if ([value isKindOfClass:[NSString class]]) {
-                        if (meta->_nsType == YYEncodingTypeNSString) {
-                            ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, value);
-                        } else {
-                            ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, ((NSString *)value).mutableCopy);
-                        }
+                        ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
+                                                                       meta->_setter,
+                                                                       (meta->_nsType == YYEncodingTypeNSString) ?
+                                                                       value :
+                                                                       ((NSString *)value).mutableCopy);
                     } else if ([value isKindOfClass:[NSNumber class]]) {
                         ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
                                                                        meta->_setter,
