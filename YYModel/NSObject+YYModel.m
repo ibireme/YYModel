@@ -442,7 +442,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
 @interface _YYModelMeta : NSObject {
     @package
     YYClassInfo *_classInfo;
-    /// Key:mapped key and key path, Value:_YYModelPropertyInfo.
+    /// Key:mapped key and key path, Value:_YYModelPropertyMeta.
     NSDictionary *_mapper;
     /// Array<_YYModelPropertyMeta>, all property meta of this model.
     NSArray *_allPropertyMetas;
