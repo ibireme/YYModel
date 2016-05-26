@@ -160,7 +160,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         _name = [NSString stringWithUTF8String:name];
     }
     
-    YYEncodingType type = 0;
+    YYEncodingType type = YYEncodingTypeUnknown;
     unsigned int attrCount;
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &attrCount);
     for (unsigned int i = 0; i < attrCount; i++) {
@@ -172,10 +172,26 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                     if ((type & YYEncodingTypeMask) == YYEncodingTypeObject) {
                         size_t len = strlen(attrs[i].value);
                         if (len > 3) {
-                            char name[len - 2];
-                            name[len - 3] = '\0';
-                            memcpy(name, attrs[i].value + 2, len - 3);
-                            _cls = objc_getClass(name);
+                            len = len - 3 + 1;
+                            char name[len];
+                            name[len - 1] = '\0';
+                            memcpy(name, attrs[i].value + 2, len - 1);
+                            
+                            //It has protocol when the final char is >.
+                            if (name[len - 2] == '>') {
+                                name[len - 2] = '\0';
+                                char *p = strchr(name, '<');
+                                if (p != NULL) {
+                                    p[0] = '\0';
+                                    p++;
+                                    _cls = objc_getClass(name);
+                                    
+                                    //see http://stackoverflow.com/questions/10212119/objc-getprotocol-returns-null-for-nsapplicationdelegate
+                                    _protocol = objc_getProtocol(p);
+                                }
+                            }else{
+                                _cls = objc_getClass(name);
+                            }
                         }
                     }
                 }

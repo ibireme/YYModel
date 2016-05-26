@@ -528,7 +528,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
         }
         curClassInfo = curClassInfo.superClassInfo;
     }
-    if (allPropertyMetas.count) _allPropertyMetas = allPropertyMetas.allValues.copy;
+    if (allPropertyMetas.count>0) _allPropertyMetas = allPropertyMetas.allValues.copy;
     
     // create mapper
     NSMutableDictionary *mapper = [NSMutableDictionary new];
@@ -590,9 +590,9 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
         mapper[name] = propertyMeta;
     }];
     
-    if (mapper.count) _mapper = mapper;
-    if (keyPathPropertyMetas) _keyPathPropertyMetas = keyPathPropertyMetas;
-    if (multiKeysPropertyMetas) _multiKeysPropertyMetas = multiKeysPropertyMetas;
+    if (mapper.count>0) _mapper = mapper;
+    if (keyPathPropertyMetas.count>0) _keyPathPropertyMetas = keyPathPropertyMetas;
+    if (multiKeysPropertyMetas.count>0) _multiKeysPropertyMetas = multiKeysPropertyMetas;
     
     _classInfo = classInfo;
     _keyMappedCount = _allPropertyMetas.count;
