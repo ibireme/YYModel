@@ -13,6 +13,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+//ns pseudo-generic
+@protocol NSString,NSMutableString,NSValue,NSNumber,NSDecimalNumber,NSData,NSMutableData,NSURL,NSDate;
+
 /**
  Provide some data-model method:
  

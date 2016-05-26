@@ -348,6 +348,12 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
 @implementation _YYModelPropertyMeta
 + (instancetype)metaWithClassInfo:(YYClassInfo *)classInfo propertyInfo:(YYClassPropertyInfo *)propertyInfo generic:(Class)generic {
     _YYModelPropertyMeta *meta = [self new];
+
+    if (!generic && (propertyInfo.type & YYEncodingTypeMask) == YYEncodingTypeObject && propertyInfo.protocolNames.count==1) {
+        //if the only protocolName is a class nams, as the generic class. // pseudo-generic
+        generic = NSClassFromString([propertyInfo.protocolNames firstObject]);
+    }
+    
     meta->_name = propertyInfo.name;
     meta->_type = propertyInfo.type;
     meta->_info = propertyInfo;

@@ -177,17 +177,22 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                             name[len - 1] = '\0';
                             memcpy(name, attrs[i].value + 2, len - 1);
                             
-                            //It has protocol when the final char is >.
+                            //It has protocols if the final char is >.
+                            //if multi protocols, the name maybe is NSMutableArray<Pig><Dog><Cat>
                             if (name[len - 2] == '>') {
                                 name[len - 2] = '\0';
                                 char *p = strchr(name, '<');
                                 if (p != NULL) {
                                     p[0] = '\0';
-                                    p++;
                                     _cls = objc_getClass(name);
                                     
+                                    p++;
+                                    //p maybe contain multi protocol names. maybe is Pig><Dog><Cat
+                                    //and if one protocol is not adopted(or used), objc_getProtocol(p) would return nil
                                     //see http://stackoverflow.com/questions/10212119/objc-getprotocol-returns-null-for-nsapplicationdelegate
-                                    _protocol = objc_getProtocol(p);
+                                    //so we just record the protocol names
+                                    NSString *pNames = [NSString stringWithUTF8String:p];
+                                    _protocolNames = [pNames componentsSeparatedByString:@"><"];
                                 }
                             }else{
                                 _cls = objc_getClass(name);

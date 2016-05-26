@@ -16,6 +16,7 @@
 @property (nonatomic, assign) int cutType;
 @end
 
+@protocol YYWeiboPicture;
 @interface YYWeiboPicture : NSObject <NSCoding, NSCopying>
 @property (nonatomic, strong) NSString *picID;
 @property (nonatomic, strong) NSString *objectID;
@@ -29,6 +30,7 @@
 @property (nonatomic, strong) YYWeiboPictureMetadata *original;
 @end
 
+@protocol YYWeiboURL;
 @interface YYWeiboURL : NSObject <NSCoding, NSCopying>
 @property (nonatomic, assign) BOOL result;
 @property (nonatomic, strong) NSString *shortURL;
@@ -118,9 +120,14 @@
 @property (nonatomic, strong) YYWeiboUser *user;
 @property (nonatomic, assign) int32_t userType;
 @property (nonatomic, strong) NSString *text;
-@property (nonatomic, strong) NSArray *picIds;        /// Array<NSString>
-@property (nonatomic, strong) NSDictionary *picInfos; /// Dic<NSString, YYWeiboPicture>
-@property (nonatomic, strong) NSArray *urlStruct;     ///< Array<YYWeiboURL>
+
+@property (nonatomic, strong) NSArray<NSString *><NSString> *picIds;
+@property (nonatomic, strong) NSDictionary<NSString *,YYWeiboPicture *><YYWeiboPicture> *picInfos;
+@property (nonatomic, strong) NSArray<YYWeiboURL *><YYWeiboURL> *urlStruct;
+//@property (nonatomic, strong) NSArray *picIds;        /// Array<NSString>
+//@property (nonatomic, strong) NSDictionary *picInfos; /// Dic<NSString, YYWeiboPicture>
+//@property (nonatomic, strong) NSArray *urlStruct;     ///< Array<YYWeiboURL>
+
 @property (nonatomic, assign) BOOL favorited;
 @property (nonatomic, assign) BOOL truncated;
 @property (nonatomic, assign) int32_t repostsCount;
