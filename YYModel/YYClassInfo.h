@@ -14,6 +14,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define YYMODEL_THREAD_ASSERT_ON_ERROR(x_) do { \
+_Pragma("clang diagnostic push"); \
+_Pragma("clang diagnostic ignored \"-Wunused-variable\""); \
+volatile int res = (x_); \
+assert(res == 0); \
+_Pragma("clang diagnostic pop"); \
+} while (0)
+
 /**
  Type encoding's type.
  */

@@ -12,6 +12,7 @@
 #import "NSObject+YYModel.h"
 #import "YYClassInfo.h"
 #import <objc/message.h>
+#import <pthread.h>
 
 #define force_inline __inline__ __attribute__((always_inline))
 
@@ -605,25 +606,34 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
 }
 
 /// Returns the cached model class meta
-+ (instancetype)metaWithClass:(Class)cls {
-    if (!cls) return nil;
-    static CFMutableDictionaryRef cache;
+
+static CFMutableDictionaryRef cache;
+static pthread_rwlock_t rwlock;
+
++ (void)load
+{
     static dispatch_once_t onceToken;
-    static dispatch_semaphore_t lock;
     dispatch_once(&onceToken, ^{
         cache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        lock = dispatch_semaphore_create(1);
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_init(&rwlock, NULL));
     });
-    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
+}
+
++ (instancetype)metaWithClass:(Class)cls {
+    if (!cls) return nil;
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&rwlock));
     _YYModelMeta *meta = CFDictionaryGetValue(cache, (__bridge const void *)(cls));
-    dispatch_semaphore_signal(lock);
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
     if (!meta || meta->_classInfo.needUpdate) {
-        meta = [[_YYModelMeta alloc] initWithClass:cls];
-        if (meta) {
-            dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
-            CFDictionarySetValue(cache, (__bridge const void *)(cls), (__bridge const void *)(meta));
-            dispatch_semaphore_signal(lock);
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&rwlock));
+        meta = CFDictionaryGetValue(cache, (__bridge const void *)(cls));
+        if (!meta || meta->_classInfo.needUpdate) {
+            meta = [[_YYModelMeta alloc] initWithClass:cls];
+            if (meta) {
+                CFDictionarySetValue(cache, (__bridge const void *)(cls), (__bridge const void *)(meta));
+            }
         }
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
     }
     return meta;
 }

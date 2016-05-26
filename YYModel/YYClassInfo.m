@@ -11,6 +11,7 @@
 
 #import "YYClassInfo.h"
 #import <objc/runtime.h>
+#import <pthread.h>
 
 YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     char *type = (char *)typeEncoding;
@@ -53,10 +54,10 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
             default: { prefix = false; } break;
         }
     }
-
+    
     len = strlen(type);
     if (len == 0) return YYEncodingTypeUnknown | qualifier;
-
+    
     switch (*type) {
         case 'v': return YYEncodingTypeVoid | qualifier;
         case 'B': return YYEncodingTypeBool | qualifier;
@@ -251,7 +252,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     }
     _name = NSStringFromClass(cls);
     [self _update];
-
+    
     _superClassInfo = [self.class classInfoWithClass:_superCls];
     return self;
 }
@@ -304,38 +305,59 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     _needUpdate = NO;
 }
 
+static CFMutableDictionaryRef classCache;
+static CFMutableDictionaryRef metaCache;
+static pthread_rwlock_t rwlock;
+
++ (void)load
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_init(&rwlock, NULL));
+    });
+}
+
 - (void)setNeedUpdate {
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&rwlock));
     _needUpdate = YES;
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
 }
 
 - (BOOL)needUpdate {
-    return _needUpdate;
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&rwlock));
+    BOOL needUpdate = _needUpdate;
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+    return needUpdate;
 }
 
 + (instancetype)classInfoWithClass:(Class)cls {
     if (!cls) return nil;
-    static CFMutableDictionaryRef classCache;
-    static CFMutableDictionaryRef metaCache;
-    static dispatch_once_t onceToken;
-    static dispatch_semaphore_t lock;
-    dispatch_once(&onceToken, ^{
-        classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        lock = dispatch_semaphore_create(1);
-    });
-    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
+    
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&rwlock));
     YYClassInfo *info = CFDictionaryGetValue(class_isMetaClass(cls) ? metaCache : classCache, (__bridge const void *)(cls));
-    if (info && info->_needUpdate) {
-        [info _update];
-    }
-    dispatch_semaphore_signal(lock);
-    if (!info) {
-        info = [[YYClassInfo alloc] initWithClass:cls];
-        if (info) {
-            dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
-            CFDictionarySetValue(info.isMeta ? metaCache : classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
-            dispatch_semaphore_signal(lock);
+    BOOL needUpdate = info && info->_needUpdate;
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+    
+    if (needUpdate) {
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&rwlock));
+        if (info->_needUpdate) {
+            [info _update];
         }
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+    }else if (!info) {
+        info = [[YYClassInfo alloc] initWithClass:cls];
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&rwlock));
+        YYClassInfo *infoInCache = CFDictionaryGetValue(class_isMetaClass(cls) ? metaCache : classCache, (__bridge const void *)(cls));
+        if (!infoInCache) {
+            if (info) {
+                CFDictionarySetValue(info.isMeta ? metaCache : classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
+            }
+        }else{
+            info = infoInCache;
+        }
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
     }
     return info;
 }
