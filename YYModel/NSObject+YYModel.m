@@ -889,11 +889,11 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                     
                 case YYEncodingTypeNSArray:
                 case YYEncodingTypeNSMutableArray: {
-                    if (meta->_genericCls) {
-                        NSArray *valueArr = nil;
-                        if ([value isKindOfClass:[NSArray class]]) valueArr = value;
-                        else if ([value isKindOfClass:[NSSet class]]) valueArr = ((NSSet *)value).allObjects;
-                        if (valueArr) {
+                    NSArray *valueArr = nil;
+                    if ([value isKindOfClass:[NSArray class]]) valueArr = value;
+                    else if ([value isKindOfClass:[NSSet class]]) valueArr = ((NSSet *)value).allObjects;
+                    if (valueArr) {
+                        if (meta->_genericCls) {
                             NSMutableArray *objectArr = [NSMutableArray new];
                             for (id one in valueArr) {
                                 if ([one isKindOfClass:meta->_genericCls]) {
@@ -910,20 +910,20 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 }
                             }
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, objectArr);
-                        }
-                    } else {
-                        if ([value isKindOfClass:[NSArray class]]) {
-                            ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
-                                                                           meta->_setter,
-                                                                           (meta->_nsType == YYEncodingTypeNSArray) ?
-                                                                           value :
-                                                                           ((NSArray *)value).mutableCopy);
-                        } else if ([value isKindOfClass:[NSSet class]]) {
-                            ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
-                                                                           meta->_setter,
-                                                                           (meta->_nsType == YYEncodingTypeNSArray) ?
-                                                                           ((NSSet *)value).allObjects :
-                                                                           ((NSSet *)value).allObjects.mutableCopy);
+                        } else {
+                            if ([valueArr containsObject:(id)kCFNull]) {
+                                NSMutableArray *objectArr = valueArr.mutableCopy;
+                                [objectArr removeObject:(id)kCFNull];
+                                ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
+                                                                               meta->_setter,
+                                                                               objectArr);
+                            }else{
+                                ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
+                                                                               meta->_setter,
+                                                                               (meta->_nsType == YYEncodingTypeNSArray) ?
+                                                                               valueArr :
+                                                                               valueArr.mutableCopy);
+                            }
                         }
                     }
                 } break;
@@ -947,11 +947,13 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             }];
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, dic);
                         } else {
-                            ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
-                                                                           meta->_setter,
-                                                                           (meta->_nsType == YYEncodingTypeNSDictionary) ?
-                                                                           value :
-                                                                           ((NSDictionary *)value).mutableCopy);
+                            NSMutableDictionary *dic = [NSMutableDictionary new];
+                            [((NSDictionary *)value) enumerateKeysAndObjectsUsingBlock:^(NSString *oneKey, id oneValue, BOOL *stop) {
+                                if (oneValue != (id)kCFNull) {
+                                    dic[oneKey] = oneValue;
+                                }
+                            }];
+                            ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, dic);
                         }
                     }
                 } break;
@@ -962,29 +964,39 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                     if ([value isKindOfClass:[NSArray class]]) valueSet = [NSMutableSet setWithArray:value];
                     else if ([value isKindOfClass:[NSSet class]]) valueSet = ((NSSet *)value);
                     
-                    if (meta->_genericCls) {
-                        NSMutableSet *set = [NSMutableSet new];
-                        for (id one in valueSet) {
-                            if ([one isKindOfClass:meta->_genericCls]) {
-                                [set addObject:one];
-                            } else if ([one isKindOfClass:[NSDictionary class]]) {
-                                Class cls = meta->_genericCls;
-                                if (meta->_hasCustomClassFromDictionary) {
-                                    cls = [cls modelCustomClassForDictionary:one];
-                                    if (!cls) cls = meta->_genericCls; // for xcode code coverage
+                    if (valueSet) {
+                        if (meta->_genericCls) {
+                            NSMutableSet *set = [NSMutableSet new];
+                            for (id one in valueSet) {
+                                if ([one isKindOfClass:meta->_genericCls]) {
+                                    [set addObject:one];
+                                } else if ([one isKindOfClass:[NSDictionary class]]) {
+                                    Class cls = meta->_genericCls;
+                                    if (meta->_hasCustomClassFromDictionary) {
+                                        cls = [cls modelCustomClassForDictionary:one];
+                                        if (!cls) cls = meta->_genericCls; // for xcode code coverage
+                                    }
+                                    NSObject *newOne = [cls new];
+                                    [newOne yy_modelSetWithDictionary:one];
+                                    if (newOne) [set addObject:newOne];
                                 }
-                                NSObject *newOne = [cls new];
-                                [newOne yy_modelSetWithDictionary:one];
-                                if (newOne) [set addObject:newOne];
+                            }
+                            ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, set);
+                        } else {
+                            if ([valueSet containsObject:(id)kCFNull]) {
+                                NSMutableSet *objectSet = [valueSet isKindOfClass:[NSMutableSet class]]?valueSet:valueSet.mutableCopy;
+                                [objectSet removeObject:(id)kCFNull];
+                                ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
+                                                                               meta->_setter,
+                                                                               objectSet);
+                            }else{
+                                ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
+                                                                               meta->_setter,
+                                                                               (meta->_nsType == YYEncodingTypeNSSet) ?
+                                                                               valueSet :
+                                                                               ([valueSet isKindOfClass:[NSMutableSet class]]?valueSet:valueSet.mutableCopy));
                             }
                         }
-                        ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, set);
-                    } else {
-                        ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model,
-                                                                       meta->_setter,
-                                                                       (meta->_nsType == YYEncodingTypeNSSet) ?
-                                                                       valueSet :
-                                                                       ((NSSet *)valueSet).mutableCopy);
                     }
                 } // break; commented for code coverage in next line
                     
