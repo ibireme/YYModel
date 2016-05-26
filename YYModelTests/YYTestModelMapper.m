@@ -180,7 +180,7 @@
     
     model = [YYTestPropertyMapperModelContainer yy_modelWithJSON:json];
     XCTAssertTrue([model.array isKindOfClass:[NSArray class]]);
-    XCTAssertTrue(model.array.count == 4);
+    XCTAssertTrue(model.array.count == 3);
     
     jsonObject = [model yy_modelToJSONObject];
     XCTAssertTrue([jsonObject[@"array"] isKindOfClass:[NSArray class]]);
@@ -201,7 +201,7 @@
     
     model = [YYTestPropertyMapperModelContainer yy_modelWithJSON:json];
     XCTAssertTrue([model.dict isKindOfClass:[NSDictionary class]]);
-    XCTAssertTrue(model.dict.count == 4);
+    XCTAssertTrue(model.dict.count == 3);
     
     jsonObject = [model yy_modelToJSONObject];
     XCTAssertTrue(jsonObject != nil);
@@ -222,7 +222,7 @@
     
     model = [YYTestPropertyMapperModelContainer yy_modelWithJSON:json];
     XCTAssertTrue([model.set isKindOfClass:[NSSet class]]);
-    XCTAssertTrue(model.set.count == 4);
+    XCTAssertTrue(model.set.count == 3);
     
     jsonObject = [model yy_modelToJSONObject];
     XCTAssertTrue(jsonObject != nil);
