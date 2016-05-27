@@ -16,6 +16,10 @@
 
 #define force_inline __inline__ __attribute__((always_inline))
 
+/// Returns the cached model class meta
+static CFMutableDictionaryRef cache;
+static pthread_rwlock_t rwlock;
+
 /// Foundation Class Type
 typedef NS_ENUM (NSUInteger, YYEncodingNSType) {
     YYEncodingTypeNSUnknown = 0,
@@ -314,8 +318,67 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     return value;
 }
 
+@implementation YYModelTransformProtocol {
+    @package
+    Class _protocolClass;
+}
 
++ (instancetype)center
+{
+    static id _center = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _center = [[[self class] alloc]init];
+    });
+    return _center;
+}
 
++ (void)registerClass:(Class)cls
+{
+    [[self center]registerClass:cls];
+}
+
++ (void)unregisterClass
+{
+    [[self center]unregisterClass];
+}
+
+- (void)registerClass:(Class)cls
+{
+    NSAssert([cls isSubclassOfClass:[YYModelTransformProtocol class]], @"Register transform class must be subclass of \'YYModelTransformProtocol\'");
+    
+    //We must clean the cached model class meta,
+    //Because maybe the cache is all not correct after new protocol class set.
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&rwlock));
+    
+    _protocolClass = cls;
+    
+    //Just recreate
+    cache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+    
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+}
+
+- (void)unregisterClass
+{
+    //We must clean the cached model class meta,
+    //Because maybe the cache is all not correct after new protocol class set.
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&rwlock));
+    
+    _protocolClass = (Class)NULL;
+    
+    //Just recreate
+    cache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+    
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+}
+
++ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapperForClass:(Class)cls
+{
+    return nil;
+}
+
+@end
 
 /// A property info in object model.
 @interface _YYModelPropertyMeta : NSObject {
@@ -541,54 +604,69 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     NSMutableArray *keyPathPropertyMetas = [NSMutableArray new];
     NSMutableArray *multiKeysPropertyMetas = [NSMutableArray new];
     
+    // get center mapper
+    NSDictionary *allCustomMapper = [[YYModelTransformProtocol center]->_protocolClass modelCustomPropertyMapperForClass:cls];
     if ([cls respondsToSelector:@selector(modelCustomPropertyMapper)]) {
-        NSDictionary *customMapper = [(id <YYModel>)cls modelCustomPropertyMapper];
-        [customMapper enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSString *mappedToKey, BOOL *stop) {
-            _YYModelPropertyMeta *propertyMeta = allPropertyMetas[propertyName];
-            if (!propertyMeta) return;
-            [allPropertyMetas removeObjectForKey:propertyName];
-            
-            if ([mappedToKey isKindOfClass:[NSString class]]) {
-                if (mappedToKey.length == 0) return;
-                
-                propertyMeta->_mappedToKey = mappedToKey;
-                NSArray *keyPath = [mappedToKey componentsSeparatedByString:@"."];
-                if (keyPath.count > 1) {
-                    propertyMeta->_mappedToKeyPath = keyPath;
-                    [keyPathPropertyMetas addObject:propertyMeta];
-                }
-                propertyMeta->_next = mapper[mappedToKey] ?: nil;
-                mapper[mappedToKey] = propertyMeta;
-                
-            } else if ([mappedToKey isKindOfClass:[NSArray class]]) {
-                
-                NSMutableArray *mappedToKeyArray = [NSMutableArray new];
-                for (NSString *oneKey in ((NSArray *)mappedToKey)) {
-                    if (![oneKey isKindOfClass:[NSString class]]) continue;
-                    if (oneKey.length == 0) continue;
-                    
-                    NSArray *keyPath = [oneKey componentsSeparatedByString:@"."];
-                    if (keyPath.count > 1) {
-                        [mappedToKeyArray addObject:keyPath];
-                    } else {
-                        [mappedToKeyArray addObject:oneKey];
-                    }
-                    
-                    if (!propertyMeta->_mappedToKey) {
-                        propertyMeta->_mappedToKey = oneKey;
-                        propertyMeta->_mappedToKeyPath = keyPath.count > 1 ? keyPath : nil;
-                    }
-                }
-                if (!propertyMeta->_mappedToKey) return;
-                
-                propertyMeta->_mappedToKeyArray = mappedToKeyArray;
-                [multiKeysPropertyMetas addObject:propertyMeta];
-                
-                propertyMeta->_next = mapper[mappedToKey] ?: nil;
-                mapper[mappedToKey] = propertyMeta;
-            }
-        }];
+        NSDictionary *selfCustomMapper = [(id <YYModel>)cls modelCustomPropertyMapper];
+        if (selfCustomMapper && !allCustomMapper) {
+            //just use customMapper
+            allCustomMapper = selfCustomMapper;
+        }else{
+            allCustomMapper = [allCustomMapper isKindOfClass:[NSMutableDictionary class]]?allCustomMapper:[allCustomMapper mutableCopy];
+            //replace the same key with selfCustomMapper and add nonexistent
+            [allCustomMapper setValuesForKeysWithDictionary:selfCustomMapper];
+        }
     }
+    [allCustomMapper enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSString *mappedToKey, BOOL *stop) {
+        _YYModelPropertyMeta *propertyMeta = allPropertyMetas[propertyName];
+        if (!propertyMeta) return;
+        [allPropertyMetas removeObjectForKey:propertyName];
+        
+        if ([mappedToKey isKindOfClass:[NSString class]]) {
+            if (mappedToKey.length == 0) return;
+            
+            propertyMeta->_mappedToKey = mappedToKey;
+            NSArray *keyPath = [mappedToKey componentsSeparatedByString:@"."];
+            if (keyPath.count > 1) {
+                propertyMeta->_mappedToKeyPath = keyPath;
+                [keyPathPropertyMetas addObject:propertyMeta];
+            }
+            propertyMeta->_next = mapper[mappedToKey] ?: nil;
+            mapper[mappedToKey] = propertyMeta;
+            
+        } else if ([mappedToKey isKindOfClass:[NSArray class]]) {
+            
+            NSMutableArray *mappedToKeyArray = [NSMutableArray new];
+            for (NSString *oneKey in ((NSArray *)mappedToKey)) {
+                if (![oneKey isKindOfClass:[NSString class]]) continue;
+                if (oneKey.length == 0) continue;
+                
+                NSArray *keyPath = [oneKey componentsSeparatedByString:@"."];
+                if (keyPath.count > 1) {
+                    [mappedToKeyArray addObject:keyPath];
+                } else {
+                    [mappedToKeyArray addObject:oneKey];
+                }
+                
+                if (!propertyMeta->_mappedToKey) {
+                    propertyMeta->_mappedToKey = oneKey;
+                    propertyMeta->_mappedToKeyPath = keyPath.count > 1 ? keyPath : nil;
+                }
+            }
+            if (!propertyMeta->_mappedToKey) return;
+            
+            propertyMeta->_mappedToKeyArray = mappedToKeyArray;
+            [multiKeysPropertyMetas addObject:propertyMeta];
+            
+            propertyMeta->_next = mapper[mappedToKey] ?: nil;
+            mapper[mappedToKey] = propertyMeta;
+        }
+    }];
+    
+    NSDictionary *centerCustomMapper = [[YYModelTransformProtocol center]->_protocolClass modelCustomPropertyMapperForClass:cls];
+    [centerCustomMapper enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSString *mappedToKey, BOOL *stop) {
+        
+    }];
     
     [allPropertyMetas enumerateKeysAndObjectsUsingBlock:^(NSString *name, _YYModelPropertyMeta *propertyMeta, BOOL *stop) {
         propertyMeta->_mappedToKey = name;
@@ -610,11 +688,6 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     
     return self;
 }
-
-/// Returns the cached model class meta
-
-static CFMutableDictionaryRef cache;
-static pthread_rwlock_t rwlock;
 
 + (void)load
 {

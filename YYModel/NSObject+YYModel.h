@@ -430,4 +430,34 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/**
+ YYModelTransformProtocol is an abstract class which provides the
+ basic structure for performing protocol-specific transforming of YYModel.
+ Concrete subclass handles the specifics associated with one or more methods.
+ */
+@interface YYModelTransformProtocol : NSObject
+
+/**
+ This method registers a protocol class, making it visible to several other `YYModelTransformProtocol` class methods.
+ 
+ @param cls A protocol class which must be subclass of `YYModelTransformProtocol` class.
+ */
++ (void)registerClass:(Class)cls;
+
+/**
+ Unregister custom transform center class
+ */
++ (void)unregisterClass;
+
+/**
+ This method's behavior is similar to `+ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper;` of `YYModel` protocol. It returns the additional mapper finally.
+ 
+ @param cls which class is being create mappers.
+ 
+ @return A custom mapper for properties.
+ */
++ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapperForClass:(Class)cls;
+
+@end
+
 NS_ASSUME_NONNULL_END
