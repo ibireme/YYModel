@@ -326,59 +326,59 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     _needUpdate = NO;
 }
 
-static CFMutableDictionaryRef classCache;
-static CFMutableDictionaryRef metaCache;
-static pthread_rwlock_t rwlock;
+static CFMutableDictionaryRef yymodel_classCache;
+static CFMutableDictionaryRef yymodel_metaCache;
+static pthread_rwlock_t yymodel_rwlock;
 
 + (void)load
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_init(&rwlock, NULL));
+        yymodel_classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        yymodel_metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_init(&yymodel_rwlock, NULL));
     });
 }
 
 - (void)setNeedUpdate {
-    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&rwlock));
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&yymodel_rwlock));
     _needUpdate = YES;
-    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
 }
 
 - (BOOL)needUpdate {
-    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&rwlock));
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&yymodel_rwlock));
     BOOL needUpdate = _needUpdate;
-    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
     return needUpdate;
 }
 
 + (instancetype)classInfoWithClass:(Class)cls {
     if (!cls) return nil;
     
-    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&rwlock));
-    YYClassInfo *info = CFDictionaryGetValue(class_isMetaClass(cls) ? metaCache : classCache, (__bridge const void *)(cls));
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&yymodel_rwlock));
+    YYClassInfo *info = CFDictionaryGetValue(class_isMetaClass(cls) ? yymodel_metaCache : yymodel_classCache, (__bridge const void *)(cls));
     BOOL needUpdate = info && info->_needUpdate;
-    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
     
     if (needUpdate) {
-        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&rwlock));
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&yymodel_rwlock));
         if (info->_needUpdate) {
             [info _update];
         }
-        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
     }else if (!info) {
         info = [[YYClassInfo alloc] initWithClass:cls];
-        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&rwlock));
-        YYClassInfo *infoInCache = CFDictionaryGetValue(class_isMetaClass(cls) ? metaCache : classCache, (__bridge const void *)(cls));
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&yymodel_rwlock));
+        YYClassInfo *infoInCache = CFDictionaryGetValue(class_isMetaClass(cls) ? yymodel_metaCache : yymodel_classCache, (__bridge const void *)(cls));
         if (!infoInCache) {
             if (info) {
-                CFDictionarySetValue(info.isMeta ? metaCache : classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
+                CFDictionarySetValue(info.isMeta ? yymodel_metaCache : yymodel_classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
             }
         }else{
             info = infoInCache;
         }
-        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&rwlock));
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
     }
     return info;
 }
