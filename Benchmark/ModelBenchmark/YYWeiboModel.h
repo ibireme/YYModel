@@ -16,7 +16,8 @@
 @property (nonatomic, assign) int cutType;
 @end
 
-@protocol YYWeiboPicture;
+@protocol YYWeiboPicture
+@end
 @interface YYWeiboPicture : NSObject <NSCoding, NSCopying>
 @property (nonatomic, strong) NSString *picID;
 @property (nonatomic, strong) NSString *objectID;
@@ -30,7 +31,8 @@
 @property (nonatomic, strong) YYWeiboPictureMetadata *original;
 @end
 
-@protocol YYWeiboURL;
+@protocol YYWeiboURL
+@end
 @interface YYWeiboURL : NSObject <NSCoding, NSCopying>
 @property (nonatomic, assign) BOOL result;
 @property (nonatomic, strong) NSString *shortURL;

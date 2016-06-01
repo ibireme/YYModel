@@ -1102,7 +1102,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         Class cls = meta->_cls;
                         if (meta->_hasCustomClassFromDictionary) {
                             cls = [cls modelCustomClassForDictionary:value];
-                            if (!cls) cls = meta->_genericCls; // for xcode code coverage
+                            if (!cls) cls = meta->_cls; // for xcode code coverage
                         }
                         one = [cls new];
                         [one yy_modelSetWithDictionary:value];
