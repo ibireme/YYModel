@@ -147,6 +147,10 @@
     model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
     XCTAssertTrue([model.desc4 isEqualToString:@"Apple"]);
     
+    json = @"{\".ext\":\"Apple\", \"name\":\"Apple\", \"count\":\"10\", \"desc1\":\"Apple\", \"desc2\":\"Apple\", \"desc3\":\"Apple\", \"desc4\":\"Apple\", \"modelID\":\"Apple\"}";
+    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    XCTAssertTrue([model.desc4 isEqualToString:@"Apple"]);
+    
     json = @"{\"id\":\"abcd\"}";
     model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
     XCTAssertTrue([model.modelID isEqualToString:@"abcd"]);
