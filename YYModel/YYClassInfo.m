@@ -389,3 +389,56 @@ static pthread_rwlock_t yymodel_rwlock;
 }
 
 @end
+
+@implementation NSObject (YYClassInfo)
+
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey
+{
+    return [self yy_containsPropertyKey:propertyKey untilClass:[NSObject class] ignoreUntilClass:YES];
+}
+
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey untilClass:(Class)untilCls
+{
+    return [self yy_containsPropertyKey:propertyKey untilClass:untilCls ignoreUntilClass:NO];
+}
+
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey untilClass:(Class)untilCls ignoreUntilClass:(BOOL)ignoreUntilCls
+{
+    NSDictionary<NSString *, YYClassPropertyInfo *> *propertyInfos = [self yy_propertyInfosUntilClass:untilCls ignoreUntilClass:ignoreUntilCls];
+    return (propertyInfos[propertyKey]!=nil);
+}
+
++ (NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfos
+{
+    return [self yy_propertyInfosUntilClass:[NSObject class] ignoreUntilClass:YES];
+}
+
++ (NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfosUntilClass:(Class)untilCls
+{
+    return [self yy_propertyInfosUntilClass:untilCls ignoreUntilClass:NO];
+}
+
++ (NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfosUntilClass:(Class)untilCls ignoreUntilClass:(BOOL)ignoreUntilCls
+{
+    NSAssert(untilCls, @"The `cls` param of yy_propertyInfosUntilClass:ignoreUntilClass: cant be nil!");
+    NSAssert([[self class] isSubclassOfClass:untilCls], @"%@ is not the subclass of %@",NSStringFromClass([self class]),NSStringFromClass(untilCls));
+    
+    YYClassInfo *classInfo = [YYClassInfo classInfoWithClass:[self class]];
+    if (!classInfo) return nil;
+    
+    NSMutableDictionary<NSString *, YYClassPropertyInfo *> *allPropertyInfos = [NSMutableDictionary<NSString *, YYClassPropertyInfo *> dictionary];
+    Class ignoreClass = ignoreUntilCls?untilCls:[untilCls superclass];//if cls is [NSObject class],its superclass is nil
+    
+    YYClassInfo *curClassInfo = classInfo;
+    while (curClassInfo && curClassInfo.cls != ignoreClass) {
+        for (YYClassPropertyInfo *propertyInfo in curClassInfo.propertyInfos.allValues) {
+            if (!propertyInfo.name || allPropertyInfos[propertyInfo.name]) continue; //If contains the same key, subclass is preferred.
+            allPropertyInfos[propertyInfo.name] = propertyInfo;
+        }
+        curClassInfo = curClassInfo.superClassInfo;
+    }
+    
+    return allPropertyInfos.count>0?allPropertyInfos:nil;
+}
+
+@end

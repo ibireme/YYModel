@@ -206,4 +206,68 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 
 @end
 
+/**
+ Provide some method to tell all property infos or whether a given property key is present in the class(or its superclass)
+ */
+@interface NSObject (YYClassInfo)
+
+/**
+ Returns a Boolean value that indicates whether a given property key is present in the class(or its superclass). The method will ignore the properties of [NSObject class].
+ 
+ @param propertyKey a property key maybe exist
+ 
+ @return YES if property key is present in the class, otherwise NO.
+ */
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey;
+
+/**
+ Returns a Boolean value that indicates whether a given property key is present in the class(or its superclass). The method will not ignore the properties of untilCls.
+ 
+ @param propertyKey a property key maybe exist
+ @param untilCls the last superclass which will be not ignored
+ 
+ @return YES if property key is present in the class, otherwise NO.
+ */
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey untilClass:(Class)untilCls;
+
+/**
+ Returns a Boolean value that indicates whether a given property key is present in the class(or its superclass).
+ 
+ @param propertyKey a property key maybe exist
+ @param untilCls the last superclass which will be ignored or not
+ @param ignoreUntilCls indicates whether the untilCls will be ignored
+ 
+ @return YES if property key is present in the class, otherwise NO.
+ */
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey untilClass:(Class)untilCls ignoreUntilClass:(BOOL)ignoreUntilCls;
+
+/**
+ Returns all property infos in the class(or its superclass). The method will ignore the properties of [NSObject class].
+ 
+ @return all property infos
+ */
++ (nullable NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfos;
+
+/**
+ Returns all property infos in the class(or its superclass). The method will not ignore the properties of untilCls.
+ 
+ @param untilCls the last superclass which will be not ignored
+ 
+ @return all property infos
+ */
++ (nullable NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfosUntilClass:(Class)untilCls;
+
+/**
+ Returns all property infos in the class(or its superclass).
+ 
+ @param propertyKey a property key maybe exist
+ @param untilCls the last superclass which will be ignored or not
+ @param ignoreUntilCls indicates whether the untilCls will be ignored
+ 
+ @return all property infos
+ */
++ (nullable NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfosUntilClass:(Class)untilCls ignoreUntilClass:(BOOL)ignoreUntilCls;
+
+@end
+
 NS_ASSUME_NONNULL_END
