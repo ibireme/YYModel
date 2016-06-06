@@ -153,7 +153,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
 
 - (instancetype)initWithProperty:(objc_property_t)property {
     if (!property) return nil;
-    self = [self init];
+    self = [super init];
     _property = property;
     const char *name = property_getName(property);
     if (name) {
