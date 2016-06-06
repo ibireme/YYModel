@@ -12,10 +12,14 @@
 #import <XCTest/XCTest.h>
 #import "YYModel.h"
 
-
+@protocol YYTestPropertyMapperModelAuto
+@end
 @interface YYTestPropertyMapperModelAuto : NSObject
 @property (nonatomic, assign) NSString *name;
 @property (nonatomic, assign) NSNumber *count;
+
+@property (nonatomic, copy) NSString *GodIsAGirl;
+
 @end
 
 @implementation YYTestPropertyMapperModelAuto
@@ -28,6 +32,7 @@
 @property (nonatomic, assign) NSString *desc2;
 @property (nonatomic, assign) NSString *desc3;
 @property (nonatomic, assign) NSString *desc4;
+@property (nonatomic, assign) NSString *desc5;
 @property (nonatomic, assign) NSString *modelID;
 @end
 
@@ -39,6 +44,7 @@
               @"desc2" : @"ext.d", // mapped to same key path
               @"desc3" : @"ext.d.e",
               @"desc4" : @".ext",
+              @"desc5" : @[@"ext..a"],
               @"modelID" : @[@"ID", @"Id", @"id", @"ext.id"]};
 }
 @end
@@ -86,7 +92,28 @@
 }
 @end
 
+@interface YYTestPseudoGenericPropertyMapperModelContainer : NSObject
 
+@property (nonatomic, strong) NSArray<YYTestPropertyMapperModelAuto *><YYTestPropertyMapperModelAuto> *array;
+
+@end
+
+@implementation YYTestPseudoGenericPropertyMapperModelContainer
+@end
+
+@interface YYTestTransformProtocol : YYModelTransformProtocol
+
+@end
+
+@implementation YYTestTransformProtocol
+
++ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapperForClass:(Class)cls {
+    return @{
+             @"GodIsAGirl":@"god-is-a-girl",
+             };
+}
+
+@end
 
 @interface YYTestModelPropertyMapper : XCTestCase
 
@@ -151,6 +178,10 @@
     model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
     XCTAssertTrue([model.desc4 isEqualToString:@"Apple"]);
     
+    json = @"{\"ext..a\":\"AppleDesc5\", \"name\":\"Apple\", \"count\":\"10\", \"desc1\":\"Apple\", \"desc2\":\"Apple\", \"desc3\":\"Apple\", \"desc4\":\"Apple\", \"modelID\":\"Apple\"}";
+    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    XCTAssertTrue([model.desc5 isEqualToString:@"AppleDesc5"]);
+
     json = @"{\"id\":\"abcd\"}";
     model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
     XCTAssertTrue([model.modelID isEqualToString:@"abcd"]);
@@ -255,6 +286,27 @@
     model = [YYTestPropertyMapperModelContainer yy_modelWithJSON:@{@"mArray" : [NSSet setWithArray:@[[YYTestPropertyMapperModelAuto new]]]}];
     XCTAssertTrue([model.mArray isKindOfClass:[NSMutableArray class]]);
     XCTAssertTrue([[model.mArray firstObject] isKindOfClass:[YYTestPropertyMapperModelAuto class]]);
+    
+    NSString *json2 = @"{\"array\":[\n  {\"name\":\"Apple\", \"count\":10},\n  {\"name\":\"Banana\", \"count\":11},\n  {\"name\":\"Pear\", \"count\":12},\n  null\n]}";
+    YYTestPseudoGenericPropertyMapperModelContainer *model2 = [YYTestPseudoGenericPropertyMapperModelContainer yy_modelWithJSON:json2];
+    XCTAssertTrue(model2.array.count == 3);
+    for (id object in model2.array) {
+        XCTAssertTrue([object isMemberOfClass:[YYTestPropertyMapperModelAuto class]]);
+    }
+}
+
+- (void)testTansformProtocol
+{
+    [YYModelTransformProtocol registerClass:[YYTestTransformProtocol class]];
+    
+    NSString *json = @"{\"god-is-a-girl\":\"Hello World\"}";
+    YYTestPropertyMapperModelAuto *model = [YYTestPropertyMapperModelAuto yy_modelWithJSON:json];
+    XCTAssertTrue([model.GodIsAGirl isEqualToString:@"Hello World"]);
+    
+    [YYModelTransformProtocol unregisterClass];
+    
+    model = [YYTestPropertyMapperModelAuto yy_modelWithJSON:json];
+    XCTAssertTrue(![model.GodIsAGirl isEqualToString:@"Hello World"]);
 }
 
 @end

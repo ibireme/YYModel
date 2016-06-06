@@ -620,7 +620,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
         if (selfCustomMapper && !allCustomMapper) {
             //just use customMapper
             allCustomMapper = selfCustomMapper;
-        }else{
+        }else if (selfCustomMapper.count > 0) {
             allCustomMapper = [allCustomMapper isKindOfClass:[NSMutableDictionary class]]?allCustomMapper:[allCustomMapper mutableCopy];
             //replace the same key with selfCustomMapper and add nonexistent
             [allCustomMapper setValuesForKeysWithDictionary:selfCustomMapper];
@@ -636,19 +636,9 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
             
             propertyMeta->_mappedToKey = mappedToKey;
             NSArray *keyPath = [mappedToKey componentsSeparatedByString:@"."];
-            if (keyPath.count > 1 ) {
-                __block BOOL hasEmptyKey = NO;
-                [keyPath enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                    //if there is empty key, indicates it's not a valid keyPath
-                    if ([obj stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length<=0) {
-                        hasEmptyKey = YES;
-                        *stop = YES;
-                    }
-                }];
-                if (!hasEmptyKey) {
-                    propertyMeta->_mappedToKeyPath = keyPath;
-                    [keyPathPropertyMetas addObject:propertyMeta];
-                }
+            if (keyPath.count > 1 && ![keyPath containsObject:@""]) {
+                propertyMeta->_mappedToKeyPath = keyPath;
+                [keyPathPropertyMetas addObject:propertyMeta];
             }
 
             propertyMeta->_next = mapper[mappedToKey] ?: nil;
@@ -661,30 +651,16 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
                 if (![oneKey isKindOfClass:[NSString class]]) continue;
                 if (oneKey.length == 0) continue;
                 
-                BOOL hasValidKeyPath = NO;
                 NSArray *keyPath = [oneKey componentsSeparatedByString:@"."];
-                if (keyPath.count > 1) {
-                    __block BOOL hasEmptyKey = NO;
-                    [keyPath enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                        //if there is empty key, indicates it's not a valid keyPath
-                        if ([obj stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length<=0) {
-                            hasEmptyKey = YES;
-                            *stop = YES;
-                        }
-                    }];
-                    if (!hasEmptyKey) {
-                        [mappedToKeyArray addObject:keyPath];
-                        hasValidKeyPath = YES;
-                    }
-                }
-                
-                if (!hasValidKeyPath) {
+                if (keyPath.count > 1 && ![keyPath containsObject:@""]) {
+                    [mappedToKeyArray addObject:keyPath];
+                } else {
                     [mappedToKeyArray addObject:oneKey];
                 }
                 
                 if (!propertyMeta->_mappedToKey) {
                     propertyMeta->_mappedToKey = oneKey;
-                    propertyMeta->_mappedToKeyPath = hasValidKeyPath ? [mappedToKeyArray lastObject] : nil;
+                    propertyMeta->_mappedToKeyPath = (keyPath.count > 1 && ![keyPath containsObject:@""]) ? keyPath : nil;
                 }
             }
             if (!propertyMeta->_mappedToKey) return;
