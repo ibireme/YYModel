@@ -55,6 +55,20 @@
 @end
 
 
+
+
+
+
+@protocol YYTestPropertyMapperModelAuto <NSObject>
+@end
+
+@protocol YYTestPropertyMapperModelCustom <NSObject>
+@end
+
+@protocol YYSimpleProtocol <NSObject>
+@end
+
+
 @interface YYTestPropertyMapperModelContainer : NSObject
 @property (nonatomic, strong) NSArray *array;
 @property (nonatomic, strong) NSMutableArray *mArray;
@@ -62,6 +76,10 @@
 @property (nonatomic, strong) NSMutableDictionary *mDict;
 @property (nonatomic, strong) NSSet *set;
 @property (nonatomic, strong) NSMutableSet *mSet;
+
+@property (nonatomic, strong) NSArray<YYTestPropertyMapperModelAuto> *pArray1;
+@property (nonatomic, strong) NSArray<YYSimpleProtocol,YYTestPropertyMapperModelAuto> *pArray2;
+@property (nonatomic, strong) NSArray<YYSimpleProtocol,YYTestPropertyMapperModelCustom> *pArray3;
 @end
 
 @implementation YYTestPropertyMapperModelContainer
@@ -74,7 +92,10 @@
 + (NSDictionary *)modelCustomPropertyMapper {
     return @{ @"mArray" : @"array",
               @"mDict" : @"dict",
-              @"mSet" : @"set"};
+              @"mSet" : @"set",
+              @"pArray1" : @"array",
+              @"pArray2" : @"array",
+              @"pArray3" : @"array"};
 }
 + (NSDictionary *)modelContainerPropertyGenericClass {
     return @{@"array" : YYTestPropertyMapperModelAuto.class,
@@ -82,7 +103,8 @@
              @"dict" : YYTestPropertyMapperModelAuto.class,
              @"mDict" : YYTestPropertyMapperModelAuto.class,
              @"set" : @"YYTestPropertyMapperModelAuto",
-             @"mSet" : @"YYTestPropertyMapperModelAuto"};
+             @"mSet" : @"YYTestPropertyMapperModelAuto",
+             @"pArray3" : @"YYTestPropertyMapperModelAuto"};
 }
 @end
 
@@ -197,6 +219,17 @@
     XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.array[2]).name isEqualToString:@"Pear"]);
     XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.array[2]).count isEqual:@12]);
     XCTAssertTrue([model.mArray isKindOfClass:[NSMutableArray class]]);
+    
+    XCTAssertTrue(model.pArray1.count == 3);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.pArray1[0]).name isEqualToString:@"Apple"]);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.pArray1[0]).count isEqual:@10]);
+    XCTAssertTrue(model.pArray2.count == 3);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.pArray2[0]).name isEqualToString:@"Apple"]);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.pArray2[0]).count isEqual:@10]);
+    XCTAssertTrue(model.pArray3.count == 3);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.pArray3[0]).name isEqualToString:@"Apple"]);
+    XCTAssertTrue([((YYTestPropertyMapperModelAuto *)model.pArray3[0]).count isEqual:@10]);
+    
     
     jsonObject = [model yy_modelToJSONObject];
     XCTAssertTrue([jsonObject[@"array"] isKindOfClass:[NSArray class]]);

@@ -168,14 +168,28 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                 if (attrs[i].value) {
                     _typeEncoding = [NSString stringWithUTF8String:attrs[i].value];
                     type = YYEncodingGetType(attrs[i].value);
-                    if ((type & YYEncodingTypeMask) == YYEncodingTypeObject) {
-                        size_t len = strlen(attrs[i].value);
-                        if (len > 3) {
-                            char name[len - 2];
-                            name[len - 3] = '\0';
-                            memcpy(name, attrs[i].value + 2, len - 3);
-                            _cls = objc_getClass(name);
+                    
+                    if ((type & YYEncodingTypeMask) == YYEncodingTypeObject && _typeEncoding.length) {
+                        NSScanner *scanner = [NSScanner scannerWithString:_typeEncoding];
+                        if (![scanner scanString:@"@\"" intoString:NULL]) continue;
+                        
+                        NSString *clsName = nil;
+                        if ([scanner scanUpToCharactersFromSet: [NSCharacterSet characterSetWithCharactersInString:@"\"<"] intoString:&clsName]) {
+                            if (clsName.length) _cls = objc_getClass(clsName.UTF8String);
                         }
+                        
+                        NSMutableArray *protocols = nil;
+                        while ([scanner scanString:@"<" intoString:NULL]) {
+                            NSString* protocol = nil;
+                            if ([scanner scanUpToString:@">" intoString: &protocol]) {
+                                if (protocol.length) {
+                                    if (!protocols) protocols = [NSMutableArray new];
+                                    [protocols addObject:protocol];
+                                }
+                            }
+                            [scanner scanString:@">" intoString:NULL];
+                        }
+                        _protocols = protocols;
                     }
                 }
             } break;
