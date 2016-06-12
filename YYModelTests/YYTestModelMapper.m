@@ -54,14 +54,17 @@
 @synthesize description = _description;
 @end
 
+@protocol AProtocol
+@end
 
 @interface YYTestPropertyMapperModelContainer : NSObject
-@property (nonatomic, strong) NSArray *array;
+@property (nonatomic, strong) NSArray<AProtocol> *array;
 @property (nonatomic, strong) NSMutableArray *mArray;
-@property (nonatomic, strong) NSDictionary *dict;
+@property (nonatomic, strong) NSDictionary<AProtocol> *dict;
 @property (nonatomic, strong) NSMutableDictionary *mDict;
-@property (nonatomic, strong) NSSet *set;
+@property (nonatomic, strong) NSSet<AProtocol> *set;
 @property (nonatomic, strong) NSMutableSet *mSet;
+@property (nonatomic, strong) YYTestPropertyMapperModelAuto<AProtocol>* autoModel;
 @end
 
 @implementation YYTestPropertyMapperModelContainer
@@ -179,6 +182,12 @@
     NSString *json;
     NSDictionary *jsonObject = nil;
     YYTestPropertyMapperModelContainer *model;
+    
+    json = @"{\"autoModel\":{\"name\":\"Apple\", \"count\":10}}";
+    model = [YYTestPropertyMapperModelContainerGeneric yy_modelWithJSON:json];
+    XCTAssertTrue([model.autoModel isKindOfClass:[YYTestPropertyMapperModelAuto class]]);
+    XCTAssertTrue([model.autoModel.name isEqualToString:@"Apple"]);
+    XCTAssertTrue([model.autoModel.count isEqual:@10]);
     
     json = @"{\"array\":[\n  {\"name\":\"Apple\", \"count\":10},\n  {\"name\":\"Banana\", \"count\":11},\n  {\"name\":\"Pear\", \"count\":12},\n  null\n]}";
     
