@@ -169,12 +169,16 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                     _typeEncoding = [NSString stringWithUTF8String:attrs[i].value];
                     type = YYEncodingGetType(attrs[i].value);
                     if ((type & YYEncodingTypeMask) == YYEncodingTypeObject) {
-                        size_t len = strlen(attrs[i].value);
-                        if (len > 3) {
-                            char name[len - 2];
-                            name[len - 3] = '\0';
-                            memcpy(name, attrs[i].value + 2, len - 3);
-                            _cls = objc_getClass(name);
+                        NSInteger toRight = [_typeEncoding rangeOfString:@"<"].location;
+                        if (toRight != NSNotFound) {
+                            toRight = toRight - 2;
+                        }
+                        else {
+                            toRight = _typeEncoding.length - 3;
+                        }
+                        if (toRight > 0) {
+                            NSString* className = [_typeEncoding substringWithRange:NSMakeRange(2, toRight)];
+                            _cls = NSClassFromString(className);
                         }
                     }
                 }
