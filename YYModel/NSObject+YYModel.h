@@ -248,7 +248,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param json  A json dictionary of `NSDictionary`, `NSString` or `NSData`.
               Example: {"user1":{"name","Mary"}, "user2": {name:"Joe"}}
  
- @return A array, or nil if an error occurs.
+ @return A dictionary, or nil if an error occurs.
  */
 + (nullable NSDictionary *)yy_modelDictionaryWithClass:(Class)cls json:(id)json;
 @end
