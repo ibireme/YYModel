@@ -11,6 +11,7 @@
 
 #import "YYClassInfo.h"
 #import <objc/runtime.h>
+#import <pthread.h>
 
 YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     char *type = (char *)typeEncoding;
@@ -53,10 +54,10 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
             default: { prefix = false; } break;
         }
     }
-
+    
     len = strlen(type);
     if (len == 0) return YYEncodingTypeUnknown | qualifier;
-
+    
     switch (*type) {
         case 'v': return YYEncodingTypeVoid | qualifier;
         case 'B': return YYEncodingTypeBool | qualifier;
@@ -159,7 +160,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         _name = [NSString stringWithUTF8String:name];
     }
     
-    YYEncodingType type = 0;
+    YYEncodingType type = YYEncodingTypeUnknown;
     unsigned int attrCount;
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &attrCount);
     for (unsigned int i = 0; i < attrCount; i++) {
@@ -171,10 +172,31 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
                     if ((type & YYEncodingTypeMask) == YYEncodingTypeObject) {
                         size_t len = strlen(attrs[i].value);
                         if (len > 3) {
-                            char name[len - 2];
-                            name[len - 3] = '\0';
-                            memcpy(name, attrs[i].value + 2, len - 3);
-                            _cls = objc_getClass(name);
+                            len = len - 3 + 1;
+                            char name[len];
+                            name[len - 1] = '\0';
+                            memcpy(name, attrs[i].value + 2, len - 1);
+                            
+                            //It has protocols if the final char is >.
+                            //if multi protocols, the name maybe is NSMutableArray<Pig><Dog><Cat>
+                            if (name[len - 2] == '>') {
+                                name[len - 2] = '\0';
+                                char *p = strchr(name, '<');
+                                if (p != NULL) {
+                                    p[0] = '\0';
+                                    _cls = objc_getClass(name);
+                                    
+                                    p++;
+                                    //p maybe contain multi protocol names. maybe is Pig><Dog><Cat
+                                    //and if one protocol is not adopted(or used), objc_getProtocol(p) would return nil
+                                    //see http://stackoverflow.com/questions/10212119/objc-getprotocol-returns-null-for-nsapplicationdelegate
+                                    //so we just record the protocol names
+                                    NSString *pNames = [NSString stringWithUTF8String:p];
+                                    _protocolNames = [pNames componentsSeparatedByString:@"><"];
+                                }
+                            }else{
+                                _cls = objc_getClass(name);
+                            }
                         }
                     }
                 }
@@ -251,7 +273,7 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     }
     _name = NSStringFromClass(cls);
     [self _update];
-
+    
     _superClassInfo = [self.class classInfoWithClass:_superCls];
     return self;
 }
@@ -304,38 +326,59 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
     _needUpdate = NO;
 }
 
+static CFMutableDictionaryRef yymodel_classCache;
+static CFMutableDictionaryRef yymodel_metaCache;
+static pthread_rwlock_t yymodel_rwlock;
+
++ (void)load
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        yymodel_classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        yymodel_metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_init(&yymodel_rwlock, NULL));
+    });
+}
+
 - (void)setNeedUpdate {
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&yymodel_rwlock));
     _needUpdate = YES;
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
 }
 
 - (BOOL)needUpdate {
-    return _needUpdate;
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&yymodel_rwlock));
+    BOOL needUpdate = _needUpdate;
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
+    return needUpdate;
 }
 
 + (instancetype)classInfoWithClass:(Class)cls {
     if (!cls) return nil;
-    static CFMutableDictionaryRef classCache;
-    static CFMutableDictionaryRef metaCache;
-    static dispatch_once_t onceToken;
-    static dispatch_semaphore_t lock;
-    dispatch_once(&onceToken, ^{
-        classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        lock = dispatch_semaphore_create(1);
-    });
-    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
-    YYClassInfo *info = CFDictionaryGetValue(class_isMetaClass(cls) ? metaCache : classCache, (__bridge const void *)(cls));
-    if (info && info->_needUpdate) {
-        [info _update];
-    }
-    dispatch_semaphore_signal(lock);
-    if (!info) {
-        info = [[YYClassInfo alloc] initWithClass:cls];
-        if (info) {
-            dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
-            CFDictionarySetValue(info.isMeta ? metaCache : classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
-            dispatch_semaphore_signal(lock);
+    
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_rdlock(&yymodel_rwlock));
+    YYClassInfo *info = CFDictionaryGetValue(class_isMetaClass(cls) ? yymodel_metaCache : yymodel_classCache, (__bridge const void *)(cls));
+    BOOL needUpdate = info && info->_needUpdate;
+    YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
+    
+    if (needUpdate) {
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&yymodel_rwlock));
+        if (info->_needUpdate) {
+            [info _update];
         }
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
+    }else if (!info) {
+        info = [[YYClassInfo alloc] initWithClass:cls];
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_wrlock(&yymodel_rwlock));
+        YYClassInfo *infoInCache = CFDictionaryGetValue(class_isMetaClass(cls) ? yymodel_metaCache : yymodel_classCache, (__bridge const void *)(cls));
+        if (!infoInCache) {
+            if (info) {
+                CFDictionarySetValue(info.isMeta ? yymodel_metaCache : yymodel_classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
+            }
+        }else{
+            info = infoInCache;
+        }
+        YYMODEL_THREAD_ASSERT_ON_ERROR(pthread_rwlock_unlock(&yymodel_rwlock));
     }
     return info;
 }
@@ -343,6 +386,59 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
 + (instancetype)classInfoWithClassName:(NSString *)className {
     Class cls = NSClassFromString(className);
     return [self classInfoWithClass:cls];
+}
+
+@end
+
+@implementation NSObject (YYClassInfo)
+
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey
+{
+    return [self yy_containsPropertyKey:propertyKey untilClass:[NSObject class] ignoreUntilClass:YES];
+}
+
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey untilClass:(Class)untilCls
+{
+    return [self yy_containsPropertyKey:propertyKey untilClass:untilCls ignoreUntilClass:NO];
+}
+
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey untilClass:(Class)untilCls ignoreUntilClass:(BOOL)ignoreUntilCls
+{
+    NSDictionary<NSString *, YYClassPropertyInfo *> *propertyInfos = [self yy_propertyInfosUntilClass:untilCls ignoreUntilClass:ignoreUntilCls];
+    return (propertyInfos[propertyKey]!=nil);
+}
+
++ (NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfos
+{
+    return [self yy_propertyInfosUntilClass:[NSObject class] ignoreUntilClass:YES];
+}
+
++ (NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfosUntilClass:(Class)untilCls
+{
+    return [self yy_propertyInfosUntilClass:untilCls ignoreUntilClass:NO];
+}
+
++ (NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfosUntilClass:(Class)untilCls ignoreUntilClass:(BOOL)ignoreUntilCls
+{
+    NSAssert(untilCls, @"The `cls` param of yy_propertyInfosUntilClass:ignoreUntilClass: cant be nil!");
+    NSAssert([[self class] isSubclassOfClass:untilCls], @"%@ is not the subclass of %@",NSStringFromClass([self class]),NSStringFromClass(untilCls));
+    
+    YYClassInfo *classInfo = [YYClassInfo classInfoWithClass:[self class]];
+    if (!classInfo) return nil;
+    
+    NSMutableDictionary<NSString *, YYClassPropertyInfo *> *allPropertyInfos = [NSMutableDictionary<NSString *, YYClassPropertyInfo *> dictionary];
+    Class ignoreClass = ignoreUntilCls?untilCls:[untilCls superclass];//if cls is [NSObject class],its superclass is nil
+    
+    YYClassInfo *curClassInfo = classInfo;
+    while (curClassInfo && curClassInfo.cls != ignoreClass) {
+        for (YYClassPropertyInfo *propertyInfo in curClassInfo.propertyInfos.allValues) {
+            if (!propertyInfo.name || allPropertyInfos[propertyInfo.name]) continue; //If contains the same key, subclass is preferred.
+            allPropertyInfos[propertyInfo.name] = propertyInfo;
+        }
+        curClassInfo = curClassInfo.superClassInfo;
+    }
+    
+    return allPropertyInfos.count>0?allPropertyInfos:nil;
 }
 
 @end

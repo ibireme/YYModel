@@ -14,6 +14,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define YYMODEL_THREAD_ASSERT_ON_ERROR(x_) do { \
+_Pragma("clang diagnostic push"); \
+_Pragma("clang diagnostic ignored \"-Wunused-variable\""); \
+volatile int res = (x_); \
+assert(res == 0); \
+_Pragma("clang diagnostic pop"); \
+} while (0)
+
 /**
  Type encoding's type.
  */
@@ -128,6 +136,8 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
 @property (nonatomic, strong, readonly) NSString *typeEncoding;   ///< property's encoding value
 @property (nonatomic, strong, readonly) NSString *ivarName;       ///< property's ivar name
 @property (nullable, nonatomic, assign, readonly) Class cls;      ///< may be nil
+@property (nullable, nonatomic, strong, readonly) NSArray *protocolNames; ///< may be nil
+
 @property (nonatomic, assign, readonly) SEL getter;               ///< getter (nonnull)
 @property (nonatomic, assign, readonly) SEL setter;               ///< setter (nonnull)
 
@@ -193,6 +203,70 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding);
  @return A class info, or nil if an error occurs.
  */
 + (nullable instancetype)classInfoWithClassName:(NSString *)className;
+
+@end
+
+/**
+ Provide some method to tell all property infos or whether a given property key is present in the class(or its superclass)
+ */
+@interface NSObject (YYClassInfo)
+
+/**
+ Returns a Boolean value that indicates whether a given property key is present in the class(or its superclass). The method will ignore the properties of [NSObject class].
+ 
+ @param propertyKey a property key maybe exist
+ 
+ @return YES if property key is present in the class, otherwise NO.
+ */
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey;
+
+/**
+ Returns a Boolean value that indicates whether a given property key is present in the class(or its superclass). The method will not ignore the properties of untilCls.
+ 
+ @param propertyKey a property key maybe exist
+ @param untilCls the last superclass which will be not ignored
+ 
+ @return YES if property key is present in the class, otherwise NO.
+ */
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey untilClass:(Class)untilCls;
+
+/**
+ Returns a Boolean value that indicates whether a given property key is present in the class(or its superclass).
+ 
+ @param propertyKey a property key maybe exist
+ @param untilCls the last superclass which will be ignored or not
+ @param ignoreUntilCls indicates whether the untilCls will be ignored
+ 
+ @return YES if property key is present in the class, otherwise NO.
+ */
++ (BOOL)yy_containsPropertyKey:(NSString*)propertyKey untilClass:(Class)untilCls ignoreUntilClass:(BOOL)ignoreUntilCls;
+
+/**
+ Returns all property infos in the class(or its superclass). The method will ignore the properties of [NSObject class].
+ 
+ @return all property infos
+ */
++ (nullable NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfos;
+
+/**
+ Returns all property infos in the class(or its superclass). The method will not ignore the properties of untilCls.
+ 
+ @param untilCls the last superclass which will be not ignored
+ 
+ @return all property infos
+ */
++ (nullable NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfosUntilClass:(Class)untilCls;
+
+/**
+ Returns all property infos in the class(or its superclass).
+ 
+ @param propertyKey a property key maybe exist
+ @param untilCls the last superclass which will be ignored or not
+ @param ignoreUntilCls indicates whether the untilCls will be ignored
+ 
+ @return all property infos
+ */
++ (nullable NSDictionary<NSString *, YYClassPropertyInfo *> *)yy_propertyInfosUntilClass:(Class)untilCls ignoreUntilClass:(BOOL)ignoreUntilCls;
 
 @end
 

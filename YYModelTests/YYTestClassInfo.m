@@ -79,8 +79,21 @@ typedef union yy_union{ char a; int b;} yy_union;
 @end
 
 
+@protocol Pig
+@end
+@protocol Egg
+@end
+@protocol Dog
+@end
 
+@interface YYTestPropertySubModel : YYTestPropertyModel
 
+@property (nonatomic, strong) NSString<Pig,Egg,Dog> *randomValue;
+
+@end
+
+@implementation YYTestPropertySubModel
+@end
 
 
 @interface YYTestClassInfo : XCTestCase
@@ -175,6 +188,27 @@ typedef union yy_union{ char a; int b;} yy_union;
     XCTAssert([self getType:info name:@"dynamicValue"] & YYEncodingTypePropertyMask & YYEncodingTypePropertyDynamic);
     XCTAssert([self getType:info name:@"getterValue"] & YYEncodingTypePropertyMask &YYEncodingTypePropertyCustomGetter);
     XCTAssert([self getType:info name:@"setterValue"] & YYEncodingTypePropertyMask & YYEncodingTypePropertyCustomSetter);
+}
+
+- (void)testOthers {
+    //contain property key
+    XCTAssert([YYTestPropertyModel yy_containsPropertyKey:@"boolValue"]);
+    XCTAssert(![YYTestPropertyModel yy_containsPropertyKey:@"boolValue" untilClass:[YYTestPropertyModel class] ignoreUntilClass:YES]);
+    XCTAssert(![YYTestPropertySubModel yy_containsPropertyKey:@"boolValue" untilClass:[YYTestPropertySubModel class]]);
+    XCTAssert([YYTestPropertySubModel yy_containsPropertyKey:@"boolValue" untilClass:[YYTestPropertyModel class]]);
+    XCTAssert(![YYTestPropertySubModel yy_containsPropertyKey:@"boolValue" untilClass:[YYTestPropertyModel class] ignoreUntilClass:YES]);
+    
+    //propertyInfos
+    XCTAssert([YYTestPropertySubModel yy_propertyInfos][@"boolValue"]);
+    XCTAssert([YYTestPropertySubModel yy_propertyInfosUntilClass:[YYTestPropertySubModel class]][@"randomValue"]);
+    XCTAssert(![YYTestPropertySubModel yy_propertyInfosUntilClass:[YYTestPropertyModel class] ignoreUntilClass:YES][@"boolValue"]);
+    
+    //protocol names
+    YYClassInfo *info = [YYClassInfo classInfoWithClass:[YYTestPropertySubModel class]];
+    YYClassPropertyInfo *propertyInfo = info.propertyInfos[@"randomValue"];
+    XCTAssert([propertyInfo.protocolNames containsObject:@"Pig"]);
+    XCTAssert([propertyInfo.protocolNames containsObject:@"Egg"]);
+    XCTAssert([propertyInfo.protocolNames containsObject:@"Dog"]);
 }
 
 - (YYEncodingType)getType:(YYClassInfo *)info name:(NSString *)name {
