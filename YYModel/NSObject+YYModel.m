@@ -546,62 +546,71 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     NSMutableArray *keyPathPropertyMetas = [NSMutableArray new];
     NSMutableArray *multiKeysPropertyMetas = [NSMutableArray new];
     
+    NSDictionary *customMapper = nil;
+    
     if ([cls respondsToSelector:@selector(modelCustomPropertyMapper)]) {
-        NSDictionary *customMapper = [(id <YYModel>)cls modelCustomPropertyMapper];
-        [customMapper enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSString *mappedToKey, BOOL *stop) {
-            _YYModelPropertyMeta *propertyMeta = allPropertyMetas[propertyName];
-            if (!propertyMeta) return;
-            [allPropertyMetas removeObjectForKey:propertyName];
-            
-            if ([mappedToKey isKindOfClass:[NSString class]]) {
-                if (mappedToKey.length == 0) return;
-                
-                propertyMeta->_mappedToKey = mappedToKey;
-                NSArray *keyPath = [mappedToKey componentsSeparatedByString:@"."];
-                for (NSString *onePath in keyPath) {
-                    if (onePath.length == 0) {
-                        NSMutableArray *tmp = keyPath.mutableCopy;
-                        [tmp removeObject:@""];
-                        keyPath = tmp;
-                        break;
-                    }
-                }
-                if (keyPath.count > 1) {
-                    propertyMeta->_mappedToKeyPath = keyPath;
-                    [keyPathPropertyMetas addObject:propertyMeta];
-                }
-                propertyMeta->_next = mapper[mappedToKey] ?: nil;
-                mapper[mappedToKey] = propertyMeta;
-                
-            } else if ([mappedToKey isKindOfClass:[NSArray class]]) {
-                
-                NSMutableArray *mappedToKeyArray = [NSMutableArray new];
-                for (NSString *oneKey in ((NSArray *)mappedToKey)) {
-                    if (![oneKey isKindOfClass:[NSString class]]) continue;
-                    if (oneKey.length == 0) continue;
-                    
-                    NSArray *keyPath = [oneKey componentsSeparatedByString:@"."];
-                    if (keyPath.count > 1) {
-                        [mappedToKeyArray addObject:keyPath];
-                    } else {
-                        [mappedToKeyArray addObject:oneKey];
-                    }
-                    
-                    if (!propertyMeta->_mappedToKey) {
-                        propertyMeta->_mappedToKey = oneKey;
-                        propertyMeta->_mappedToKeyPath = keyPath.count > 1 ? keyPath : nil;
-                    }
-                }
-                if (!propertyMeta->_mappedToKey) return;
-                
-                propertyMeta->_mappedToKeyArray = mappedToKeyArray;
-                [multiKeysPropertyMetas addObject:propertyMeta];
-                
-                propertyMeta->_next = mapper[mappedToKey] ?: nil;
-                mapper[mappedToKey] = propertyMeta;
-            }
+        customMapper = [(id <YYModel>)cls modelCustomPropertyMapper];
+    } else if ([cls respondsToSelector:@selector(modelCustomKeyNameWithPropertyName:)]) {
+        NSMutableDictionary *tempCustomMapper = [NSMutableDictionary new];
+        [allPropertyMetas enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            id mappedToKey = [(id <YYModel>)cls modelCustomKeyNameWithPropertyName:propertyName];
+            if (mappedToKey) tempCustomMapper[propertyName] = mappedToKey;
         }];
+        if (tempCustomMapper.count) customMapper = tempCustomMapper;
     }
+    [customMapper enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSString *mappedToKey, BOOL *stop) {
+        _YYModelPropertyMeta *propertyMeta = allPropertyMetas[propertyName];
+        if (!propertyMeta) return;
+        [allPropertyMetas removeObjectForKey:propertyName];
+        
+        if ([mappedToKey isKindOfClass:[NSString class]]) {
+            if (mappedToKey.length == 0) return;
+            
+            propertyMeta->_mappedToKey = mappedToKey;
+            NSArray *keyPath = [mappedToKey componentsSeparatedByString:@"."];
+            for (NSString *onePath in keyPath) {
+                if (onePath.length == 0) {
+                    NSMutableArray *tmp = keyPath.mutableCopy;
+                    [tmp removeObject:@""];
+                    keyPath = tmp;
+                    break;
+                }
+            }
+            if (keyPath.count > 1) {
+                propertyMeta->_mappedToKeyPath = keyPath;
+                [keyPathPropertyMetas addObject:propertyMeta];
+            }
+            propertyMeta->_next = mapper[mappedToKey] ?: nil;
+            mapper[mappedToKey] = propertyMeta;
+            
+        } else if ([mappedToKey isKindOfClass:[NSArray class]]) {
+            
+            NSMutableArray *mappedToKeyArray = [NSMutableArray new];
+            for (NSString *oneKey in ((NSArray *)mappedToKey)) {
+                if (![oneKey isKindOfClass:[NSString class]]) continue;
+                if (oneKey.length == 0) continue;
+                
+                NSArray *keyPath = [oneKey componentsSeparatedByString:@"."];
+                if (keyPath.count > 1) {
+                    [mappedToKeyArray addObject:keyPath];
+                } else {
+                    [mappedToKeyArray addObject:oneKey];
+                }
+                
+                if (!propertyMeta->_mappedToKey) {
+                    propertyMeta->_mappedToKey = oneKey;
+                    propertyMeta->_mappedToKeyPath = keyPath.count > 1 ? keyPath : nil;
+                }
+            }
+            if (!propertyMeta->_mappedToKey) return;
+            
+            propertyMeta->_mappedToKeyArray = mappedToKeyArray;
+            [multiKeysPropertyMetas addObject:propertyMeta];
+            
+            propertyMeta->_next = mapper[mappedToKey] ?: nil;
+            mapper[mappedToKey] = propertyMeta;
+        }
+    }];
     
     [allPropertyMetas enumerateKeysAndObjectsUsingBlock:^(NSString *name, _YYModelPropertyMeta *propertyMeta, BOOL *stop) {
         propertyMeta->_mappedToKey = name;

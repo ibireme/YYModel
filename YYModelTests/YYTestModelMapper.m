@@ -32,6 +32,12 @@
 @end
 
 @implementation YYTestPropertyMapperModelCustom
+@end
+
+@interface YYTestPropertyMapperModelCustom1 : YYTestPropertyMapperModelCustom
+@end
+
+@implementation YYTestPropertyMapperModelCustom1
 + (NSDictionary *)modelCustomPropertyMapper {
     return @{ @"name" : @"n",
               @"count" : @"ext.c",
@@ -40,6 +46,16 @@
               @"desc3" : @"ext.d.e",
               @"desc4" : @".ext",
               @"modelID" : @[@"ID", @"Id", @"id", @"ext.id"]};
+}
+@end
+
+@interface YYTestPropertyMapperModelCustom2 : YYTestPropertyMapperModelCustom
+@end
+
+@implementation YYTestPropertyMapperModelCustom2
++ (id)modelCustomKeyNameWithPropertyName:(NSString *)propertyName {
+    NSDictionary *mapper = [YYTestPropertyMapperModelCustom1 modelCustomPropertyMapper];
+    return mapper[propertyName];
 }
 @end
 
@@ -131,30 +147,30 @@
     XCTAssertTrue([model.count isEqual:@12]);
 }
 
-- (void)testCustom {
+- (void)_testCustomWithModel:(nonnull YYTestPropertyMapperModelCustom *)model {
     NSString *json;
     NSDictionary *jsonObject;
-    YYTestPropertyMapperModelCustom *model;
+    Class modelClass = [model class];
     
     json = @"{\"n\":\"Apple\",\"ext\":{\"c\":12}}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue([model.name isEqualToString:@"Apple"]);
     XCTAssertTrue([model.count isEqual:@12]);
     
     json = @"{\"n\":\"Apple\",\"count\":12}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue(model.count == nil);
     
     json = @"{\"n\":\"Apple\",\"ext\":12}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue(model.count == nil);
     
     json = @"{\"n\":\"Apple\",\"ext\":@{}}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue(model.count == nil);
     
     json = @"{\"ext\":{\"d\":\"Apple\"}}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue([model.desc1 isEqualToString:@"Apple"]);
     XCTAssertTrue([model.desc2 isEqualToString:@"Apple"]);
     
@@ -162,32 +178,42 @@
     XCTAssertTrue([((NSDictionary *)jsonObject[@"ext"])[@"d"] isEqualToString:@"Apple"]);
     
     json = @"{\"ext\":{\"d\":{ \"e\" : \"Apple\"}}}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue([model.desc3 isEqualToString:@"Apple"]);
     
     json = @"{\".ext\":\"Apple\"}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue([model.desc4 isEqualToString:@"Apple"]);
     
     json = @"{\".ext\":\"Apple\", \"name\":\"Apple\", \"count\":\"10\", \"desc1\":\"Apple\", \"desc2\":\"Apple\", \"desc3\":\"Apple\", \"desc4\":\"Apple\", \"modelID\":\"Apple\"}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue([model.desc4 isEqualToString:@"Apple"]);
     
     json = @"{\"id\":\"abcd\"}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue([model.modelID isEqualToString:@"abcd"]);
     
     json = @"{\"ext\":{\"id\":\"abcd\"}}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue([model.modelID isEqualToString:@"abcd"]);
     
     json = @"{\"id\":\"abcd\",\"ID\":\"ABCD\",\"Id\":\"Abcd\"}";
-    model = [YYTestPropertyMapperModelCustom yy_modelWithJSON:json];
+    model = [modelClass yy_modelWithJSON:json];
     XCTAssertTrue([model.modelID isEqualToString:@"ABCD"]);
     
     jsonObject = [model yy_modelToJSONObject];
     XCTAssertTrue(jsonObject[@"id"] == nil);
     XCTAssertTrue([jsonObject[@"ID"] isEqualToString:@"ABCD"]);
+}
+
+- (void)testCustom1 {
+    YYTestPropertyMapperModelCustom1 *model = [YYTestPropertyMapperModelCustom1 new];
+    [self _testCustomWithModel:model];
+}
+
+- (void)testCustom2 {
+    YYTestPropertyMapperModelCustom2 *model = [YYTestPropertyMapperModelCustom2 new];
+    [self _testCustomWithModel:model];
 }
 
 - (void)testWarn {

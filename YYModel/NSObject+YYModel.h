@@ -269,6 +269,8 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion If the key in JSON/Dictionary does not match to the model's property name,
  implements this method and returns the additional mapper.
  
+ modelCustomPropertyMapper and modelCustomKeyNameWithPropertyName: Use only one of them.
+ 
  Example:
     
     json: 
@@ -301,6 +303,50 @@ NS_ASSUME_NONNULL_BEGIN
  @return A custom mapper for properties.
  */
 + (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper;
+
+/**
+ 
+ Custom property name.
+ 
+ @discussion If the key in JSON/Dictionary does not match to the model's property name
+ and has certain rules, implements this method and returns the corresponding
+ JSON/Dictionary key name.
+ 
+ modelCustomPropertyMapper and modelCustomKeyNameWithPropertyName: Use only one of them.
+ 
+ Example:
+ 
+    json:
+        {
+            "Name":"Harry Pottery",
+            "Page": 256,
+            "Description": "A book written by J.K.Rowling."
+            "BookID" : 100010
+        }
+ 
+    model:
+        @interface YYBook : NSObject
+        @property NSString *name;
+        @property NSInteger page;
+        @property NSString *desc;
+        @property NSString *bookID;
+        @end
+ 
+        @implementation YYBook
+        + (id)modelCustomKeyNameWithPropertyName:(NSString *)propertyName {
+            if ([propertyName isEqualToString:@"desc"]) {
+                return @"Description";
+            }
+            // first letter uppercase
+            return [NSString stringWithFormat:@"%@%@", [[propertyName substringToIndex:1] uppercaseString], [propertyName substringFromIndex:1]];
+        }
+        @end
+ 
+ @param propertyName The model property name.
+ 
+ @return A JSON/Dictionary key name.
+ */
++ (nullable id)modelCustomKeyNameWithPropertyName:(NSString *)propertyName;
 
 /**
  The generic class mapper for container properties.
