@@ -147,32 +147,32 @@ EEE MMM dd HH:mm:ss Z yyyy
 	}
 	@end
 
-  // OR
+	// OR
 
-  // JSON:
-  {
-      "Name":"Harry Pottery",
-      "Page": 256,
-      "Description": "A book written by J.K.Rowling."
-      "BookID" : 100010
-  }
+	// JSON:
+	{
+		"Name":"Harry Pottery",
+		"Page": 256,
+		"Description": "A book written by J.K.Rowling."
+		"BookID" : 100010
+	}
 
-  // Model:
-  @interface Book : NSObject
-  @property NSString *name;
-  @property NSInteger page;
-  @property NSString *desc;
-  @property NSString *bookID;
-  @end
-  @implementation Book
-  + (id)modelCustomKeyNameWithPropertyName:(NSString *)propertyName {
-      if ([propertyName isEqualToString:@"desc"]) {
-          return @"Description";
-      }
-      // first letter uppercase
-      return [NSString stringWithFormat:@"%@%@", [[propertyName substringToIndex:1] uppercaseString], [propertyName substringFromIndex:1]];
-  }
-  @end
+	// Model:
+	@interface Book : NSObject
+	@property NSString *name;
+	@property NSInteger page;
+	@property NSString *desc;
+	@property NSString *bookID;
+	@end
+	@implementation Book
+	+ (id)modelCustomKeyNameWithPropertyName:(NSString *)propertyName {
+		if ([propertyName isEqualToString:@"desc"]) {
+			return @"Description";
+		}
+		// first letter uppercase
+		return [NSString stringWithFormat:@"%@%@", [[propertyName substringToIndex:1] uppercaseString], [propertyName substringFromIndex:1]];
+	}
+	@end
 
 You can map a json key (key path) or an array of json key (key path) to one or multiple property name. If there's no mapper for a property, it will use the property's name as default.
 
@@ -471,33 +471,33 @@ EEE MMM dd HH:mm:ss Z yyyy
 	}
 	@end
 
-  // 或者
-
-  // JSON:
-  {
-      "Name":"Harry Pottery",
-      "Page": 256,
-      "Description": "A book written by J.K.Rowling."
-      "BookID" : 100010
-  }
-
-  // Model:
-  @interface Book : NSObject
-  @property NSString *name;
-  @property NSInteger page;
-  @property NSString *desc;
-  @property NSString *bookID;
-  @end
-  @implementation Book
-  //返回propertyName 对映射到 JSON 的 Key。
-  + (id)modelCustomKeyNameWithPropertyName:(NSString *)propertyName {
-      if ([propertyName isEqualToString:@"desc"]) {
-          return @"Description";
-      }
-      // 首字母大字
-      return [NSString stringWithFormat:@"%@%@", [[propertyName substringToIndex:1] uppercaseString], [propertyName substringFromIndex:1]];
-  }
-  @end
+	// 或者
+	
+	// JSON:
+	{
+		"Name":"Harry Pottery",
+		"Page": 256,
+		"Description": "A book written by J.K.Rowling."
+		"BookID" : 100010
+	}
+	
+	// Model:
+	@interface Book : NSObject
+	@property NSString *name;
+	@property NSInteger page;
+	@property NSString *desc;
+	@property NSString *bookID;
+	@end
+	@implementation Book
+	//返回propertyName 对映射到 JSON 的 Key。
+	+ (id)modelCustomKeyNameWithPropertyName:(NSString *)propertyName {
+		if ([propertyName isEqualToString:@"desc"]) {
+			return @"Description";
+		}
+		// 首字母大字
+		return [NSString stringWithFormat:@"%@%@", [[propertyName substringToIndex:1] uppercaseString], [propertyName substringFromIndex:1]];
+	}
+	@end
 
 你可以把一个或一组 json key (key path) 映射到一个或多个属性。如果一个属性没有映射关系，那默认会使用相同属性名作为映射。
 
