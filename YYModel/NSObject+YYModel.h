@@ -411,6 +411,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)modelCustomTransformFromDictionary:(NSDictionary *)dic;
 
 /**
+ This method's behavior is similar to `- (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic;`,
+ but be called before the model transform.
+ 
+ @discussion If the model implements this method, it will be called at the end of
+ `-modelToJSONObject` and `-modelToJSONString`.
+ If this method returns NO, the transform process will ignore this json dictionary.
+ 
+ @param dic  The alloc dictionary.
+ 
+ @return Returns the modified dictionary, or nil to ignore this model.
+ */
+- (NSMutableDictionary *)modelCustomWillTransformToDictionary:(NSMutableDictionary *)dic;
+
+/**
  If the default model-to-json transform does not fit to your model class, implement
  this method to do additional process. You can also use this method to validate the
  json dictionary.

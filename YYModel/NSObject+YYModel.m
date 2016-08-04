@@ -471,6 +471,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     BOOL _hasCustomTransformFromDictionary;
     BOOL _hasCustomTransformToDictionary;
     BOOL _hasCustomClassFromDictionary;
+    BOOL _hasCustomWillTransformToDictionary;
 }
 @end
 
@@ -620,6 +621,7 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     _hasCustomTransformFromDictionary = ([cls instancesRespondToSelector:@selector(modelCustomTransformFromDictionary:)]);
     _hasCustomTransformToDictionary = ([cls instancesRespondToSelector:@selector(modelCustomTransformToDictionary:)]);
     _hasCustomClassFromDictionary = ([cls respondsToSelector:@selector(modelCustomClassForDictionary:)]);
+    _hasCustomWillTransformToDictionary = ([cls respondsToSelector:@selector(modelCustomWillTransformToDictionary:)]);
     
     return self;
 }
@@ -1211,6 +1213,10 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:[model class]];
     if (!modelMeta || modelMeta->_keyMappedCount == 0) return nil;
     NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithCapacity:64];
+    if (modelMeta->_hasCustomWillTransformToDictionary) {
+        result = [((id<YYModel>)model) modelCustomWillTransformToDictionary:result];
+        if (!result) return nil;
+    }
     __unsafe_unretained NSMutableDictionary *dic = result; // avoid retain and release in block
     [modelMeta->_mapper enumerateKeysAndObjectsUsingBlock:^(NSString *propertyMappedKey, _YYModelPropertyMeta *propertyMeta, BOOL *stop) {
         if (!propertyMeta->_getter) return;
