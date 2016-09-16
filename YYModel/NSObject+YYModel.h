@@ -231,6 +231,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (nullable NSArray *)yy_modelArrayWithClass:(Class)cls json:(id)json;
 
++ (nullable NSArray *)yy_modelArrayWithClass:(Class)cls array:(NSArray *)arr;
+
 @end
 
 
