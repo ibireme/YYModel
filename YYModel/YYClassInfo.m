@@ -256,9 +256,11 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
 
 - (instancetype)initWithClass:(Class)cls {
     if (!cls) return nil;
+    Class superClass = class_getSuperclass(cls);
+    if (!superClass) return nil;
     self = [super init];
     _cls = cls;
-    _superCls = class_getSuperclass(cls);
+    _superCls = superClass;
     _isMeta = class_isMetaClass(cls);
     if (!_isMeta) {
         _metaCls = objc_getMetaClass(class_getName(cls));
