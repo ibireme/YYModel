@@ -53,10 +53,10 @@ Usage
 	@implementation User
 	@end
 
-	
+
 	// Convert json to model:
 	User *user = [User yy_modelWithJSON:json];
-	
+
 	// Convert model to json:
 	NSDictionary *json = [user yy_modelToJSONObject];
 
@@ -147,6 +147,33 @@ EEE MMM dd HH:mm:ss Z yyyy
 	}
 	@end
 
+	// OR
+
+	// JSON:
+	{
+		"Name":"Harry Pottery",
+		"Page": 256,
+		"Description": "A book written by J.K.Rowling."
+		"BookID" : 100010
+	}
+
+	// Model:
+	@interface Book : NSObject
+	@property NSString *name;
+	@property NSInteger page;
+	@property NSString *desc;
+	@property NSString *bookID;
+	@end
+	@implementation Book
+	+ (id)modelCustomKeyNameWithPropertyName:(NSString *)propertyName {
+		if ([propertyName isEqualToString:@"desc"]) {
+			return @"Description";
+		}
+		// first letter uppercase
+		return [NSString stringWithFormat:@"%@%@", [[propertyName substringToIndex:1] uppercaseString], [propertyName substringFromIndex:1]];
+	}
+	@end
+
 You can map a json key (key path) or an array of json key (key path) to one or multiple property name. If there's no mapper for a property, it will use the property's name as default.
 
 ###Nested model
@@ -168,7 +195,7 @@ You can map a json key (key path) or an array of json key (key path) to one or m
 	@end
 	@implementation Author
 	@end
-	
+
 	@interface Book : NSObject
 	@property NSString *name;
 	@property NSUInteger pages;
@@ -176,8 +203,8 @@ You can map a json key (key path) or an array of json key (key path) to one or m
 	@end
 	@implementation Book
 	@end
-	
-	
+
+
 
 ### Container property
 
@@ -208,7 +235,7 @@ You can map a json key (key path) or an array of json key (key path) to one or m
 	@property NSString *name;
 	@property NSUInteger age;
 	@end
-	
+
 	@implementation Attributes
 	+ (NSArray *)modelPropertyBlacklist {
 	    return @[@"test1", @"test2"];
@@ -219,13 +246,13 @@ You can map a json key (key path) or an array of json key (key path) to one or m
 	@end
 
 ###Data validate and custom transform
-	
+
 	// JSON:
 	{
 		"name":"Harry",
 		"timestamp" : 1445534567
 	}
-	
+
 	// Model:
 	@interface User
 	@property NSString *name;
@@ -351,10 +378,10 @@ YYModel is provided under the MIT license. See LICENSE file for details.
 	@implementation User
 	@end
 
-	
+
 	// 将 JSON (NSData,NSString,NSDictionary) 转换为 Model:
 	User *user = [User yy_modelWithJSON:json];
-	
+
 	// 将 Model 转换为 JSON 对象:
 	NSDictionary *json = [user yy_modelToJSONObject];
 
@@ -443,12 +470,42 @@ EEE MMM dd HH:mm:ss Z yyyy
 	             @"bookID" : @[@"id",@"ID",@"book_id"]};
 	}
 	@end
+
+	// 或者
 	
+	// JSON:
+	{
+		"Name":"Harry Pottery",
+		"Page": 256,
+		"Description": "A book written by J.K.Rowling."
+		"BookID" : 100010
+	}
+	
+	// Model:
+	@interface Book : NSObject
+	@property NSString *name;
+	@property NSInteger page;
+	@property NSString *desc;
+	@property NSString *bookID;
+	@end
+	@implementation Book
+	//返回propertyName 对映射到 JSON 的 Key。
+	+ (id)modelCustomKeyNameWithPropertyName:(NSString *)propertyName {
+		if ([propertyName isEqualToString:@"desc"]) {
+			return @"Description";
+		}
+		// 首字母大字
+		return [NSString stringWithFormat:@"%@%@", [[propertyName substringToIndex:1] uppercaseString], [propertyName substringFromIndex:1]];
+	}
+	@end
+
 你可以把一个或一组 json key (key path) 映射到一个或多个属性。如果一个属性没有映射关系，那默认会使用相同属性名作为映射。
 
 在 json->model 的过程中：如果一个属性对应了多个 json key，那么转换过程会按顺序查找，并使用第一个不为空的值。
-	
+
 在 model->json 的过程中：如果一个属性对应了多个 json key (key path)，那么转换过程仅会处理第一个 json key (key path)；如果多个属性对应了同一个 json key，则转换过过程会使用其中任意一个不为空的值。
+
+modelCustomPropertyMapper和modelCustomKeyNameWithPropertyName只能使用其中一个，如果同时使用只有modelCustomPropertyMapper有效。
 
 ###Model 包含其他 Model
 
@@ -469,7 +526,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@end
 	@implementation Author
 	@end
-	
+
 	@interface Book : NSObject
 	@property NSString *name;
 	@property NSUInteger pages;
@@ -477,8 +534,8 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@end
 	@implementation Book
 	@end
-	
-	
+
+
 
 ###容器类属性
 
@@ -509,7 +566,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@property NSString *name;
 	@property NSUInteger age;
 	@end
-	
+
 	@implementation Attributes
 	// 如果实现了该方法，则处理过程中会忽略该列表内的所有属性
 	+ (NSArray *)modelPropertyBlacklist {
@@ -522,13 +579,13 @@ EEE MMM dd HH:mm:ss Z yyyy
 	@end
 
 ###数据校验与自定义转换
-	
+
 	// JSON:
 	{
 		"name":"Harry",
 		"timestamp" : 1445534567
 	}
-	
+
 	// Model:
 	@interface User
 	@property NSString *name;
@@ -545,7 +602,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	    _createdAt = [NSDate dateWithTimeIntervalSince1970:timestamp.floatValue];
 	    return YES;
 	}
-	
+
 	// 当 Model 转为 JSON 完成后，该方法会被调用。
 	// 你可以在这里对数据进行校验，如果校验不通过，可以返回 NO，则该 Model 会被忽略。
 	// 你也可以在这里做一些自动转换不能完成的工作。

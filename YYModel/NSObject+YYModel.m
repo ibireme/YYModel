@@ -546,8 +546,18 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     NSMutableArray *keyPathPropertyMetas = [NSMutableArray new];
     NSMutableArray *multiKeysPropertyMetas = [NSMutableArray new];
     
+    NSDictionary *customMapper = nil;
     if ([cls respondsToSelector:@selector(modelCustomPropertyMapper)]) {
-        NSDictionary *customMapper = [(id <YYModel>)cls modelCustomPropertyMapper];
+        customMapper = [(id <YYModel>)cls modelCustomPropertyMapper];
+    } else if ([cls respondsToSelector:@selector(modelCustomKeyNameWithPropertyName:)]) {
+        NSMutableDictionary *tempCustomMapper = [NSMutableDictionary new];
+        [allPropertyMetas enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            id mappedToKey = [(id <YYModel>)cls modelCustomKeyNameWithPropertyName:propertyName];
+            if (mappedToKey) tempCustomMapper[propertyName] = mappedToKey;
+        }];
+        if (tempCustomMapper.count) customMapper = tempCustomMapper;
+    }
+    if (customMapper) {
         [customMapper enumerateKeysAndObjectsUsingBlock:^(NSString *propertyName, NSString *mappedToKey, BOOL *stop) {
             _YYModelPropertyMeta *propertyMeta = allPropertyMetas[propertyName];
             if (!propertyMeta) return;
