@@ -636,15 +636,14 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
     });
     dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
     _YYModelMeta *meta = CFDictionaryGetValue(cache, (__bridge const void *)(cls));
-    dispatch_semaphore_signal(lock);
+
     if (!meta || meta->_classInfo.needUpdate) {
         meta = [[_YYModelMeta alloc] initWithClass:cls];
         if (meta) {
-            dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
             CFDictionarySetValue(cache, (__bridge const void *)(cls), (__bridge const void *)(meta));
-            dispatch_semaphore_signal(lock);
         }
     }
+    dispatch_semaphore_signal(lock);
     return meta;
 }
 
