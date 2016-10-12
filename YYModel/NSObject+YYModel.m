@@ -1751,14 +1751,14 @@ static NSString *ModelDescription(NSObject *model) {
     if (![model isMemberOfClass:self.class]) return NO;
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:self.class];
     if (modelMeta->_nsType) return [self isEqual:model];
-    if ([self hash] != [model hash]) return NO;
+    if ([self yy_modelHash] != [model yy_modelHash]) return NO;
     
     for (_YYModelPropertyMeta *propertyMeta in modelMeta->_allPropertyMetas) {
         if (!propertyMeta->_isKVCCompatible) continue;
         id this = [self valueForKey:NSStringFromSelector(propertyMeta->_getter)];
         id that = [model valueForKey:NSStringFromSelector(propertyMeta->_getter)];
         if (this == that) continue;
-        if (this == nil || that == nil) return NO;
+        if (this == nil ^ that == nil) return NO;
         if (![this isEqual:that]) return NO;
     }
     return YES;
