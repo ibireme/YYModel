@@ -1759,11 +1759,7 @@ static NSString *ModelDescription(NSObject *model) {
         id that = [model valueForKey:NSStringFromSelector(propertyMeta->_getter)];
         if (this == that) continue;
         if ((this == nil) ^ (that == nil)) return NO;
-        if ([this respondsToSelector:@selector(yy_modelIsEqual:)]) {
-            if (![this yy_modelIsEqual:that]) return NO;
-        } else {
-            if (![this isEqual:that]) return NO;
-        }
+        if (![this yy_modelIsEqual:that]) return NO;
     }
     return YES;
 }
