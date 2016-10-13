@@ -906,7 +906,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                     Class cls = meta->_genericCls;
                                     if (meta->_hasCustomClassFromDictionary) {
                                         cls = [cls modelCustomClassForDictionary:one];
-                                        if (!cls) cls = meta->_genericCls; // for xcode code coverage
+//                                        if (!cls) cls = meta->_genericCls; // for xcode code coverage
                                     }
                                     NSObject *newOne = [cls new];
                                     if([newOne yy_modelSetWithDictionary:one]){
@@ -947,7 +947,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                     Class cls = meta->_genericCls;
                                     if (meta->_hasCustomClassFromDictionary) {
                                         cls = [cls modelCustomClassForDictionary:oneValue];
-                                        if (!cls) cls = meta->_genericCls; // for xcode code coverage
+//                                        if (!cls) cls = meta->_genericCls; // for xcode code coverage
                                     }
                                     NSObject *newOne = [cls new];
                                     if([newOne yy_modelSetWithDictionary:(id)oneValue]){
@@ -983,7 +983,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 Class cls = meta->_genericCls;
                                 if (meta->_hasCustomClassFromDictionary) {
                                     cls = [cls modelCustomClassForDictionary:one];
-                                    if (!cls) cls = meta->_genericCls; // for xcode code coverage
+//                                    if (!cls) cls = meta->_genericCls; // for xcode code coverage
                                 }
                                 NSObject *newOne = [cls new];
                                 if([newOne yy_modelSetWithDictionary:one]){
@@ -1025,7 +1025,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         Class cls = meta->_cls;
                         if (meta->_hasCustomClassFromDictionary) {
                             cls = [cls modelCustomClassForDictionary:value];
-                            if (!cls) cls = meta->_genericCls; // for xcode code coverage
+//                            if (!cls) cls = meta->_genericCls; // for xcode code coverage
                         }
                         one = [cls new];
                         if([one yy_modelSetWithDictionary:value]){
@@ -1466,7 +1466,7 @@ static NSString *ModelDescription(NSObject *model) {
     Class cls = [self class];
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:cls];
     if (modelMeta->_hasCustomClassFromDictionary) {
-        cls = [cls modelCustomClassForDictionary:dictionary] ?: cls;
+        cls = [cls modelCustomClassForDictionary:dictionary];
     }
     
     NSObject *one = [cls new];

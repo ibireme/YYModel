@@ -97,17 +97,17 @@
     } else if ([dictionary[@"name"] isEqualToString:@"Square"]) {
         return [Square class];
     }
-    return self;
-}
-
-- (NSDictionary *)modelCustomWillTransformFromDictionary:(NSDictionary *)dictionary{
-    NSString *name = dictionary[@"name"];
-    if([name isEqualToString:@"Circle"] || [name isEqualToString:@"Square"]){
-        return dictionary;
-    }
-    NSLog(@"unrecognized shape");
     return nil;
 }
+
+//- (NSDictionary *)modelCustomWillTransformFromDictionary:(NSDictionary *)dictionary{
+//    NSString *name = dictionary[@"name"];
+//    if([name isEqualToString:@"Circle"] || [name isEqualToString:@"Square"]){
+//        return dictionary;
+//    }
+//    NSLog(@"unrecognized shape");
+//    return nil;
+//}
 @end
 
 @implementation Circle
