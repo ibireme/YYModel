@@ -184,7 +184,7 @@ static force_inline NSDate *YYNSDateFromString(__unsafe_unretained NSString *str
                 }
             };
 
-            blocks[23] = ^(NSString *string) {
+            blocks[22] = ^(NSString *string) {
                 if ([string characterAtIndex:10] == 'T') {
                     return [formatter3 dateFromString:string];
                 } else {
@@ -201,6 +201,7 @@ static force_inline NSDate *YYNSDateFromString(__unsafe_unretained NSString *str
              2014-01-20T12:24:48.000Z
              2014-01-20T12:24:48.000+0800
              2014-01-20T12:24:48.000+12:00
+             2016-10-13T15:19:53.78Z
              */
             NSDateFormatter *formatter = [NSDateFormatter new];
             formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
@@ -210,9 +211,10 @@ static force_inline NSDate *YYNSDateFromString(__unsafe_unretained NSString *str
             formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter2.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-            blocks[20] = ^(NSString *string) { return [formatter dateFromString:string]; };
+            blocks[20] = ^(NSString *string) { return [formatter dateFromString:string];  };
+            blocks[23] = ^(NSString *string) { return [formatter2 dateFromString:string];  };
             blocks[24] = ^(NSString *string) { return [formatter dateFromString:string]?: [formatter2 dateFromString:string]; };
-            blocks[25] = ^(NSString *string) { return [formatter dateFromString:string]; };
+            blocks[25] = ^(NSString *string) { return [formatter dateFromString:string];  };
             blocks[28] = ^(NSString *string) { return [formatter2 dateFromString:string]; };
             blocks[29] = ^(NSString *string) { return [formatter2 dateFromString:string]; };
         }
