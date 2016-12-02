@@ -886,6 +886,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         if (str.length == 0) {
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, nil);
                         } else {
+                            str = [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, [[NSURL alloc] initWithString:str]);
                         }
                     }
