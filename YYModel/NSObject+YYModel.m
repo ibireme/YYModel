@@ -1803,6 +1803,19 @@ static NSString *ModelDescription(NSObject *model) {
     return result;
 }
 
+- (NSString *)yy_modelArrayToJSONString {
+    NSString *jsonDictionary = [self yy_modelToJSONString];
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    [array addObject:jsonDictionary];
+    if ([array count] == 0) return nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:array[0]
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:NULL];
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData
+                                                 encoding:NSUTF8StringEncoding];
+    return jsonString;
+}
+
 @end
 
 
