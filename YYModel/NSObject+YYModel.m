@@ -1758,7 +1758,7 @@ static NSString *ModelDescription(NSObject *model) {
         id this = [self valueForKey:NSStringFromSelector(propertyMeta->_getter)];
         id that = [model valueForKey:NSStringFromSelector(propertyMeta->_getter)];
         if (this == that) continue;
-        if (this == nil || that == nil) return NO;
+        if (this == nil ^ that == nil) return NO;
         if (![this isEqual:that]) return NO;
     }
     return YES;
