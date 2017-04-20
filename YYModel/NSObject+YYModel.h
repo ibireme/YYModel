@@ -302,6 +302,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper;
 
+
+#pragma mark - YYAdd
+
+/**
+ A custom method for mapper between property and key
+
+ @discussion if you implement method `+(NSDictionary *)modelCustomPropertyMapper` and return an valid dictionary, then the property in the dicionary will not as method '+ (NSString *)mapperToKeyFromPropertyName:' propertyName parameter
+ 
+ @param propertyName the property's name
+ @return the key associated with the property name
+ */
++ (NSString *)mapperToKeyFromPropertyName:(NSString *)propertyName;
+
 /**
  The generic class mapper for container properties.
  
@@ -426,5 +439,51 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic;
 
 @end
+
+
+
+@interface NSObject (YYAdd)
+
+
+/**
+ To avoid method `+ (NSDictionary *)yy_modelDictionaryWithClass:json:` too many parameter
+
+ @param json A json array of `NSArray`, `NSString` or `NSData`.
+             Example: [{"name","Mary"},{name:"Joe"}]
+ @return A array, or nil if an error occurs.
+ */
++ (nullable NSDictionary *)yy_modelDictionaryWithJSON:(id)json;
+
+/**
+ To avoid method `(NSDictionary *)yy_modelDictionaryWithClass:json:` too many parameter
+ 
+ @param json A json dictionary of `NSDictionary`, `NSString` or `NSData`.
+             Example: {"user1":{"name","Mary"}, "user2": {name:"Joe"}}
+ @return A dictionary, or nil if an error occurs.
+ */
++ (nullable NSArray *)yy_modelArrayWithKeyValuesArray:(id)json;
+
+
+/**
+ Create model array from a plist file
+
+ @discussion the plist file must be in the main bundle.
+ 
+ @param filename plist file name
+ @return model array
+ */
++ (NSArray *)yy_modelArrayWithFilename:(NSString *)filename;
+
+/**
+ Create model array from a plist file
+ 
+ @param file the full path of the plist file
+ @return model array
+ */
++ (NSArray *)yy_modelArrayWithFile:(NSString *)file;
+
+
+@end
+
 
 NS_ASSUME_NONNULL_END
