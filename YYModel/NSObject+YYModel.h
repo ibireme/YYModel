@@ -294,7 +294,8 @@ NS_ASSUME_NONNULL_BEGIN
             return @{@"name"  : @"n",
                      @"page"  : @"p",
                      @"desc"  : @"ext.desc",
-                     @"bookID": @[@"id", @"ID", @"book_id"]};
+                     @"bookID": @[@"id", @"ID", @"book_id"],
+                     @"tagTitle" : @"tags[0].title"};
         }
         @end
  
