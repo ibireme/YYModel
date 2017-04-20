@@ -291,10 +291,10 @@ NS_ASSUME_NONNULL_BEGIN
         
         @implementation YYBook
         + (NSDictionary *)modelCustomPropertyMapper {
-            return @{@"name"  : @"n",
-                     @"page"  : @"p",
-                     @"desc"  : @"ext.desc",
-                     @"bookID": @[@"id", @"ID", @"book_id"],
+            return @{@"name"     : @"n",
+                     @"page"     : @"p",
+                     @"desc"     : @"ext.desc",
+                     @"bookID"   : @[@"id", @"ID", @"book_id"],
                      @"tagTitle" : @"tags[0].title"};
         }
         @end
