@@ -1007,9 +1007,10 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
         BOOL isNull = (value == (id)kCFNull);
         switch (meta->_type & YYEncodingTypeMask) {
             case YYEncodingTypeObject: {
+                Class cls = meta->_genericCls ?: meta->_cls;
                 if (isNull) {
                     ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, (id)nil);
-                } else if ([value isKindOfClass:meta->_cls] || !meta->_cls) {
+                } else if ([value isKindOfClass:cls] || !cls) {
                     ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, (id)value);
                 } else if ([value isKindOfClass:[NSDictionary class]]) {
                     NSObject *one = nil;
@@ -1019,10 +1020,8 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                     if (one) {
                         [one yy_modelSetWithDictionary:value];
                     } else {
-                        Class cls = meta->_cls;
                         if (meta->_hasCustomClassFromDictionary) {
-                            cls = [cls modelCustomClassForDictionary:value];
-                            if (!cls) cls = meta->_genericCls; // for xcode code coverage
+                            cls = [cls modelCustomClassForDictionary:value] ?: cls;
                         }
                         one = [cls new];
                         [one yy_modelSetWithDictionary:value];
