@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name         = 'YYModel'
+  s.name         = 'YYModel@Haidora'
   s.summary      = 'High performance model framework for iOS/OSX.'
   s.version      = '1.0.4'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = '2.0'
   s.tvos.deployment_target = '9.0'
 
-  s.source       = { :git => 'https://github.com/ibireme/YYModel.git', :tag => s.version.to_s }
+  s.source       = { :git => 'https://github.com/mrdaios/YYModel.git', :tag => s.version.to_s }
   
   s.requires_arc = true
   s.source_files = 'YYModel/*.{h,m}'
