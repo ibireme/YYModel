@@ -3,8 +3,8 @@ YYModel
 
 [![License MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/ibireme/YYModel/master/LICENSE)&nbsp;
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)&nbsp;
-[![CocoaPods](http://img.shields.io/cocoapods/v/YYModel.svg?style=flat)](http://cocoapods.org/?q= YYModel)&nbsp;
-[![CocoaPods](http://img.shields.io/cocoapods/p/YYModel.svg?style=flat)](http://cocoapods.org/?q= YYModel)&nbsp;
+[![CocoaPods](http://img.shields.io/cocoapods/v/YYModel.svg?style=flat)](http://cocoapods.org/?q=YYModel)&nbsp;
+[![CocoaPods](http://img.shields.io/cocoapods/p/YYModel.svg?style=flat)](http://cocoapods.org/?q=YYModel)&nbsp;
 [![Build Status](https://travis-ci.org/ibireme/YYModel.svg?branch=master)](https://travis-ci.org/ibireme/YYModel)&nbsp;
 [![codecov.io](https://codecov.io/github/ibireme/YYModel/coverage.svg?branch=master)](https://codecov.io/github/ibireme/YYModel?branch=master)
 
@@ -35,7 +35,7 @@ Features
 Usage
 ==============
 
-###Simple model json convert
+### Simple model json convert
 
 	// JSON:
 	{
@@ -119,7 +119,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 
 
 
-###Match model property to different JSON key
+### Match model property to different JSON key
 
 	// JSON:
 	{
@@ -149,7 +149,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 
 You can map a json key (key path) or an array of json key (key path) to one or multiple property name. If there's no mapper for a property, it will use the property's name as default.
 
-###Nested model
+### Nested model
 
 	// JSON
 	{
@@ -218,7 +218,7 @@ You can map a json key (key path) or an array of json key (key path) to one or m
 	}
 	@end
 
-###Data validate and custom transform
+### Data validate and custom transform
 	
 	// JSON:
 	{
@@ -246,7 +246,7 @@ You can map a json key (key path) or an array of json key (key path) to one or m
 	}
 	@end
 
-###Coding/Copying/hash/equal/description
+### Coding/Copying/hash/equal/description
 
 	@interface YYShadow :NSObject <NSCoding, NSCopying>
 	@property (nonatomic, copy) NSString *name;
@@ -333,7 +333,7 @@ YYModel is provided under the MIT license. See LICENSE file for details.
 使用方法
 ==============
 
-###简单的 Model 与 JSON 相互转换
+### 简单的 Model 与 JSON 相互转换
 
 	// JSON:
 	{
@@ -415,7 +415,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 </table>
 
 
-###Model 属性名和 JSON 中的 Key 不相同
+### Model 属性名和 JSON 中的 Key 不相同
 
 	// JSON:
 	{
@@ -450,7 +450,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	
 在 model->json 的过程中：如果一个属性对应了多个 json key (key path)，那么转换过程仅会处理第一个 json key (key path)；如果多个属性对应了同一个 json key，则转换过过程会使用其中任意一个不为空的值。
 
-###Model 包含其他 Model
+### Model 包含其他 Model
 
 	// JSON
 	{
@@ -480,7 +480,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	
 	
 
-###容器类属性
+### 容器类属性
 
 	@class Shadow, Border, Attachment;
 
@@ -503,7 +503,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 
 
 
-###黑名单与白名单
+### 黑名单与白名单
 
 	@interface User
 	@property NSString *name;
@@ -521,7 +521,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	}
 	@end
 
-###数据校验与自定义转换
+### 数据校验与自定义转换
 	
 	// JSON:
 	{
@@ -556,7 +556,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 	}
 	@end
 
-###Coding/Copying/hash/equal/description
+### Coding/Copying/hash/equal/description
 
 	@interface YYShadow :NSObject <NSCoding, NSCopying>
 	@property (nonatomic, copy) NSString *name;
