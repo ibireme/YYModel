@@ -56,13 +56,83 @@
              @"userDict" : YYBaseUser.class,
              @"userSet" : YYBaseUser.class};
 }
+//+ (Class)modelCustomClassForDictionary:(NSDictionary*)dictionary {
+//    if (dictionary[@"localName"]) {
+//        return [YYLocalUser class];
+//    } else if (dictionary[@"remoteName"]) {
+//        return [YYRemoteUser class];
+//    }
+//    return nil;
+//}
+@end
+
+
+
+
+
+
+@interface Shape : NSObject
+@property (nonatomic, strong) NSString *name;
+@end
+
+@interface Circle : Shape
+
+@property (nonatomic) CGPoint center;
+@property (nonatomic) CGFloat radius;
+
+@end
+
+@interface Square : Shape
+@property (nonatomic) CGFloat side;
+@end
+
+
+
+
+@implementation Shape
+
 + (Class)modelCustomClassForDictionary:(NSDictionary*)dictionary {
-    if (dictionary[@"localName"]) {
-        return [YYLocalUser class];
-    } else if (dictionary[@"remoteName"]) {
-        return [YYRemoteUser class];
+    if ([dictionary[@"name"] isEqualToString:@"Circle"]) {
+        return [Circle class];
+    } else if ([dictionary[@"name"] isEqualToString:@"Square"]) {
+        return [Square class];
     }
     return nil;
+}
+
+//- (NSDictionary *)modelCustomWillTransformFromDictionary:(NSDictionary *)dictionary{
+//    NSString *name = dictionary[@"name"];
+//    if([name isEqualToString:@"Circle"] || [name isEqualToString:@"Square"]){
+//        return dictionary;
+//    }
+//    NSLog(@"unrecognized shape");
+//    return nil;
+//}
+@end
+
+@implementation Circle
+
+@end
+
+@implementation Square
+
+@end
+
+
+
+@interface YYTestCustomShapeModel : NSObject
+@property (nonatomic, strong) NSArray *shapes;
+@property (nonatomic, strong) NSDictionary *shapesDict;
+@property (nonatomic, strong) NSSet *shapesSet;
+@property (nonatomic, strong) Shape *shape;
+@end
+
+@implementation YYTestCustomShapeModel
+
++ (NSDictionary *)modelContainerPropertyGenericClass {
+    return @{@"shapes" : Shape.class,
+             @"shapesDict" : Shape.class,
+             @"shapesSet" : Shape.class};
 }
 @end
 
@@ -106,6 +176,37 @@
     
     model = [YYTestCustomClassModel yy_modelWithJSON:@{@"userSet" : @[jsonUserBase, jsonUserLocal, jsonUserRemote]}];
     XCTAssert([model.userSet.anyObject isKindOfClass:[YYBaseUser class]]);
+}
+
+- (void)testUnrecognizedShape {
+    NSDictionary *unrecognizedShapeDic = @{@"name" : @"unrecognizedShape"};
+    NSDictionary *squareDic = @{@"name" : @"Square", @"side":@99};
+    NSDictionary *circleDic = @{@"name" : @"Circle", @"radius":@11};
+    
+    
+    YYTestCustomShapeModel *model;
+    Shape *shape;
+    shape = [Shape yy_modelWithJSON:unrecognizedShapeDic];
+    XCTAssert(shape == nil);
+    
+    model = [YYTestCustomShapeModel yy_modelWithJSON:@{@"shapes" : @[unrecognizedShapeDic, squareDic, circleDic]}];
+    XCTAssert(model.shapes.count == 2);
+    XCTAssert([model.shapes[0] isMemberOfClass:[Square class]]);
+    XCTAssert([model.shapes[1] isMemberOfClass:[Circle class]]);
+    
+    model = [YYTestCustomShapeModel yy_modelWithJSON:@{@"shapesDict" : @{@"a" : unrecognizedShapeDic, @"b" : squareDic, @"c": circleDic}}];
+    XCTAssert(model.shapesDict.count == 2);
+    XCTAssert(model.shapesDict[@"a"] == nil);
+    XCTAssert([model.shapesDict[@"b"] isMemberOfClass:[Square class]]);
+    XCTAssert([model.shapesDict[@"c"] isMemberOfClass:[Circle class]]);
+    
+    model = [YYTestCustomShapeModel yy_modelWithJSON:@{@"shapesSet" : @[unrecognizedShapeDic, squareDic, circleDic]}];
+    XCTAssert(model.shapesSet.count == 2);
+//    XCTAssert([model.shapesSet[0] isMemberOfClass:[Square class]]);
+//    XCTAssert([model.shapesSet[1] isMemberOfClass:[Circle class]]);
+    
+    model = [YYTestCustomShapeModel yy_modelWithJSON:@{@"shape" : unrecognizedShapeDic,}];
+    XCTAssert(model.shape == nil);
 }
 
 @end
