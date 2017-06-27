@@ -3,8 +3,8 @@ YYModel
 
 [![License MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/ibireme/YYModel/master/LICENSE)&nbsp;
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)&nbsp;
-[![CocoaPods](http://img.shields.io/cocoapods/v/YYModel.svg?style=flat)](http://cocoapods.org/?q=YYModel)&nbsp;
-[![CocoaPods](http://img.shields.io/cocoapods/p/YYModel.svg?style=flat)](http://cocoapods.org/?q=YYModel)&nbsp;
+[![CocoaPods](http://img.shields.io/cocoapods/v/YYModel.svg?style=flat)](http://cocoapods.org/pods/YYModel)&nbsp;
+[![CocoaPods](http://img.shields.io/cocoapods/p/YYModel.svg?style=flat)](http://cocoadocs.org/docsets/YYModel)&nbsp;
 [![Build Status](https://travis-ci.org/ibireme/YYModel.svg?branch=master)](https://travis-ci.org/ibireme/YYModel)&nbsp;
 [![codecov.io](https://codecov.io/github/ibireme/YYModel/coverage.svg?branch=master)](https://codecov.io/github/ibireme/YYModel?branch=master)
 
@@ -36,30 +36,30 @@ Usage
 ==============
 
 ### Simple model json convert
+```objc
+// JSON:
+{
+    "uid":123456,
+    "name":"Harry",
+    "created":"1965-07-31T00:00:00+0000"
+}
 
-	// JSON:
-	{
-	    "uid":123456,
-	    "name":"Harry",
-	    "created":"1965-07-31T00:00:00+0000"
-	}
-
-	// Model:
-	@interface User : NSObject
-	@property UInt64 uid;
-	@property NSString *name;
-	@property NSDate *created;
-	@end
-	@implementation User
-	@end
+// Model:
+@interface User : NSObject
+@property UInt64 uid;
+@property NSString *name;
+@property NSDate *created;
+@end
+@implementation User
+@end
 
 	
-	// Convert json to model:
-	User *user = [User yy_modelWithJSON:json];
+// Convert json to model:
+User *user = [User yy_modelWithJSON:json];
 	
-	// Convert model to json:
-	NSDictionary *json = [user yy_modelToJSONObject];
-
+// Convert model to json:
+NSDictionary *json = [user yy_modelToJSONObject];
+```
 
 If the type of an object in JSON/Dictionary cannot be matched to the property of the model, the following automatic conversion is performed. If the automatic conversion failed, the value will be ignored.
 <table>
@@ -120,148 +120,148 @@ EEE MMM dd HH:mm:ss Z yyyy
 
 
 ### Match model property to different JSON key
+```objc
+// JSON:
+{
+    "n":"Harry Pottery",
+    "p": 256,
+    "ext" : {
+        "desc" : "A book written by J.K.Rowing."
+    },
+    "ID" : 100010
+}
 
-	// JSON:
-	{
-	    "n":"Harry Pottery",
-	    "p": 256,
-	    "ext" : {
-	        "desc" : "A book written by J.K.Rowing."
-	    },
-	    "ID" : 100010
-	}
-
-	// Model:
-	@interface Book : NSObject
-	@property NSString *name;
-	@property NSInteger page;
-	@property NSString *desc;
-	@property NSString *bookID;
-	@end
-	@implementation Book
-	+ (NSDictionary *)modelCustomPropertyMapper {
-	    return @{@"name" : @"n",
-	             @"page" : @"p",
-	             @"desc" : @"ext.desc",
-	             @"bookID" : @[@"id",@"ID",@"book_id"]};
-	}
-	@end
+// Model:
+@interface Book : NSObject
+@property NSString *name;
+@property NSInteger page;
+@property NSString *desc;
+@property NSString *bookID;
+@end
+@implementation Book
++ (NSDictionary *)modelCustomPropertyMapper {
+    return @{@"name" : @"n",
+             @"page" : @"p",
+             @"desc" : @"ext.desc",
+             @"bookID" : @[@"id",@"ID",@"book_id"]};
+}
+@end
+```
 
 You can map a json key (key path) or an array of json key (key path) to one or multiple property name. If there's no mapper for a property, it will use the property's name as default.
 
 ### Nested model
+```objc
+// JSON
+{
+    "author":{
+        "name":"J.K.Rowling",
+        "birthday":"1965-07-31T00:00:00+0000"
+    },
+    "name":"Harry Potter",
+    "pages":256
+}
 
-	// JSON
-	{
-	    "author":{
-	        "name":"J.K.Rowling",
-	        "birthday":"1965-07-31T00:00:00+0000"
-	    },
-	    "name":"Harry Potter",
-	    "pages":256
-	}
-
-	// Model: (no need to do anything)
-	@interface Author : NSObject
-	@property NSString *name;
-	@property NSDate *birthday;
-	@end
-	@implementation Author
-	@end
+// Model: (no need to do anything)
+@interface Author : NSObject
+@property NSString *name;
+@property NSDate *birthday;
+@end
+@implementation Author
+@end
 	
-	@interface Book : NSObject
-	@property NSString *name;
-	@property NSUInteger pages;
-	@property Author *author;
-	@end
-	@implementation Book
-	@end
-	
-	
+@interface Book : NSObject
+@property NSString *name;
+@property NSUInteger pages;
+@property Author *author;
+@end
+@implementation Book
+@end
+```
 
 ### Container property
+```objc
+@class Shadow, Border, Attachment;
 
-	@class Shadow, Border, Attachment;
+@interface Attributes
+@property NSString *name;
+@property NSArray *shadows; //Array<Shadow>
+@property NSSet *borders; //Set<Border>
+@property NSMutableDictionary *attachments; //Dict<NSString,Attachment>
+@end
 
-	@interface Attributes
-	@property NSString *name;
-	@property NSArray *shadows; //Array<Shadow>
-	@property NSSet *borders; //Set<Border>
-	@property NSMutableDictionary *attachments; //Dict<NSString,Attachment>
-	@end
-
-	@implementation Attributes
-	+ (NSDictionary *)modelContainerPropertyGenericClass {
-		// value should be Class or Class name.
-	    return @{@"shadows" : [Shadow class],
-	             @"borders" : Border.class,
-	             @"attachments" : @"Attachment" };
-	}
-	@end
-
-
-
+@implementation Attributes
++ (NSDictionary *)modelContainerPropertyGenericClass {
+	// value should be Class or Class name.
+    return @{@"shadows" : [Shadow class],
+             @"borders" : Border.class,
+             @"attachments" : @"Attachment" };
+}
+@end
+```
 
 ### Whitelist and blacklist
-
-	@interface User
-	@property NSString *name;
-	@property NSUInteger age;
-	@end
+```objc
+@interface User
+@property NSString *name;
+@property NSUInteger age;
+@end
 	
-	@implementation Attributes
-	+ (NSArray *)modelPropertyBlacklist {
-	    return @[@"test1", @"test2"];
-	}
-	+ (NSArray *)modelPropertyWhitelist {
-	    return @[@"name"];
-	}
-	@end
+@implementation Attributes
++ (NSArray *)modelPropertyBlacklist {
+    return @[@"test1", @"test2"];
+}
++ (NSArray *)modelPropertyWhitelist {
+    return @[@"name"];
+}
+@end
+```
 
 ### Data validate and custom transform
+```objc
+// JSON:
+{
+	"name":"Harry",
+	"timestamp" : 1445534567
+}
 	
-	// JSON:
-	{
-		"name":"Harry",
-		"timestamp" : 1445534567
-	}
-	
-	// Model:
-	@interface User
-	@property NSString *name;
-	@property NSDate *createdAt;
-	@end
+// Model:
+@interface User
+@property NSString *name;
+@property NSDate *createdAt;
+@end
 
-	@implementation User
-	- (BOOL)modelCustomTransformFromDictionary:(NSDictionary *)dic {
-	    NSNumber *timestamp = dic[@"timestamp"];
-	    if (![timestamp isKindOfClass:[NSNumber class]]) return NO;
-	    _createdAt = [NSDate dateWithTimeIntervalSince1970:timestamp.floatValue];
-	    return YES;
-	}
-	- (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic {
-	    if (!_createdAt) return NO;
-	    dic[@"timestamp"] = @(n.timeIntervalSince1970);
-	    return YES;
-	}
-	@end
+@implementation User
+- (BOOL)modelCustomTransformFromDictionary:(NSDictionary *)dic {
+    NSNumber *timestamp = dic[@"timestamp"];
+    if (![timestamp isKindOfClass:[NSNumber class]]) return NO;
+    _createdAt = [NSDate dateWithTimeIntervalSince1970:timestamp.floatValue];
+    return YES;
+}
+- (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic {
+    if (!_createdAt) return NO;
+    dic[@"timestamp"] = @(n.timeIntervalSince1970);
+    return YES;
+}
+@end
+```
 
 ### Coding/Copying/hash/equal/description
+```objc
+@interface YYShadow :NSObject <NSCoding, NSCopying>
+@property (nonatomic, copy) NSString *name;
+@property (nonatomic, assign) CGSize size;
+@end
 
-	@interface YYShadow :NSObject <NSCoding, NSCopying>
-	@property (nonatomic, copy) NSString *name;
-	@property (nonatomic, assign) CGSize size;
-	@end
-
-	@implementation YYShadow
-	- (void)encodeWithCoder:(NSCoder *)aCoder { [self yy_modelEncodeWithCoder:aCoder]; }
-	- (id)initWithCoder:(NSCoder *)aDecoder { self = [super init]; return [self yy_modelInitWithCoder:aDecoder]; }
-	- (id)copyWithZone:(NSZone *)zone { return [self yy_modelCopy]; }
-	- (NSUInteger)hash { return [self yy_modelHash]; }
-	- (BOOL)isEqual:(id)object { return [self yy_modelIsEqual:object]; }
-	- (NSString *)description { return [self yy_modelDescription]; }
-	@end
-
+@implementation YYShadow
+- (void)encodeWithCoder:(NSCoder *)aCoder { [self yy_modelEncodeWithCoder:aCoder]; }
+- (id)initWithCoder:(NSCoder *)aDecoder { self = [super init]; return [self yy_modelInitWithCoder:aDecoder]; }
+- (id)copyWithZone:(NSZone *)zone { return [self yy_modelCopy]; }
+- (NSUInteger)hash { return [self yy_modelHash]; }
+- (BOOL)isEqual:(id)object { return [self yy_modelIsEqual:object]; }
+- (NSString *)description { return [self yy_modelDescription]; }
+@end
+```
 
 Installation
 ==============
@@ -295,7 +295,7 @@ You can also install documentation locally using [appledoc](https://github.com/t
 
 Requirements
 ==============
-This library requires `iOS 6.0+` and `Xcode 7.0+`.
+This library requires `iOS 6.0+` and `Xcode 8.0+`.
 
 
 License
@@ -334,29 +334,30 @@ YYModel is provided under the MIT license. See LICENSE file for details.
 ==============
 
 ### 简单的 Model 与 JSON 相互转换
+```objc
+// JSON:
+{
+    "uid":123456,
+    "name":"Harry",
+    "created":"1965-07-31T00:00:00+0000"
+}
 
-	// JSON:
-	{
-	    "uid":123456,
-	    "name":"Harry",
-	    "created":"1965-07-31T00:00:00+0000"
-	}
-
-	// Model:
-	@interface User : NSObject
-	@property UInt64 uid;
-	@property NSString *name;
-	@property NSDate *created;
-	@end
-	@implementation User
-	@end
+// Model:
+@interface User : NSObject
+@property UInt64 uid;
+@property NSString *name;
+@property NSDate *created;
+@end
+@implementation User
+@end
 
 	
-	// 将 JSON (NSData,NSString,NSDictionary) 转换为 Model:
-	User *user = [User yy_modelWithJSON:json];
+// 将 JSON (NSData,NSString,NSDictionary) 转换为 Model:
+User *user = [User yy_modelWithJSON:json];
 	
-	// 将 Model 转换为 JSON 对象:
-	NSDictionary *json = [user yy_modelToJSONObject];
+// 将 Model 转换为 JSON 对象:
+NSDictionary *json = [user yy_modelToJSONObject];
+```
 
 当 JSON/Dictionary 中的对象类型与 Model 属性不一致时，YYModel 将会进行如下自动转换。自动转换不支持的值将会被忽略，以避免各种潜在的崩溃问题。
 <table>
@@ -416,33 +417,34 @@ EEE MMM dd HH:mm:ss Z yyyy
 
 
 ### Model 属性名和 JSON 中的 Key 不相同
+```objc
+// JSON:
+{
+    "n":"Harry Pottery",
+    "p": 256,
+    "ext" : {
+        "desc" : "A book written by J.K.Rowing."
+    },
+    "ID" : 100010
+}
 
-	// JSON:
-	{
-	    "n":"Harry Pottery",
-	    "p": 256,
-	    "ext" : {
-	        "desc" : "A book written by J.K.Rowing."
-	    },
-	    "ID" : 100010
-	}
-
-	// Model:
-	@interface Book : NSObject
-	@property NSString *name;
-	@property NSInteger page;
-	@property NSString *desc;
-	@property NSString *bookID;
-	@end
-	@implementation Book
-	//返回一个 Dict，将 Model 属性名对映射到 JSON 的 Key。
-	+ (NSDictionary *)modelCustomPropertyMapper {
-	    return @{@"name" : @"n",
-	             @"page" : @"p",
-	             @"desc" : @"ext.desc",
-	             @"bookID" : @[@"id",@"ID",@"book_id"]};
-	}
-	@end
+// Model:
+@interface Book : NSObject
+@property NSString *name;
+@property NSInteger page;
+@property NSString *desc;
+@property NSString *bookID;
+@end
+@implementation Book
+//返回一个 Dict，将 Model 属性名对映射到 JSON 的 Key。
++ (NSDictionary *)modelCustomPropertyMapper {
+    return @{@"name" : @"n",
+             @"page" : @"p",
+             @"desc" : @"ext.desc",
+             @"bookID" : @[@"id",@"ID",@"book_id"]};
+}
+@end
+```
 	
 你可以把一个或一组 json key (key path) 映射到一个或多个属性。如果一个属性没有映射关系，那默认会使用相同属性名作为映射。
 
@@ -451,128 +453,127 @@ EEE MMM dd HH:mm:ss Z yyyy
 在 model->json 的过程中：如果一个属性对应了多个 json key (key path)，那么转换过程仅会处理第一个 json key (key path)；如果多个属性对应了同一个 json key，则转换过过程会使用其中任意一个不为空的值。
 
 ### Model 包含其他 Model
+```objc
+// JSON
+{
+    "author":{
+        "name":"J.K.Rowling",
+        "birthday":"1965-07-31T00:00:00+0000"
+    },
+    "name":"Harry Potter",
+    "pages":256
+}
 
-	// JSON
-	{
-	    "author":{
-	        "name":"J.K.Rowling",
-	        "birthday":"1965-07-31T00:00:00+0000"
-	    },
-	    "name":"Harry Potter",
-	    "pages":256
-	}
-
-	// Model: 什么都不用做，转换会自动完成
-	@interface Author : NSObject
-	@property NSString *name;
-	@property NSDate *birthday;
-	@end
-	@implementation Author
-	@end
+// Model: 什么都不用做，转换会自动完成
+@interface Author : NSObject
+@property NSString *name;
+@property NSDate *birthday;
+@end
+@implementation Author
+@end
 	
-	@interface Book : NSObject
-	@property NSString *name;
-	@property NSUInteger pages;
-	@property Author *author; //Book 包含 Author 属性
-	@end
-	@implementation Book
-	@end
-	
-	
+@interface Book : NSObject
+@property NSString *name;
+@property NSUInteger pages;
+@property Author *author; //Book 包含 Author 属性
+@end
+@implementation Book
+@end
+```	
 
 ### 容器类属性
+```objc
+@class Shadow, Border, Attachment;
 
-	@class Shadow, Border, Attachment;
+@interface Attributes
+@property NSString *name;
+@property NSArray *shadows; //Array<Shadow>
+@property NSSet *borders; //Set<Border>
+@property NSMutableDictionary *attachments; //Dict<NSString,Attachment>
+@end
 
-	@interface Attributes
-	@property NSString *name;
-	@property NSArray *shadows; //Array<Shadow>
-	@property NSSet *borders; //Set<Border>
-	@property NSMutableDictionary *attachments; //Dict<NSString,Attachment>
-	@end
-
-	@implementation Attributes
-	// 返回容器类中的所需要存放的数据类型 (以 Class 或 Class Name 的形式)。
-	+ (NSDictionary *)modelContainerPropertyGenericClass {
-	    return @{@"shadows" : [Shadow class],
-	             @"borders" : Border.class,
-	             @"attachments" : @"Attachment" };
-	}
-	@end
-
-
-
+@implementation Attributes
+// 返回容器类中的所需要存放的数据类型 (以 Class 或 Class Name 的形式)。
++ (NSDictionary *)modelContainerPropertyGenericClass {
+    return @{@"shadows" : [Shadow class],
+             @"borders" : Border.class,
+             @"attachments" : @"Attachment" };
+}
+@end
+```
 
 ### 黑名单与白名单
-
-	@interface User
-	@property NSString *name;
-	@property NSUInteger age;
-	@end
+```objc
+@interface User
+@property NSString *name;
+@property NSUInteger age;
+@end
 	
-	@implementation Attributes
-	// 如果实现了该方法，则处理过程中会忽略该列表内的所有属性
-	+ (NSArray *)modelPropertyBlacklist {
-	    return @[@"test1", @"test2"];
-	}
-	// 如果实现了该方法，则处理过程中不会处理该列表外的属性。
-	+ (NSArray *)modelPropertyWhitelist {
-	    return @[@"name"];
-	}
-	@end
+@implementation Attributes
+// 如果实现了该方法，则处理过程中会忽略该列表内的所有属性
++ (NSArray *)modelPropertyBlacklist {
+    return @[@"test1", @"test2"];
+}
+// 如果实现了该方法，则处理过程中不会处理该列表外的属性。
++ (NSArray *)modelPropertyWhitelist {
+    return @[@"name"];
+}
+@end
+```
 
 ### 数据校验与自定义转换
+```objc	
+// JSON:
+{
+	"name":"Harry",
+	"timestamp" : 1445534567
+}
 	
-	// JSON:
-	{
-		"name":"Harry",
-		"timestamp" : 1445534567
-	}
-	
-	// Model:
-	@interface User
-	@property NSString *name;
-	@property NSDate *createdAt;
-	@end
+// Model:
+@interface User
+@property NSString *name;
+@property NSDate *createdAt;
+@end
 
-	@implementation User
-	// 当 JSON 转为 Model 完成后，该方法会被调用。
-	// 你可以在这里对数据进行校验，如果校验不通过，可以返回 NO，则该 Model 会被忽略。
-	// 你也可以在这里做一些自动转换不能完成的工作。
-	- (BOOL)modelCustomTransformFromDictionary:(NSDictionary *)dic {
-	    NSNumber *timestamp = dic[@"timestamp"];
-	    if (![timestamp isKindOfClass:[NSNumber class]]) return NO;
-	    _createdAt = [NSDate dateWithTimeIntervalSince1970:timestamp.floatValue];
-	    return YES;
-	}
+@implementation User
+// 当 JSON 转为 Model 完成后，该方法会被调用。
+// 你可以在这里对数据进行校验，如果校验不通过，可以返回 NO，则该 Model 会被忽略。
+// 你也可以在这里做一些自动转换不能完成的工作。
+- (BOOL)modelCustomTransformFromDictionary:(NSDictionary *)dic {
+    NSNumber *timestamp = dic[@"timestamp"];
+    if (![timestamp isKindOfClass:[NSNumber class]]) return NO;
+    _createdAt = [NSDate dateWithTimeIntervalSince1970:timestamp.floatValue];
+    return YES;
+}
 	
-	// 当 Model 转为 JSON 完成后，该方法会被调用。
-	// 你可以在这里对数据进行校验，如果校验不通过，可以返回 NO，则该 Model 会被忽略。
-	// 你也可以在这里做一些自动转换不能完成的工作。
-	- (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic {
-	    if (!_createdAt) return NO;
-	    dic[@"timestamp"] = @(n.timeIntervalSince1970);
-	    return YES;
-	}
-	@end
+// 当 Model 转为 JSON 完成后，该方法会被调用。
+// 你可以在这里对数据进行校验，如果校验不通过，可以返回 NO，则该 Model 会被忽略。
+// 你也可以在这里做一些自动转换不能完成的工作。
+- (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic {
+    if (!_createdAt) return NO;
+    dic[@"timestamp"] = @(n.timeIntervalSince1970);
+    return YES;
+}
+@end
+```
 
 ### Coding/Copying/hash/equal/description
+```objc
+@interface YYShadow :NSObject <NSCoding, NSCopying>
+@property (nonatomic, copy) NSString *name;
+@property (nonatomic, assign) CGSize size;
+@end
 
-	@interface YYShadow :NSObject <NSCoding, NSCopying>
-	@property (nonatomic, copy) NSString *name;
-	@property (nonatomic, assign) CGSize size;
-	@end
-
-	@implementation YYShadow
-	// 直接添加以下代码即可自动完成
-	- (void)encodeWithCoder:(NSCoder *)aCoder { [self yy_modelEncodeWithCoder:aCoder]; }
-	- (id)initWithCoder:(NSCoder *)aDecoder { self = [super init]; return [self yy_modelInitWithCoder:aDecoder]; }
-	- (id)copyWithZone:(NSZone *)zone { return [self yy_modelCopy]; }
-	- (NSUInteger)hash { return [self yy_modelHash]; }
-	- (BOOL)isEqual:(id)object { return [self yy_modelIsEqual:object]; }
-	- (NSString *)description { return [self yy_modelDescription]; }
-	@end
-
+@implementation YYShadow
+// 直接添加以下代码即可自动完成
+- (void)encodeWithCoder:(NSCoder *)aCoder { [self yy_modelEncodeWithCoder:aCoder]; }
+- (id)initWithCoder:(NSCoder *)aDecoder { self = [super init]; return [self yy_modelInitWithCoder:aDecoder]; }
+- (id)copyWithZone:(NSZone *)zone { return [self yy_modelCopy]; }
+- (NSUInteger)hash { return [self yy_modelHash]; }
+- (BOOL)isEqual:(id)object { return [self yy_modelIsEqual:object]; }
+- (NSString *)description { return [self yy_modelDescription]; }
+@end
+```
 
 安装
 ==============
@@ -605,7 +606,7 @@ EEE MMM dd HH:mm:ss Z yyyy
 
 系统要求
 ==============
-该项目最低支持 `iOS 6.0` 和 `Xcode 7.0`。
+该项目最低支持 `iOS 6.0` 和 `Xcode 8.0`。
 
 
 许可证
