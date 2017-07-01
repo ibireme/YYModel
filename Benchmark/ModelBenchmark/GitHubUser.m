@@ -118,7 +118,6 @@ SET_NUM(_following, @"following");
 
 
 
-
 @implementation YYGHUser
 + (NSDictionary *)modelCustomPropertyMapper {
     return @{
@@ -142,6 +141,7 @@ SET_NUM(_following, @"following");
         @"updatedAt" : @"updated_at",
     };
 }
+
 - (void)encodeWithCoder:(NSCoder *)aCoder { [self yy_modelEncodeWithCoder:aCoder]; }
 - (id)initWithCoder:(NSCoder *)aDecoder { return [self yy_modelInitWithCoder:aDecoder]; }
 @end

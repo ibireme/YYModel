@@ -76,42 +76,29 @@ static force_inline BOOL YYEncodingTypeIsCNumber(YYEncodingType type) {
 }
 
 /// Parse a number value from 'id'.
+#pragma mark - _YYAdd
 static force_inline NSNumber *YYNSNumberCreateFromID(__unsafe_unretained id value) {
     static NSCharacterSet *dot;
     static NSDictionary *dic;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         dot = [NSCharacterSet characterSetWithRange:NSMakeRange('.', 1)];
-        dic = @{@"TRUE" :   @(YES),
-                @"True" :   @(YES),
-                @"true" :   @(YES),
-                @"FALSE" :  @(NO),
-                @"False" :  @(NO),
-                @"false" :  @(NO),
-                @"YES" :    @(YES),
-                @"Yes" :    @(YES),
-                @"yes" :    @(YES),
-                @"NO" :     @(NO),
-                @"No" :     @(NO),
-                @"no" :     @(NO),
-                @"NIL" :    (id)kCFNull,
-                @"Nil" :    (id)kCFNull,
-                @"nil" :    (id)kCFNull,
-                @"NULL" :   (id)kCFNull,
-                @"Null" :   (id)kCFNull,
-                @"null" :   (id)kCFNull,
-                @"(NULL)" : (id)kCFNull,
-                @"(Null)" : (id)kCFNull,
-                @"(null)" : (id)kCFNull,
-                @"<NULL>" : (id)kCFNull,
-                @"<Null>" : (id)kCFNull,
-                @"<null>" : (id)kCFNull};
+        dic = @{@"true"  :   @(YES),
+                @"false" :   @(NO),
+                @"yes"   :   @(YES),
+                @"no"    :   @(NO),
+                @"y"     :   @(YES),
+                @"n"     :   @(NO),
+                @"nil"   :   (id)kCFNull,
+                @"null"  :   (id)kCFNull,
+                @"(null)" :  (id)kCFNull,
+                @"<null>" :  (id)kCFNull};
     });
     
     if (!value || value == (id)kCFNull) return nil;
     if ([value isKindOfClass:[NSNumber class]]) return value;
     if ([value isKindOfClass:[NSString class]]) {
-        NSNumber *num = dic[value];
+        NSNumber *num = dic[((NSString *)value).lowercaseString];
         if (num) {
             if (num == (id)kCFNull) return nil;
             return num;
@@ -282,16 +269,25 @@ static force_inline NSDateFormatter *YYISODateFormatter() {
 
 /// Get the value with key paths from dictionary
 /// The dic should be NSDictionary, and the keyPath should not be nil.
+#pragma mark - _YYAdd
 static force_inline id YYValueForKeyPath(__unsafe_unretained NSDictionary *dic, __unsafe_unretained NSArray *keyPaths) {
     id value = nil;
-    for (NSUInteger i = 0, max = keyPaths.count; i < max; i++) {
-        value = dic[keyPaths[i]];
-        if (i + 1 < max) {
-            if ([value isKindOfClass:[NSDictionary class]]) {
-                dic = value;
-            } else {
-                return nil;
-            }
+    for (NSString *keyPath in keyPaths) {
+        NSUInteger left = [keyPath rangeOfString:@"["].location;
+        if (left != NSNotFound) {
+            NSString *sub = [keyPath substringToIndex:left];
+            if (![value isKindOfClass:[NSDictionary class]]) return nil;
+            value = value[sub];
+            if (![value isKindOfClass:[NSArray class]]) return nil;
+            NSUInteger right = [keyPath rangeOfString:@"]"].location;
+            if (right == NSNotFound) return nil;
+            NSString *idxStr = [keyPath substringWithRange:(NSRange){left + 1, right - left - 1}];
+            if (!idxStr.length) return nil;
+            NSInteger idx = idxStr.integerValue;
+            value = (NSArray *)value[idx];
+        } else {
+            if (value && ![value isKindOfClass:[NSDictionary class]]) return nil;
+            value = value ? value[keyPath] : dic[keyPath];
         }
     }
     return value;
@@ -600,6 +596,36 @@ static force_inline id YYValueForMultiKeys(__unsafe_unretained NSDictionary *dic
                 propertyMeta->_next = mapper[mappedToKey] ?: nil;
                 mapper[mappedToKey] = propertyMeta;
             }
+        }];
+    }
+    
+#pragma mark - _YYAdd
+    if ([cls respondsToSelector:@selector(mapperToKeyFromPropertyName:)]) {
+        [allPropertyMetas enumerateKeysAndObjectsUsingBlock:^(NSString *name, _YYModelPropertyMeta *propertyMeta, BOOL *stop) {
+            NSString *mappedToKey = [(id <YYModel>)cls mapperToKeyFromPropertyName:name];
+            if (![mappedToKey isKindOfClass:[NSString class]]) return;
+            if (mappedToKey.length == 0) return;
+            if (!propertyMeta) return;
+            [allPropertyMetas removeObjectForKey:name];
+            propertyMeta->_mappedToKey = mappedToKey;
+            
+            NSArray *keyPath = [mappedToKey componentsSeparatedByString:@"."];
+            for (NSString *onePath in keyPath) {
+                if (onePath.length == 0) {
+                    NSMutableArray *tmp = keyPath.mutableCopy;
+                    [tmp removeObject:@""];
+                    keyPath = tmp;
+                    break;
+                }
+            }
+            
+            if (keyPath.count > 1) {
+                propertyMeta->_mappedToKeyPath = keyPath;
+                [keyPathPropertyMetas addObject:propertyMeta];
+            }
+            
+            propertyMeta->_next = mapper[mappedToKey] ?: nil;
+            mapper[mappedToKey] = propertyMeta;
         }];
     }
     
@@ -1158,6 +1184,7 @@ static void ModelSetWithPropertyMetaArrayFunction(const void *_propertyMeta, voi
  @param model Model, can be nil.
  @return JSON object, nil if an error occurs.
  */
+#pragma mark - _YYAdd
 static id ModelToJSONObjectRecursive(NSObject *model) {
     if (!model || model == (id)kCFNull) return model;
     if ([model isKindOfClass:[NSString class]]) return model;
@@ -1240,30 +1267,67 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
         }
         if (!value) return;
         
+#pragma mark - _YYAdd
         if (propertyMeta->_mappedToKeyPath) {
             NSMutableDictionary *superDic = dic;
             NSMutableDictionary *subDic = nil;
+            NSMutableArray *superArr = nil;
+            NSMutableArray *subArr = nil;
+            BOOL contains = NO;
             for (NSUInteger i = 0, max = propertyMeta->_mappedToKeyPath.count; i < max; i++) {
                 NSString *key = propertyMeta->_mappedToKeyPath[i];
-                if (i + 1 == max) { // end
-                    if (!superDic[key]) superDic[key] = value;
-                    break;
-                }
                 
-                subDic = superDic[key];
-                if (subDic) {
-                    if ([subDic isKindOfClass:[NSDictionary class]]) {
-                        subDic = subDic.mutableCopy;
-                        superDic[key] = subDic;
+                NSRange left = [key rangeOfString:@"["];
+                if (left.location != NSNotFound) {
+                    NSString *sub = [key substringToIndex:left.location];
+                    subDic = superDic[sub];
+                    if (subDic) {
+                        
                     } else {
-                        break;
+                        subDic = [NSMutableDictionary dictionary];
+                        subArr = [NSMutableArray new];
+                        superDic[sub] = subArr;
+                        if (superArr && contains) [superArr addObject:superDic];
                     }
+                    NSInteger start = left.location + left.length;
+                    NSRange right = [key rangeOfString:@"]"];
+                    if (right.location == NSNotFound) {
+                        NSLog(@"the mapper of keypath %@ which class is %@ error", key, propertyMeta->_cls);
+                    } else {
+                        contains = YES;
+                        NSString *countStr = [key substringWithRange:(NSRange){start, right.location - start}];
+                        if (countStr.length == 0) {
+                            NSLog(@"the mapper of keypath %@ which class is %@ error", key, propertyMeta->_cls);
+                        } else {
+                            NSInteger count = countStr.integerValue;
+                            for (NSInteger i = 0; i < count; i++)
+                                [subArr addObject:[NSNull null]];
+                        }
+                    }
+                    
+                    superDic = subDic;
+                    superArr = subArr;
+                    subDic = nil;
+                    subArr = nil;
+                    if (i + 1 == max) if (superArr) [superArr addObject:value];
                 } else {
-                    subDic = [NSMutableDictionary new];
-                    superDic[key] = subDic;
+                    subDic = superDic[key];
+                    if (subDic) {
+                        
+                    } else {
+                        if (i + 1 == max) {
+                            superDic[key] = value;
+                            if (superArr && contains) [superArr addObject:superDic];
+                        } else {
+                            subDic = [NSMutableDictionary new];
+                            superDic[key] = subDic;
+                            if (superArr && contains) [superArr addObject:superDic];
+                        }
+                    }
+                    contains = NO;
+                    superDic = subDic;
+                    subDic = nil;
                 }
-                superDic = subDic;
-                subDic = nil;
             }
         } else {
             if (!dic[propertyMeta->_mappedToKey]) {
@@ -1834,6 +1898,29 @@ static NSString *ModelDescription(NSObject *model) {
         if (obj) result[key] = obj;
     }
     return result;
+}
+
+@end
+
+
+@implementation NSObject (YYAdd)
+
++ (NSArray *)yy_modelArrayWithKeyValuesArray:(id)json {
+    return [NSArray yy_modelArrayWithClass:[self class] json:json];
+}
+
++ (NSDictionary *)yy_modelDictionaryWithJSON:(id)json {
+    return [NSDictionary yy_modelDictionaryWithClass:[self class] json:json];
+}
+
++ (NSArray *)yy_modelArrayWithFilename:(NSString *)filename {
+    if (!filename.length) return nil;
+    return [self yy_modelArrayWithFile:[[NSBundle mainBundle] pathForResource:filename ofType:nil]];
+}
+
++ (NSArray *)yy_modelArrayWithFile:(NSString *)file {
+    if (!file.length) return nil;
+    return [self yy_modelArrayWithKeyValuesArray:[NSArray arrayWithContentsOfFile:file]];
 }
 
 @end
