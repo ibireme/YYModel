@@ -616,5 +616,5 @@ YYModel 使用 MIT 许可证，详情见 LICENSE 文件。
 相关链接
 ==============
 
-[iOS JSON 模型转换库评测](http://blog.ibireme.com/2015/10/23/ios_model_framework_benchmark/)
+[iOS JSON 模型转换库评测](https://blog.ibireme.com/2015/10/23/ios_model_framework_benchmark/)
 
