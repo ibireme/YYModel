@@ -112,7 +112,7 @@ static force_inline NSNumber *YYNSNumberCreateFromID(__unsafe_unretained id valu
     if ([value isKindOfClass:[NSNumber class]]) return value;
     if ([value isKindOfClass:[NSString class]]) {
         NSNumber *num = dic[value];
-        if (num) {
+        if (num != nil) {
             if (num == (id)kCFNull) return nil;
             return num;
         }
@@ -787,7 +787,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
     if (meta->_isCNumber) {
         NSNumber *num = YYNSNumberCreateFromID(value);
         ModelSetNumberToProperty(model, num, meta);
-        if (num) [num class]; // hold the number
+        if (num != nil) [num class]; // hold the number
     } else if (meta->_nsType) {
         if (value == (id)kCFNull) {
             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, (id)nil);
@@ -1643,7 +1643,7 @@ static NSString *ModelDescription(NSObject *model) {
         
         if (propertyMeta->_isCNumber) {
             NSNumber *value = ModelCreateNumberFromProperty(self, propertyMeta);
-            if (value) [aCoder encodeObject:value forKey:propertyMeta->_name];
+            if (value != nil) [aCoder encodeObject:value forKey:propertyMeta->_name];
         } else {
             switch (propertyMeta->_type & YYEncodingTypeMask) {
                 case YYEncodingTypeObject: {
