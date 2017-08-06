@@ -15,16 +15,8 @@
 #import "MTWeiboModel.h"
 #import "JSWeiboModel.h"
 #import "MJWeiboModel.h"
-//#import "ModelBenchmark-Swift.h"
+#import "ModelBenchmark-Swift.h"
 
-/*
- Benchmark: (update to 2016-01-15)
- YYModel: https://github.com/ibireme/YYKit
- Mantle: https://github.com/Mantle/Mantle
- JSONModel: https://github.com/icanzilb/JSONModel
- FastEasyMapping: https://github.com/Yalantis/FastEasyMapping
- MJExtension: https://github.com/CoderMJLee/MJExtension
- */
 @implementation ViewController
 
 - (void)viewDidLoad {
@@ -44,13 +36,10 @@
 
 - (void)benchmarkGithubUser {
     
-    /// Benchmark swift .. too slow...
-    /// [GithubUserBenchmark benchmark];
-    
     
     printf("----------------------\n");
     printf("Benchmark (10000 times):\n");
-    printf("GHUser          from json    to json    archive\n");
+    printf("GHUser             from json    to json    archive\n");
 
     /// get json data
     NSString *path = [[NSBundle mainBundle] pathForResource:@"user" ofType:@"json"];
@@ -93,6 +82,35 @@
     }
     [holder removeAllObjects];
     
+    
+    
+    /*------------------- JSON Serialization -------------------*/
+    {
+        [holder removeAllObjects];
+        begin = CACurrentMediaTime();
+        @autoreleasepool {
+            for (int i = 0; i < count; i++) {
+                NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                [holder addObject:json];
+            }
+        }
+        end = CACurrentMediaTime();
+        printf("JSON(*):            %8.2f   ", (end - begin) * 1000);
+        
+        [holder removeAllObjects];
+        begin = CACurrentMediaTime();
+        @autoreleasepool {
+            for (int i = 0; i < count; i++) {
+                NSData *data = [NSJSONSerialization dataWithJSONObject:json options:kNilOptions error:nil];
+                [holder addObject:json];
+            }
+        }
+        end = CACurrentMediaTime();
+        printf("%8.2f   \n", (end - begin) * 1000);
+    }
+    
+    
+    
     /*------------------- Manually -------------------*/
     {
         [holder removeAllObjects];
@@ -104,7 +122,7 @@
             }
         }
         end = CACurrentMediaTime();
-        printf("Manually:        %8.2f   ", (end - begin) * 1000);
+        printf("Manually(#):        %8.2f   ", (end - begin) * 1000);
         
         
         GHUser *user = [[GHUser alloc] initWithJSONDictionary:json];
@@ -151,7 +169,7 @@
             }
         }
         end = CACurrentMediaTime();
-        printf("YYModel:         %8.2f   ", (end - begin) * 1000);
+        printf("YYModel(#):         %8.2f   ", (end - begin) * 1000);
         
         
         YYGHUser *user = [YYGHUser yy_modelWithJSON:json];
@@ -200,7 +218,7 @@
             }
         }
         end = CACurrentMediaTime();
-        printf("FastEasyMapping: %8.2f   ", (end - begin) * 1000);
+        printf("FastEasyMapping(#): %8.2f   ", (end - begin) * 1000);
         
         
         FEGHUser *user = [FEGHUser new];
@@ -230,19 +248,20 @@
 
     /*------------------- JSONModel -------------------*/
     {
+        NSError *jsErr = nil;
         [holder removeAllObjects];
         begin = CACurrentMediaTime();
         @autoreleasepool {
             for (int i = 0; i < count; i++) {
-                JSGHUser *user = [[JSGHUser alloc] initWithDictionary:json error:nil];
+                JSGHUser *user = [[JSGHUser alloc] initWithDictionary:json error:&jsErr];
                 [user class];
             }
         }
         end = CACurrentMediaTime();
-        printf("JSONModel:       %8.2f   ", (end - begin) * 1000);
+        printf("JSONModel(#):       %8.2f   ", (end - begin) * 1000);
         
         
-        JSGHUser *user = [[JSGHUser alloc] initWithDictionary:json error:nil];
+        JSGHUser *user = [[JSGHUser alloc] initWithDictionary:json error:&jsErr];
         if (user.userID == 0) NSLog(@"error!");
         if (!user.login) NSLog(@"error!");
         if (!user.htmlURL) NSLog(@"error");
@@ -285,7 +304,7 @@
             }
         }
         end = CACurrentMediaTime();
-        printf("Mantle:          %8.2f   ", (end - begin) * 1000);
+        printf("Mantle(#):          %8.2f   ", (end - begin) * 1000);
         
         
         MTGHUser *user = [adapter modelFromJSONDictionary:json error:nil];
@@ -332,7 +351,7 @@
             }
         }
         end = CACurrentMediaTime();
-        printf("MJExtension:     %8.2f   ", (end - begin) * 1000);
+        printf("MJExtension(#):     %8.2f   ", (end - begin) * 1000);
         
         
         MJGHUser *user = [MJGHUser mj_objectWithKeyValues:json];
@@ -366,6 +385,14 @@
         end = CACurrentMediaTime();
         printf("%8.2f\n", (end - begin) * 1000);
     }
+    
+    
+    
+    
+    /// Benchmark swift
+    [GithubUserBenchmark benchmark];
+    
+    
     
     printf("----------------------\n");
     printf("\n");
@@ -817,7 +844,8 @@
         
         @try {
             // JSONModel
-            JSGHUser *jsUser = [[JSGHUser alloc] initWithDictionary:json error:nil];
+            NSError *err = nil;
+            JSGHUser *jsUser = [[JSGHUser alloc] initWithDictionary:json error:&err];
             logError(@"JSONModel:      ", jsUser);
         }
         @catch (NSException *exception) {

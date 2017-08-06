@@ -1,0 +1,27 @@
+platform :ios, '8.0'
+use_frameworks!
+
+target 'ModelBenchmark' do
+
+# Objective-C
+pod 'FastEasyMapping'
+pod 'JSONModel'
+pod 'Mantle'
+pod 'MJExtension'
+pod 'YYModel'
+
+# Swift
+pod 'Argo'
+pod 'Gloss'
+pod 'HandyJSON'
+pod 'ObjectMapper'
+pod 'SwiftyJSON'
+
+# Generator
+# https://github.com/Ahmed-Ali/JSONExport
+# https://github.com/nixzhu/Coolie
+# https://github.com/johnlui/JSONNeverDie
+
+end
+
+

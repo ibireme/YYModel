@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0800"
+   LastUpgradeVersion = "0830"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D9D41A061BD0FABE00CD8EBF"
+               BlueprintIdentifier = "D927FA7D1F36EB6C007B972E"
                BuildableName = "YYModel.framework"
                BlueprintName = "YYModel"
                ReferencedContainer = "container:YYModel.xcodeproj">
@@ -33,7 +33,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ABA06CA61C08514D00AD2108"
+               BlueprintIdentifier = "D927FA861F36EB6C007B972E"
                BuildableName = "YYModelTests.xctest"
                BlueprintName = "YYModelTests"
                ReferencedContainer = "container:YYModel.xcodeproj">
@@ -43,7 +43,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D9D41A061BD0FABE00CD8EBF"
+            BlueprintIdentifier = "D927FA7D1F36EB6C007B972E"
             BuildableName = "YYModel.framework"
             BlueprintName = "YYModel"
             ReferencedContainer = "container:YYModel.xcodeproj">
@@ -65,7 +65,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D9D41A061BD0FABE00CD8EBF"
+            BlueprintIdentifier = "D927FA7D1F36EB6C007B972E"
             BuildableName = "YYModel.framework"
             BlueprintName = "YYModel"
             ReferencedContainer = "container:YYModel.xcodeproj">
@@ -83,7 +83,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D9D41A061BD0FABE00CD8EBF"
+            BlueprintIdentifier = "D927FA7D1F36EB6C007B972E"
             BuildableName = "YYModel.framework"
             BlueprintName = "YYModel"
             ReferencedContainer = "container:YYModel.xcodeproj">

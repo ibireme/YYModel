@@ -1,9 +1,0 @@
-import Foundation
-import QuartzCore
-
-@objc class GithubUserBenchmark : NSObject {
-    static func benchmark() {
-        
-        GithubUserObjectMapper.benchmark()
-    }
-}
