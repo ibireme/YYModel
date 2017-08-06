@@ -116,7 +116,6 @@
 		D97394F71F36EE2D00FC2DEB /* YYModelTests */ = {
 			isa = PBXGroup;
 			children = (
-				D97394F81F36EE2D00FC2DEB /* Info.plist */,
 				D97394F91F36EE2D00FC2DEB /* YYTestAutoTypeConvert.m */,
 				D97394FA1F36EE2D00FC2DEB /* YYTestBlacklistWhitelist.m */,
 				D97394FB1F36EE2D00FC2DEB /* YYTestClassInfo.m */,
@@ -129,6 +128,7 @@
 				D97395021F36EE2D00FC2DEB /* YYTestModelMapper.m */,
 				D97395031F36EE2D00FC2DEB /* YYTestModelToJSON.m */,
 				D97395041F36EE2D00FC2DEB /* YYTestNestModel.m */,
+				D97394F81F36EE2D00FC2DEB /* Info.plist */,
 			);
 			name = YYModelTests;
 			path = ../YYModelTests;
