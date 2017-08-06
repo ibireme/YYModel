@@ -8,6 +8,7 @@ before_install:
 - xcodebuild -version
 - xcodebuild -showsdks
 - xcpretty --version
+- xcrun instruments -w 'iPhone 7' || sleep 15
 
 script:
 - set -o pipefail
