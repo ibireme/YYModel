@@ -104,7 +104,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- Creates and returns a new instance of the receiver from an array containing key-value dictionary, automatic parsing multiple array.
+ Creates and returns a new instance of the receiver from an array containing key-value dictionary, automatic parsing multiple array, if contain anything else element except dictionary, mothed will return a uninitialized instance.
 
  @param keyValueArray An array containing key-value dictionary mapped to the instance's properties.
  @return A new array containing instance.

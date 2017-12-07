@@ -1467,6 +1467,9 @@ static NSString *ModelDescription(NSObject *model) {
             NSMutableArray *array = [NSMutableArray array];
             [modelArray addObject:[self _yy_modelArrayWithRecurArray:obj modelArray:array]];
         } else {
+            if (![obj isKindOfClass:[NSDictionary class]]) {
+                obj = [NSDictionary dictionary];
+            }
             [modelArray addObject:[self yy_modelWithDictionary:obj]];
         }
     }];
