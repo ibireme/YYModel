@@ -1454,6 +1454,25 @@ static NSString *ModelDescription(NSObject *model) {
     return [self yy_modelWithDictionary:dic];
 }
 
++ (NSMutableArray *)yy_modelArrayWithKeyValueArray:(NSArray *)keyValueArray {
+    if (!keyValueArray || keyValueArray == (id)kCFNull) return nil;
+    if (![keyValueArray isKindOfClass:[NSArray class]]) return nil;
+    NSMutableArray *modelArray = [NSMutableArray array];
+    return [self _yy_modelArrayWithRecurArray:keyValueArray modelArray:modelArray];;
+}
+
++ (NSMutableArray *)_yy_modelArrayWithRecurArray:(NSArray *)array modelArray:(NSMutableArray *)modelArray {
+    [array enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isKindOfClass:[NSArray class]]) {
+            NSMutableArray *array = [NSMutableArray array];
+            [modelArray addObject:[self _yy_modelArrayWithRecurArray:obj modelArray:array]];
+        } else {
+            [modelArray addObject:[self yy_modelWithDictionary:obj]];
+        }
+    }];
+    return modelArray;
+}
+
 + (instancetype)yy_modelWithDictionary:(NSDictionary *)dictionary {
     if (!dictionary || dictionary == (id)kCFNull) return nil;
     if (![dictionary isKindOfClass:[NSDictionary class]]) return nil;
