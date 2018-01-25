@@ -432,7 +432,7 @@
     XCTAssertTrue([array.firstObject isKindOfClass:[YYTestAutoTypeModel class]]);
 
 
-    json = @"[[[{\"v\":1},{\"v\":2},{\"v\":[[{\"v\":1},{\"v\":2},{\"v\":3}]]}]]]";
+    json = @"[[[{\"v\":1},{\"v\":2},{\"v\":3}]]]";
     NSArray<NSArray<NSArray *> *> *mutiArray = [NSArray yy_modelArrayWithClass:YYTestAutoTypeModel.class json:json];
     XCTAssertTrue(mutiArray.count == 1);
     XCTAssertTrue([mutiArray.firstObject.firstObject.firstObject isKindOfClass:[YYTestAutoTypeModel class]]);
