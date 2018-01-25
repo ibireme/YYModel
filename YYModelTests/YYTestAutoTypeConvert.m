@@ -430,6 +430,20 @@
     array = [NSArray yy_modelArrayWithClass:YYTestAutoTypeModel.class json:[YYTestHelper jsonObjectFromString:json]];
     XCTAssertTrue(array.count == 3);
     XCTAssertTrue([array.firstObject isKindOfClass:[YYTestAutoTypeModel class]]);
+
+
+    json = @"[[[{\"v\":1},{\"v\":2},{\"v\":3}]]]";
+    NSArray<NSArray<NSArray *> *> *mutiArray = [NSArray yy_modelArrayWithClass:YYTestAutoTypeModel.class json:json];
+    XCTAssertTrue(mutiArray.count == 1);
+    XCTAssertTrue([mutiArray.firstObject.firstObject.firstObject isKindOfClass:[YYTestAutoTypeModel class]]);
+    
+    mutiArray = [NSArray yy_modelArrayWithClass:YYTestAutoTypeModel.class json:[YYTestHelper jsonDataFromString:json]];
+    XCTAssertTrue(mutiArray.count == 1);
+    XCTAssertTrue([mutiArray.firstObject.firstObject.firstObject isKindOfClass:[YYTestAutoTypeModel class]]);
+    
+    mutiArray = [NSArray yy_modelArrayWithClass:YYTestAutoTypeModel.class json:[YYTestHelper jsonObjectFromString:json]];
+    XCTAssertTrue(mutiArray.count == 1);
+    XCTAssertTrue([mutiArray.firstObject.firstObject.firstObject isKindOfClass:[YYTestAutoTypeModel class]]);
     
     
     json = @"{\"a\":{\"v\":1},\"b\":{\"v\":2},\"c\":{\"v\":3}}";

@@ -98,6 +98,9 @@
     XCTAssert([model.users[0] isMemberOfClass:[YYBaseUser class]]);
     XCTAssert([model.users[1] isMemberOfClass:[YYLocalUser class]]);
     XCTAssert([model.users[2] isMemberOfClass:[YYRemoteUser class]]);
+
+    model = [YYTestCustomClassModel yy_modelWithJSON:@{@"users" : @[@[jsonUserBase]]}];
+    XCTAssert([((NSArray *)(model.users[0]))[0] isMemberOfClass:[YYBaseUser class]]);
     
     model = [YYTestCustomClassModel yy_modelWithJSON:@{@"userDict" : @{@"a" : jsonUserBase, @"b" : jsonUserLocal, @"c" : jsonUserRemote}}];
     XCTAssert([model.userDict[@"a"] isKindOfClass:[YYBaseUser class]]);
