@@ -1205,6 +1205,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     if ([model isKindOfClass:[NSAttributedString class]]) return ((NSAttributedString *)model).string;
     if ([model isKindOfClass:[NSDate class]]) return [YYISODateFormatter() stringFromDate:(id)model];
     if ([model isKindOfClass:[NSData class]]) return nil;
+    if ([model isKindOfClass:[NSValue class]]) return model;
     
     
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:[model class]];
