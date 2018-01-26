@@ -321,9 +321,9 @@ NS_ASSUME_NONNULL_BEGIN
  
         @interface YYAttributes
         @property NSString *name;
-        @property NSArray *shadows;
-        @property NSSet *borders;
-        @property NSDictionary *attachments;
+        @property NSArray <YYShadow *> *shadows;
+        @property NSSet <YYBorder *> *borders;
+        @property NSDictionary <NSString *, YYAttachment *> *attachments;
         @end
  
         @implementation YYAttributes
