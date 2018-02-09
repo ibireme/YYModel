@@ -1750,7 +1750,6 @@ static NSString *ModelDescription(NSObject *model) {
     if (![model isMemberOfClass:self.class]) return NO;
     _YYModelMeta *modelMeta = [_YYModelMeta metaWithClass:self.class];
     if (modelMeta->_nsType) return [self isEqual:model];
-    if ([self hash] != [model hash]) return NO;
     
     for (_YYModelPropertyMeta *propertyMeta in modelMeta->_allPropertyMetas) {
         if (!propertyMeta->_isKVCCompatible) continue;
