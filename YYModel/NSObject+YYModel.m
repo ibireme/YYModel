@@ -1563,7 +1563,7 @@ static NSString *ModelDescription(NSObject *model) {
                 } break;
                 case YYEncodingTypeInt8:
                 case YYEncodingTypeUInt8: {
-                    uint8_t num = ((bool (*)(id, SEL))(void *) objc_msgSend)((id)self, propertyMeta->_getter);
+                    uint8_t num = ((uint8_t (*)(id, SEL))(void *) objc_msgSend)((id)self, propertyMeta->_getter);
                     ((void (*)(id, SEL, uint8_t))(void *) objc_msgSend)((id)one, propertyMeta->_setter, num);
                 } break;
                 case YYEncodingTypeInt16:
