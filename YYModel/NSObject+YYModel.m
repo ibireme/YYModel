@@ -915,9 +915,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 } else if (meta->_genericCls == [NSNumber class]) {
                                     [objectArr addObject:YYNSNumberCreateFromID(one)];
                                 } else if (meta->_genericCls == [NSURL class]) {
-                                    if ([one isKindOfClass:[NSURL class]]) {
-                                        [objectArr addObject:[NSURL URLWithString:one]];
-                                    } else if ([one isKindOfClass:[NSString class]]) {
+                                    if ([one isKindOfClass:[NSString class]]) {
                                         NSCharacterSet *set = [NSCharacterSet whitespaceAndNewlineCharacterSet];
                                         NSString *str = [one stringByTrimmingCharactersInSet:set];
                                         if (str.length == 0) {
