@@ -90,8 +90,8 @@
     NSDictionary *jsonUserBase = @{@"uid" : @123, @"name" : @"Harry"};
     NSDictionary *jsonUserLocal = @{@"uid" : @123, @"name" : @"Harry", @"localName" : @"HarryLocal"};
     NSDictionary *jsonUserRemote = @{@"uid" : @123, @"name" : @"Harry", @"remoteName" : @"HarryRemote"};
-    NSArray *jsonImageURLs = @[@"http://aaa.com", @"http://bbb.com"];
-    NSArray *jsonPhones = @[@13000000001, @13000000002, @13000000003];
+    NSArray *jsonImageURLs = @[@"http://aaa.com", @"http://bbb.com", @""];
+    NSArray *jsonPhones = @[@13000000001, @13000000002, @"13000000003"];
     NSArray *jsonScores = @[@"90", @"80", @"70"];
     
     user = [YYBaseUser yy_modelWithDictionary:jsonUserBase];

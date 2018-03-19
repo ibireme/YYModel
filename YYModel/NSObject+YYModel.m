@@ -918,8 +918,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                     if ([one isKindOfClass:[NSString class]]) {
                                         NSCharacterSet *set = [NSCharacterSet whitespaceAndNewlineCharacterSet];
                                         NSString *str = [one stringByTrimmingCharactersInSet:set];
-                                        if (str.length == 0) {
-                                        } else {
+                                        if (str.length > 0) {
                                             [objectArr addObject:[[NSURL alloc] initWithString:str]];
                                         }
                                     }
