@@ -47,6 +47,11 @@
 @property (nonatomic, strong) NSDictionary *userDict;
 @property (nonatomic, strong) NSSet *userSet;
 @property (nonatomic, strong) YYBaseUser *user;
+@property (nonatomic, strong) NSArray<NSURL *> *imageURLs;
+@property (nonatomic, strong) NSArray<NSString *> *phones;
+@property (nonatomic, strong) NSArray<NSMutableString *> *editPhones;
+@property (nonatomic, strong) NSArray<NSNumber *> *scores;
+
 @end
 
 @implementation YYTestCustomClassModel
@@ -54,7 +59,12 @@
 + (NSDictionary *)modelContainerPropertyGenericClass {
     return @{@"users" : YYBaseUser.class,
              @"userDict" : YYBaseUser.class,
-             @"userSet" : YYBaseUser.class};
+             @"userSet" : YYBaseUser.class,
+             @"imageURLs" : NSURL.class,
+             @"phones" : NSString.class,
+             @"editPhones" : NSMutableString.class,
+             @"scores" : NSNumber.class,
+             };
 }
 + (Class)modelCustomClassForDictionary:(NSDictionary*)dictionary {
     if (dictionary[@"localName"]) {
@@ -80,6 +90,9 @@
     NSDictionary *jsonUserBase = @{@"uid" : @123, @"name" : @"Harry"};
     NSDictionary *jsonUserLocal = @{@"uid" : @123, @"name" : @"Harry", @"localName" : @"HarryLocal"};
     NSDictionary *jsonUserRemote = @{@"uid" : @123, @"name" : @"Harry", @"remoteName" : @"HarryRemote"};
+    NSArray *jsonImageURLs = @[@"http://aaa.com", @"http://bbb.com", @""];
+    NSArray *jsonPhones = @[@13000000001, @13000000002, @"13000000003"];
+    NSArray *jsonScores = @[@"90", @"80", @"70"];
     
     user = [YYBaseUser yy_modelWithDictionary:jsonUserBase];
     XCTAssert([user isMemberOfClass:[YYBaseUser class]]);
@@ -90,6 +103,20 @@
     user = [YYBaseUser yy_modelWithDictionary:jsonUserRemote];
     XCTAssert([user isMemberOfClass:[YYRemoteUser class]]);
     
+    model = [YYTestCustomClassModel yy_modelWithJSON:@{@"imageURLs" : jsonImageURLs}];
+    XCTAssert([model.imageURLs[0] isMemberOfClass:[NSURL class]]);
+    
+    model = [YYTestCustomClassModel yy_modelWithJSON:@{@"phones" : jsonPhones}];
+    XCTAssert([model.phones[0] isKindOfClass:[NSString class]]);
+
+    model = [YYTestCustomClassModel yy_modelWithJSON:@{@"editPhones" : jsonPhones}];
+    //__NSCFConstantString->__NSCFString->NSMutableString->NSString
+    //model.editPhones[2]不是 NSMutableString，使用 `appendString:` 会导致 crash
+    XCTAssert([model.editPhones[2] isKindOfClass:[NSMutableString class]]);
+
+    model = [YYTestCustomClassModel yy_modelWithJSON:@{@"scores" : jsonScores}];
+    XCTAssert([model.scores[0] isKindOfClass:[NSNumber class]]);
+
     
     model = [YYTestCustomClassModel yy_modelWithJSON:@{@"user" : jsonUserLocal}];
     XCTAssert([model.user isMemberOfClass:[YYLocalUser class]]);
