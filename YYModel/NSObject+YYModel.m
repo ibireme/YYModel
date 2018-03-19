@@ -902,25 +902,17 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             for (id one in valueArr) {
                                 if ([one isKindOfClass:meta->_genericCls]) {
                                     [objectArr addObject:one];
-                                } else if (meta->_genericCls == [NSString class]) {
-                                    if ([one isKindOfClass:[NSNumber class]]) {
-                                        [objectArr addObject:((NSNumber *)one).stringValue];
-                                    }
-                                } else if (meta->_genericCls == [NSMutableString class]) {
-                                    if ([one isKindOfClass:[NSString class]]) {
-                                        [objectArr addObject:((NSString *)one).mutableCopy];
-                                    } else if ([one isKindOfClass:[NSNumber class]]) {
-                                        [objectArr addObject:((NSNumber *)one).stringValue.mutableCopy];
-                                    }
+                                } else if (meta->_genericCls == [NSString class] && [one isKindOfClass:[NSNumber class]]) {
+                                    [objectArr addObject:((NSNumber *)one).stringValue];
+                                } else if (meta->_genericCls == [NSMutableString class] && [one isKindOfClass:[NSNumber class]]) {
+                                    [objectArr addObject:((NSNumber *)one).stringValue.mutableCopy];
                                 } else if (meta->_genericCls == [NSNumber class]) {
                                     [objectArr addObject:YYNSNumberCreateFromID(one)];
-                                } else if (meta->_genericCls == [NSURL class]) {
-                                    if ([one isKindOfClass:[NSString class]]) {
-                                        NSCharacterSet *set = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-                                        NSString *str = [one stringByTrimmingCharactersInSet:set];
-                                        if (str.length > 0) {
-                                            [objectArr addObject:[[NSURL alloc] initWithString:str]];
-                                        }
+                                } else if (meta->_genericCls == [NSURL class] && [one isKindOfClass:[NSString class]]) {
+                                    NSCharacterSet *set = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+                                    NSString *str = [one stringByTrimmingCharactersInSet:set];
+                                    if (str.length > 0) {
+                                        [objectArr addObject:[[NSURL alloc] initWithString:str]];
                                     }
                                 } else if ([one isKindOfClass:[NSDictionary class]]) {
                                     Class cls = meta->_genericCls;

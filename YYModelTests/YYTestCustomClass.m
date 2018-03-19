@@ -110,7 +110,9 @@
     XCTAssert([model.phones[0] isKindOfClass:[NSString class]]);
 
     model = [YYTestCustomClassModel yy_modelWithJSON:@{@"editPhones" : jsonPhones}];
-    XCTAssert([model.editPhones[0] isKindOfClass:[NSMutableString class]]);
+    //__NSCFConstantString->__NSCFString->NSMutableString->NSString
+    //model.editPhones[2]不是 NSMutableString，使用 `appendString:` 会导致 crash
+    XCTAssert([model.editPhones[2] isKindOfClass:[NSMutableString class]]);
 
     model = [YYTestCustomClassModel yy_modelWithJSON:@{@"scores" : jsonScores}];
     XCTAssert([model.scores[0] isKindOfClass:[NSNumber class]]);
