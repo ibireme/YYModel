@@ -1701,7 +1701,7 @@ static NSString *ModelDescription(NSObject *model) {
             YYEncodingType type = propertyMeta->_type & YYEncodingTypeMask;
             switch (type) {
                 case YYEncodingTypeObject: {
-                    id value = [aDecoder decodeObjectForKey:propertyMeta->_name];
+                    id value = [aDecoder decodeObjectOfClass:propertyMeta->_cls forKey:propertyMeta->_name];
                     ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)self, propertyMeta->_setter, value);
                 } break;
                 case YYEncodingTypeSEL: {
