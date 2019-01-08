@@ -63,6 +63,7 @@ typedef NS_OPTIONS(NSUInteger, YYEncodingType) {
     YYEncodingTypePropertyDynamic      = 1 << 23, ///< @dynamic
 };
 
+
 /**
  Get the type from a Type-Encoding string.
  
