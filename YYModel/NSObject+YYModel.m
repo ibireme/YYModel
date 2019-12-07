@@ -1160,7 +1160,8 @@ static void ModelSetWithPropertyMetaArrayFunction(const void *_propertyMeta, voi
  */
 static id ModelToJSONObjectRecursive(NSObject *model) {
     if (!model || model == (id)kCFNull) return model;
-    if ([model isKindOfClass:[NSString class]]) return model;
+    if ([model isKindOfClass:[NSString class]])
+        return [((NSString *)model) dataUsingEncoding:NSUTF8StringEncoding];
     if ([model isKindOfClass:[NSNumber class]]) return model;
     if ([model isKindOfClass:[NSDictionary class]]) {
         if ([NSJSONSerialization isValidJSONObject:model]) return model;
