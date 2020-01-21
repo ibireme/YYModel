@@ -347,7 +347,12 @@ YYEncodingType YYEncodingGetType(const char *typeEncoding) {
         info = [[YYClassInfo alloc] initWithClass:cls];
         if (info) {
             dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
-            CFDictionarySetValue(info.isMeta ? metaCache : classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
+             YYClassInfo *rinfo = CFDictionaryGetValue(class_isMetaClass(cls) ? metaCache : classCache, (__bridge const void *)(cls));
+            if (!rinfo) {
+                CFDictionarySetValue(info.isMeta ? metaCache : classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
+            } else {
+                info = rinfo;
+            }
             dispatch_semaphore_signal(lock);
         }
     }
