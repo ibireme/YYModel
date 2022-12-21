@@ -32,7 +32,7 @@
 @property long double longDoubleValue;
 @property (strong) Class classValue;
 @property SEL selectorValue;
-@property (copy) void (^blockValue)();
+@property (copy) void (^blockValue)(void);
 @property void *pointerValue;
 @property CGRect structValue;
 @property CGPoint pointValue;
