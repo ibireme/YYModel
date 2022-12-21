@@ -45,7 +45,7 @@ typedef struct my_union {
 @property long double longDoubleValue;
 @property (strong) Class classValue;
 @property SEL selectorValue;
-@property (copy) void (^blockValue)();
+@property (copy) void (^blockValue)(void);
 @property void *pointerValue;
 @property char *cString;
 @property CFArrayRef cfArrayValue;

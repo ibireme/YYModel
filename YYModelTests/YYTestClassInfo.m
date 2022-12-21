@@ -35,7 +35,7 @@ typedef union yy_union{ char a; int b;} yy_union;
 @property (strong) NSArray *arrayValue;
 @property (strong) Class classValue;
 @property SEL selectorValue;
-@property (copy) void (^blockValue)();
+@property (copy) void (^blockValue)(void);
 @property void *pointerValue;
 @property CFArrayEqualCallBack functionPointerValue;
 @property CGRect structValue;
